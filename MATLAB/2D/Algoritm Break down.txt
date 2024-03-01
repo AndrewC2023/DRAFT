@@ -1,0 +1,23 @@
+This is the break down of RRT* from the MIT Paper because im dumb and need to write this all down
+	But I think I can remove the steer function (for now), May be useful for a future dynamics model of the robot (would be AWESOME)
+
+
+i want a goal region of start +- 0.5 and same for end
+
+to initialze:
+	Create start and end, with the end being a region
+	Have an obstacle map (or make one for simulation)
+
+
+
+
+
+
+Current Ideas:
+	Punish obstacle proximity
+	add a hueristic manhattan distance score for next node picking?
+
+
+Future Potential:
+	Store a heading value for each node
+	Have a dynamics model assist in node generation
