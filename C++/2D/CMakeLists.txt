@@ -1,0 +1,3 @@
+add_subdirectory(Planners)
+add_subdirectory(Validators)
+add_subdirectory(Tests)
