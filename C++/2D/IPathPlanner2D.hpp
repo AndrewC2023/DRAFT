@@ -2,6 +2,8 @@
 // STL
 #include <deque>
 #include <functional>
+#include <iostream>
+
 // Eigen
 #include <Eigen/Dense>
 
