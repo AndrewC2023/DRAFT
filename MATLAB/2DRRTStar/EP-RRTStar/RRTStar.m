@@ -85,7 +85,7 @@ classdef RRTStar
 
                             if CheckArea < 1.05*Tree.SamplingRestrictionRegionAreas(i)
                                 NodeGenerated = 1;
-                                
+                                sampledNode = sampledNodePoint;
                                 break
                                 
                             end

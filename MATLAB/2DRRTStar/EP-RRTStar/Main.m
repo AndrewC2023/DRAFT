@@ -34,13 +34,8 @@ while iteration <= Constraints.MaxIterations
         Temp.nearPoint = RRTStarTree.nodes(Temp.nearPoint,:);
 
         % steer Function
-        if RRTStarTree.SamplingRestrictionCheck ~= 1
-            [Temp.newPointCheck,newPointIndexPosition] = steer(Grid,Temp.nearPoint,Temp.newPoint,Constraints.MaxEdgeLength/Grid.Resolution);
-        else
-            Temp.newPointCheck = 1;
-            newPointIndexPosition = Temp.newPoint;
-        end
-        
+        [Temp.newPointCheck,newPointIndexPosition] = steer(Grid,Temp.nearPoint,Temp.newPoint,Constraints.MaxEdgeLength/Grid.Resolution);
+      
     end
     
     newPoint = Grid.getPoint(newPointIndexPosition);
@@ -121,7 +116,6 @@ fprintf("The Final path is: \nIndex: \t X: \t Y: \n")
 for i = 1:Temp.PathSize
     fprintf("%i   \t(%4.3f \t, %4.3f) \n",RRTStarTree.Path(i),RRTStarTree.nodes(RRTStarTree.Path(i),1),RRTStarTree.nodes(RRTStarTree.Path(i),2))
 end
-clear i iteration regenerateCount
 figure(2)
     RRTStarTree = RRTStarTree.PlotTree(Grid);
     RRTStarTree = RRTStarTree.PlotPath(Grid);
