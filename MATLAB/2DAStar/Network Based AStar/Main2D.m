@@ -5,7 +5,7 @@ close;
 % need to import an image of the rooms that are chosen
 ImageImportRooms
 Node.Count = 1;
-% Generate the nodes more easily based off the image
+% Generate the nodes more easily based off the image (for testing purposes, the main loop of the function just needs some network to be fed)
 for i = 1:MAP.Size(1)
 for j = 1:MAP.Size(2)
     if MAP.im(i,j,2) < 20 && MAP.im(i,j,3) > 150
