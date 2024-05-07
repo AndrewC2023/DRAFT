@@ -205,7 +205,6 @@ figure(2)
 Node.Connections = [
                     1,6;
                     1,7;
-
                     3,5;
                     3,9;
                     4,12;
