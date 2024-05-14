@@ -4,7 +4,7 @@
 #include <cmath>
 
 // Eigen
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 // base class
 #include "IPathPlanner3D.hpp"
@@ -19,6 +19,6 @@ namespace algorithms::ThreeD::Planners
     class AStarGridPlanner
     {
         public:
-            std::vector<
+            std::vector<>
     }
 }
