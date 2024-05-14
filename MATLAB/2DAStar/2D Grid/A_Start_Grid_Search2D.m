@@ -1,8 +1,8 @@
-% Initial draft of Djikstra's algorithm
-% September 2023
 % Andrew Campbell
 
-% This is the main script
+% the Following script is the main scrpict for an A* search algorithm resricted to a 2D grid
+% the obstacle generator script simply populates an Obstacle_MAP variable, but any script or 
+% configuration could populate this grid and the script would work
 
 %% Needed Changes and Notes
     % Need to only pass the G score through for each node and then 
@@ -12,6 +12,8 @@ clear;
 close all;
 Waypoint.Start = [2,2];
 Waypoint.End = [30,45];
+
+% populate the occupancy grid
 Obstacle_Generator2D;
 
 tic
@@ -22,8 +24,7 @@ MAP_Size = size(Obstacle_MAP);
 Temp.Max_Distance = MAP_Size(1)*MAP_Size(2)*sqrt(2);
 
 %% A* Loop
-% Define Waypoint.Start and Waypoint.End Points
-
+% Define out Waypoints
  
 Visualization = Visualization_Processes2D;
 Visualization.Start = Waypoint.Start;
@@ -33,8 +34,14 @@ if Waypoint.Start(1) == Waypoint.End(1) && Waypoint.Start(2) == Waypoint.End(2)
     error('no path to find')
 end
 
-Obstacle_MAP(Waypoint.Start(1),Waypoint.Start(2)) = 0; % Waypoint.Start
-Obstacle_MAP(Waypoint.End(1),Waypoint.End(2)) = 0; % Waypoint.End
+% For the sake of demonstration, (and the face that the main implementation of occupancy grid 
+% generation is random for demo purposes) make sure our start and goal are clear
+Obstacle_MAP(Waypoint.Start(1),Waypoint.Start(2)) = 0;
+Obstacle_MAP(Waypoint.End(1),Waypoint.End(2)) = 0; 
+
+% Visited indicates if the node has been a parent node in the search loop yet, 
+% if a node has been visited it can be proven that we have found the path to that node, 
+% and all of its neighbors have been checked to see if it should be their parent
 Visited = zeros(MAP_Size(1),MAP_Size(2));
 Parent_Node = zeros(MAP_Size(1),MAP_Size(2),2);
 Hueristic_MAP = Visited;
@@ -48,7 +55,7 @@ G_Score_MAP = Cost_MAP;
 
 % Loop initialization
 CP = Waypoint.Start;
-% in an assumed grid space this is all the adjacent points
+% in an assumed grid space this is all the adjacent points, this predefined array simplifies computation
 adj2D = [ 1, 0;
          -1, 0;
           1, 1;
@@ -60,6 +67,7 @@ adj2D = [ 1, 0;
 Temp.Neighbor_Num = size(adj2D);
 % Check condition will be if the final node has been visited or not
 iteration = 1;
+% run the look until we have visited the end point
 while Visited(Waypoint.End(1),Waypoint.End(2)) ~=  1
 
     % Run a check for each neighbor
@@ -83,7 +91,7 @@ while Visited(Waypoint.End(1),Waypoint.End(2)) ~=  1
     Visited(CP(1),CP(2)) = 1;
 
     %% Visualization Tools for path growth.
-    % These can be uncommented to show the grwoth of the path
+    % These can be uncommented to show the growth of the path
 %     Figure_num = 2;
 %     Cost_Map_Visualization(Visualization,G_Score_MAP,MAP_Size,Visited,Figure_num);
 %     Path_Visualization(Visualization,CP,Parent_Node,Figure_num);

@@ -1,4 +1,6 @@
-
+% This is a very basic script to poulate a 3D network for the algorithm to search through
+% it is not very clean as everything is hardcoded, btu in matlab and for development purposes
+% it servves its purpose, in C++ this would be loaded from a config
 
 
 

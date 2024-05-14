@@ -1,6 +1,6 @@
 classdef RRTStar
     %RRTSTAR Class containing the Tree of the search domain and methods to operate on it
-    %   Detailed explanation goes here
+    %   Class contains helper fucntions for RRT* however the main script still does the bulk of the calculation loop
     
     properties
         nodes = [];
