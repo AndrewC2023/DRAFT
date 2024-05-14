@@ -121,7 +121,7 @@ a = size(Path.Nodes);
 for i = 1:(a(2)-1)
     figure(1)
     p2 = plot3([Node.Points(Path.Nodes(i),1),Node.Points(Path.Nodes(i + 1),1)],[Node.Points(Path.Nodes(i),2),Node.Points(Path.Nodes(i + 1),2)],[Node.Points(Path.Nodes(i),3),Node.Points(Path.Nodes(i + 1),3)],'g','LineWidth',2);
-    legend([p1,p2],'Tree','Path')
+    legend([p1,p2],'Network','Path')
 
     hold on
 end
