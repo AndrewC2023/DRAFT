@@ -3,20 +3,13 @@ clear;
 close;
 
 % need to import an image of the rooms that are chosen
-ImageImportRooms
-Node.Count = 1;
-% Generate the nodes more easily based off the image
-for i = 1:MAP.Size(1)
-for j = 1:MAP.Size(2)
-    if MAP.im(i,j,2) < 20 && MAP.im(i,j,3) > 150
-    Node.Points(Node.Count,:) = [j,i];
-    Node.Count = Node.Count + 1;
-    end
-end
-end
-Node.Count = Node.Count - 1;
+TestCreateNetwork;
+Node.Count = Node.Points.size(1);
+% Generate the nodes more easily based off the image (for testing purposes, the main loop of the function just needs some network to be fed)
+
+% Plot the configuration space
 figure(1)
-    scatter(Node.Points(:,1),Node.Points(:,2),Node.Points(:,3))
+    scatter3(Node.Points(:,1),Node.Points(:,2),Node.Points(:,3))
     hold on
     xlabel('x')
     ylabel('y')
@@ -24,16 +17,13 @@ figure(1)
 
 a = size(Node.Connections);
 for i = 1:a(1)
-figure(1)
-    p1 = plot([Node.Points(Node.Connections(i,1),1),Node.Points(Node.Connections(i,2),1)],[Node.Points(Node.Connections(i,1),2),Node.Points(Node.Connections(i,2),2)],'b');
-        
-
-    hold on
+    figure(1)
+        p1 = plot([Node.Points(Node.Connections(i,1),1),Node.Points(Node.Connections(i,2),1)], ...
+        [Node.Points(Node.Connections(i,1),2),Node.Points(Node.Connections(i,2),2)], ...
+        [Node.Points(Node.Connections(i,1),3),Node.Points(Node.Connections(i,2),3)],'b');
+        hold on
 end
 clear i a
-
-Node.Start = 28;
-Node.End = 1;
 
 figure(1)
     scatter([Node.Points(Node.Start,1),Node.Points(Node.End,1)],[Node.Points(Node.Start,2),Node.Points(Node.End,2)],'green','filled')
@@ -136,3 +126,6 @@ for i = 1:(a(2)-1)
 end
 hold off
 clear a 
+%% Genearate a blockage
+
+
