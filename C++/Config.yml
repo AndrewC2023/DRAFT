@@ -2,15 +2,17 @@
 Grid:
   cellSize:
   # the folling are test rooms that could be loaded for planners to use and be tesed with, listed with preloaded obstacles in the space
+  # units are in meters ALWAYS
+  # obstacles are boxes, a center point, length(x), width(y), height(z), and roll, pitch, yaw in rads: [x,y,z ,l,w,h ,r,p,y]
   TestSpaces:
     Room1:
-      xMin:
-      xMax:
-      yMin:
-      yMax:
-      zMin:
-      zMax:
-      obstacle1:
+      xMin: 0.0
+      xMax: 2.0
+      yMin: 0.0
+      yMax: 2.0
+      zMin: -1.0
+      zMax: 1.0
+      obstacle1: 
       obstacle2:
       obstacle3:
       obstacle4:
@@ -47,3 +49,13 @@ Grid:
       obstacle2:
       obstacle3:
       obstacle4:
+
+Planners:
+  RRTStar:
+    maxEdgeLength:
+  EP_RRTStar:
+  LQR_RRTStar:
+  CL_RRTStar:
+  RRTSharp:
+  RH_ELQR:
+  AStar:
