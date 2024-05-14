@@ -4,7 +4,7 @@ close;
 
 % need to import an image of the rooms that are chosen
 TestCreateNetwork;
-Node.Count = Node.Points.size(1);
+[Node.Count,~] = size(Node.Points);
 % Generate the nodes more easily based off the image (for testing purposes, the main loop of the function just needs some network to be fed)
 
 % Plot the configuration space
@@ -18,7 +18,7 @@ figure(1)
 a = size(Node.Connections);
 for i = 1:a(1)
     figure(1)
-        p1 = plot([Node.Points(Node.Connections(i,1),1),Node.Points(Node.Connections(i,2),1)], ...
+        p1 = plot3([Node.Points(Node.Connections(i,1),1),Node.Points(Node.Connections(i,2),1)], ...
         [Node.Points(Node.Connections(i,1),2),Node.Points(Node.Connections(i,2),2)], ...
         [Node.Points(Node.Connections(i,1),3),Node.Points(Node.Connections(i,2),3)],'b');
         hold on
@@ -26,13 +26,13 @@ end
 clear i a
 
 figure(1)
-    scatter([Node.Points(Node.Start,1),Node.Points(Node.End,1)],[Node.Points(Node.Start,2),Node.Points(Node.End,2)],'green','filled')
+    scatter3([Node.Points(Node.Start,1),Node.Points(Node.End,1)],[Node.Points(Node.Start,2),Node.Points(Node.End,2)],[Node.Points(Node.Start,3),Node.Points(Node.End,3)],'green','filled')
 hold on
 
 % Assign all the costs
-Node.G_Scores = MAP.Size(1)*MAP.Size(2)*ones(Node.Count,1);
-Node.H_Scores = zeros(Node.Count,1);
-Node.Costs = MAP.Size(1)*MAP.Size(2)*ones(Node.Count,1);
+Node.G_Scores = 100000*ones(Node.Count,1); % initialize all G scores (true costs) as extremely high so they arte overwritten on at lease the first pass
+Node.H_Scores = zeros(Node.Count,1); 
+Node.Costs = Node.G_Scores;
 Node.Visited = zeros(Node.Count,1);
 Node.Parent = zeros(Node.Count,1);
 Node.Parent(Node.Start) = Node.Start;
@@ -41,6 +41,7 @@ Node.G_Scores(Node.Current) = 0;
 % the following is the A Star Algorithm, may want to set it up such that we can call the scrpit on its own
 
 while Node.Visited(Node.End) ~= 1
+
     [a,b] = find(Node.Connections == Node.Current);
     [numNeighbors,~] = size(a);
     Node.EdgeIndex = [a,b];
@@ -119,7 +120,7 @@ clear Temp i
 a = size(Path.Nodes);
 for i = 1:(a(2)-1)
     figure(1)
-    p2 = plot([Node.Points(Path.Nodes(i),1),Node.Points(Path.Nodes(i + 1),1)],[Node.Points(Path.Nodes(i),2),Node.Points(Path.Nodes(i + 1),2)],'g','LineWidth',2);
+    p2 = plot3([Node.Points(Path.Nodes(i),1),Node.Points(Path.Nodes(i + 1),1)],[Node.Points(Path.Nodes(i),2),Node.Points(Path.Nodes(i + 1),2)],[Node.Points(Path.Nodes(i),3),Node.Points(Path.Nodes(i + 1),3)],'g','LineWidth',2);
     legend([p1,p2],'Tree','Path')
 
     hold on
