@@ -1,4 +1,4 @@
-% Initial draft of Djikstra's algorithm
+
 % September 2023
 % Andrew Campbell
 

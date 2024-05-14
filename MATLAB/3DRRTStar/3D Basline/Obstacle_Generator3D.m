@@ -70,13 +70,14 @@ for k = 1:z
         end
         % Use this oppourtunity to make sure the starts and ends are clear
         dist2start = sqrt((Start(1) - i)^2 + (Start(2) - j)^2 + (Start(3) - k)^2);
+        if dist2start < 3
+            Obstacle_MAP(i,j,k) = 0;
+        end
 
     end
 end
 end
 end
-
-
 
 % debug the class
 % Obstacle_MAP = zeros(h,w,z);
