@@ -1,6 +1,6 @@
-classdef Visualization_Processes3D
+classdef Visualization
     %VISUALIZATION Summary of this class goes here
-    %   Detailed explanation goes here
+    %   Unused
     
     properties
         Obstacle_Points
@@ -49,15 +49,22 @@ classdef Visualization_Processes3D
         end
         
         function Obstacle_Visualization(VP3D,MAP_Sizes,Figure_Num)
-            figure(Figure_Num)
-                faces = fill3(VP3D.Obstacle_Points(:,:,1),VP3D.Obstacle_Points(:,:,2),VP3D.Obstacle_Points(:,:,3),ones(1,VP3D.Number_of_Faces - 1));
-                for i = 1:(VP3D.Number_of_Faces - 1)
-                  faces(i).FaceAlpha = VP3D.Shades(i);
-                end
-                colormap('gray')            
-                axis([0, MAP_Sizes(1) + 1, 0, MAP_Sizes(2) + 1, 0, MAP_Sizes(3) + 1])
-                colorbar
+            fast = 1;
+            if fast == 0
+                figure(Figure_Num)
+                    faces = fill3(VP3D.Obstacle_Points(:,:,1),VP3D.Obstacle_Points(:,:,2),VP3D.Obstacle_Points(:,:,3),ones(1,VP3D.Number_of_Faces - 1));
+                    for i = 1:(VP3D.Number_of_Faces - 1)
+                        faces(i).FaceAlpha = VP3D.Shades(i);
+                    end
+                    colormap('gray')            
+                    axis([0, MAP_Sizes(1) + 1, 0, MAP_Sizes(2) + 1, 0, MAP_Sizes(3) + 1])
+                    colorbar
+                    hold on
+            else
+                figure(Figure_Num)
+                plot3(VP3D.Obstacle_Points(:,:,1),VP3D.Obstacle_Points(:,:,2),VP3D.Obstacle_Points(:,:,3),'Marker',"o",'Color',"black")
                 hold on
+            end
         end
         
         function Path_Visualization(VP3D,Path,Figure_Num)

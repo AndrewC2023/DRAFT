@@ -26,9 +26,9 @@ Temp.Max_Distance = MAP_Size(1)*MAP_Size(2)*sqrt(2);
 %% A* Loop
 % Define out Waypoints
  
-Visualization = Visualization_Processes2D;
-Visualization.Start = Waypoint.Start;
-Visualization.End = Waypoint.End;
+Visualize = Visualization;
+Visualize.Start = Waypoint.Start;
+Visualize.End = Waypoint.End;
 
 if Waypoint.Start(1) == Waypoint.End(1) && Waypoint.Start(2) == Waypoint.End(2)
     error('no path to find')
@@ -93,8 +93,8 @@ while Visited(Waypoint.End(1),Waypoint.End(2)) ~=  1
     %% Visualization Tools for path growth.
     % These can be uncommented to show the growth of the path
 %     Figure_num = 2;
-%     Cost_Map_Visualization(Visualization,G_Score_MAP,MAP_Size,Visited,Figure_num);
-%     Path_Visualization(Visualization,CP,Parent_Node,Figure_num);
+%     Cost_Map_Visualization(Visualize,G_Score_MAP,MAP_Size,Visited,Figure_num);
+%     Path_Visualization(Visualize,CP,Parent_Node,Figure_num);
 % 
 %     % gif creation
 %     if iteration == 1
@@ -155,8 +155,8 @@ clear i
 toc
 % Final Visualization Tools
 %     Figure_num = Figure_num + 1;
-        Cost_Map_Visualization(Visualization,G_Score_MAP,MAP_Size,Visited,3);
-        Path_Visualization(Visualization,Waypoint.End,Parent_Node,3);
+        Cost_Map_Visualization(Visualize,G_Score_MAP,MAP_Size,Visited,3);
+        Path_Visualization(Visualize,Waypoint.End,Parent_Node,3);
 figure(4)
     title('Obsacle Map')
     imagesc(-1*Obstacle_MAP)    

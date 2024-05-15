@@ -13,13 +13,8 @@ end
 end
 clear i j im IndexSize
 
-figure(1)
-    imagesc(-Occupancy)
-    colormap('gray')
-    hold on
-
 % Presentation Visualization Section:
-    figure(2)
+    figure(1)
         imagesc(-Occupancy)
         colormap('gray')
         hold on

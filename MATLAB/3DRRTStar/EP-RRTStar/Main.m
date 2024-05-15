@@ -6,19 +6,22 @@ close all;
 %% Initialize
 
 % Inputs 
-Maze;
+
 Constraints.MaxIterations = 3000;
 Constraints.MaxEdgeLength = 0.3; % meters
 Constraints.GridResolution = 0.05; % meters
 Constraints.EndTolerance = 0.05; % meters
-Start_End_Indexes = [10,10;
-                     85,75];
-
+Start_End_Indexes = [2,2,2;
+                     29,25,15];
+h = 30;
+w = 30;
+z = 30;
+Obstacle_Generator3D;
 % Construction
 Grid = Grid(Constraints.GridResolution,Occupancy');
 clear IndexSize Occupancy Constraints.GridResolution
 
-RRTStarTree = RRTStar(Grid.getPoint([Start_End_Indexes(1,:)]), ...
+RRTStarTree = RRTStarTree(Grid.getPoint([Start_End_Indexes(1,:)]), ...
     Grid.getPoint([Start_End_Indexes(2,:)]));
 clear Start_End_Indexes
 

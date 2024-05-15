@@ -1,6 +1,7 @@
 function [sucessful,newPoint] = steer(Grid,parentPoint,goalPoint,MaxEdgeLength)
 %STEER Summary of this function goes here
 %   Detailed explanation goes here
+% TODO: Fails to work once the sampling region has been made, fix this
 
     parentPoint = Grid.getIndex(parentPoint);
     goalPoint = Grid.getIndex(goalPoint);
@@ -9,6 +10,7 @@ function [sucessful,newPoint] = steer(Grid,parentPoint,goalPoint,MaxEdgeLength)
 
     dx = (goalPoint(1) - parentPoint(1));
     dy = (goalPoint(2) - parentPoint(2));
+    dz = (goalPoint(3) - parentPoint(3));
     r = dx/dy;
     theta = atan(r);
     

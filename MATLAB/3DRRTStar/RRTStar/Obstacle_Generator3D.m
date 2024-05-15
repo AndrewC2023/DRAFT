@@ -1,7 +1,6 @@
 %% Map Generation
 % This is for testing the algorithm of choice
 
-
 Obstacle_MAP = zeros(h,w,z);
 
 % initialize obstacle centers array
@@ -24,7 +23,7 @@ end
 end
 end
 
-% predefined option
+% Predefined option
 Predefined = 0;
 if Predefined == 1
     clear Obstacle_Centers
@@ -48,7 +47,7 @@ if Predefined == 1
     Obstacle_Centers(17,:) = [15,13,11];
     a = size(Obstacle_Centers);
     for i = 1:a(1)
-        Obstacle_MAP(Obstacle_Centers(i,1),Obstacle_Centers(i,2),Obstacle_Centers(i,3)) = 150;
+        Occupancy(Obstacle_Centers(i,1),Obstacle_Centers(i,2),Obstacle_Centers(i,3)) = 150;
     end
 end
 
@@ -66,20 +65,17 @@ for k = 1:z
     for q = 1:checks(1)
         dist2ob = sqrt((i - Obstacle_Centers(q,1))^2 + (j - Obstacle_Centers(q,2))^2 + (k - Obstacle_Centers(q,3))^2);
         if dist2ob < 1.9
-            Obstacle_MAP(i,j,k) = Obstacle_MAP(Obstacle_Centers(q,1),Obstacle_Centers(q,2),Obstacle_Centers(q,3));
+            Occupancy(i,j,k) = Occupancy(Obstacle_Centers(q,1),Obstacle_Centers(q,2),Obstacle_Centers(q,3));
         end
         % Use this oppourtunity to make sure the starts and ends are clear
-        dist2start = sqrt((Nodes.Start(1) - i)^2 + (Nodes.Start(2) - j)^2 + (Nodes.Start(3) - k)^2);
+        dist2start = sqrt((Start(1) - i)^2 + (Start(2) - j)^2 + (Start(3) - k)^2);
         if dist2start < 3
-            Obstacle_MAP(i,j,k) = 0;
+            Occupancy(i,j,k) = 0;
         end
-        dist2end = sqrt((Nodes.End(1) - i)^2 + (Nodes.End(2) - j)^2 + (Nodes.End(3) - k)^2);
-        if dist2end < 3
-            Obstacle_MAP(i,j,k) = 0;
-        end
+
     end
 end
 end
 end
 
-clear c i j h w z Obstacle_Centers k q numob cheks dist2ob Predefined dist2start dist2end
+clear c i j h w z Obstacle_Centers k q numob cheks dist2ob Predefined

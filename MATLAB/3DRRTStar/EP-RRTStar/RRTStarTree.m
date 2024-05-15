@@ -1,4 +1,4 @@
-classdef RRTStar
+classdef RRTStarTree
     %RRTSTAR Class containing the Tree of the search domain and methods to operate on it
     %   Detailed explanation goes here
     
@@ -26,7 +26,7 @@ classdef RRTStar
     end
     
     methods
-        function Tree = RRTStar(startNode,endNode)
+        function Tree = RRTStarTree(startNode,endNode)
             %RRTSTAR Construct an instance of this class
             %   Creates an object that contains the RRT* tree and the
             %   methods to manipulate it

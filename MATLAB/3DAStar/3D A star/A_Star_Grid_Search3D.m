@@ -4,8 +4,6 @@
 
 % This is the main script
 
-
-
 %% Needed Changes and Notes
     % Currently removing visualization, create standalone visualization functions
 
@@ -14,44 +12,43 @@ clear;
 close all;
 tic
 
-% Get values from the obstacle Generator
-Start = [2,2,2];
-End = [29,25,15];
+% set up the problem and generate some obstacles, or load predefined obstacles
+% Define Start and End Points
+Nodes.Start = [2,2,2];
+Nodes.End = [29,25,15];
 
+% configuration space dimensions
 h = 30;
 w = 30;
 z = 30;
 
 Obstacle_Generator3D;
-D = size(Obstacle_MAP);
-Max_D = D(1)*D(2)*D(3)*sqrt(2);
 
-Vis = Visualization_Processes3D;
-Vis.Start = Start;
-Vis.End = End;
-Vis = Obstacle_Point_Generation(Vis,Obstacle_MAP,D);
+Grid.Dimensions  = size(Obstacle_MAP);
+Grid.Occupancy = Obstacle_MAP;
+clear Obstacle_MAP
+Grid.Max_Distance = Grid.Dimensions(1)*Grid.Dimensions(2)*Grid.Dimensions(3)*sqrt(2);
+
 %% A* Loop
-% Define Start and End Points
 
-if Start(1) == End(1) && Start(2) == End(2) && Start(3) == End(3)
+% sanity check
+if Nodes.Start(1) == Nodes.End(1) && Nodes.Start(2) == Nodes.End(2) && Nodes.Start(3) == Nodes.End(3)
     error('no path to find')
 end
 
-Obstacle_MAP(Start(1),Start(2),Start(3)) = 0; % Start
-Obstacle_MAP(End(1),End(2),End(3)) = 0; % End
-Visited_Huh = zeros(D(1),D(2),D(3));
-Parent_Node = zeros(D(1),D(2),D(3),3);
+Visited = zeros(Grid.Dimensions(1),Grid.Dimensions(2),Grid.Dimensions(3));
+Nodes.Parent_Node = zeros(Grid.Dimensions(1),Grid.Dimensions(2),Grid.Dimensions(3),3);
     % this will give from which point is best to get to the current one 
     % using 1 through 8 with 1 being the right half x ax
     
 % For A* we need to pass the G score through and combine it with the H score
-Cost_MAP = ones(D(1),D(2),D(3))*Max_D; 
-Cost_MAP(Start(1),Start(2),Start(3)) = 0;
-G_Score_MAP = Cost_MAP;
+Nodes.Cost_MAP = ones(Grid.Dimensions(1),Grid.Dimensions(2),Grid.Dimensions(3))*Grid.Max_Distance; 
+Nodes.Cost_MAP(Nodes.Start(1),Nodes.Start(2),Nodes.Start(3)) = 0;
+Nodes.G_Scores = Nodes.Cost_MAP;
 
 % Loop initialization
-CP = Start;
-% in an assumed grid space this is all the adjacent points
+Current_Node = Nodes.Start;
+% in an assumed grid space this is all the adjacent points, it is messy but faster to predefone all these points
 adj3D = [ 1, 0, 0;
           0, 1, 0;
           0, 0, 1;
@@ -81,45 +78,49 @@ adj3D = [ 1, 0, 0;
 Neighbor_Num = size(adj3D);      
 % Check condition will be if the final node has been visited or not
 
-while Visited_Huh(End(1),End(2),End(3)) ~=  1
+while Visited(Nodes.End(1),Nodes.End(2),Nodes.End(3)) ~=  1
     for n = 1:Neighbor_Num(1)
-        Check_Point = CP + adj3D(n,:);
+        Neighbor_Node = Current_Node + adj3D(n,:);
         % Check if the point we are checking is within the array bounds
-        if Check_Point(1) == 0 || Check_Point(1) == (D(1) + 1) ...
-                || Check_Point(2) == 0 || Check_Point(2) == (D(2) + 1) ...
-                || Check_Point(3) == 0 || Check_Point(3) == (D(3) + 1)
+        if Neighbor_Node(1) == 0 || Neighbor_Node(1) == (Grid.Dimensions(1) + 1) ...
+                || Neighbor_Node(2) == 0 || Neighbor_Node(2) == (Grid.Dimensions(2) + 1) ...
+                || Neighbor_Node(3) == 0 || Neighbor_Node(3) == (Grid.Dimensions(3) + 1)
 
-            % Point to be Checked is outside Array Bounds
+            % Point to be Checked is outside Array Bounds, do nothing and continue
         else
-            [Cost,G] = Cost_Function3D(CP,Check_Point,...
-                G_Score_MAP(CP(1),CP(2),CP(3)),...
-                Obstacle_MAP(Check_Point(1),Check_Point(2),Check_Point(3)), End);
-            
-            if G_Score_MAP(Check_Point(1),Check_Point(2),Check_Point(3)) > G                    
-                Cost_MAP(Check_Point(1),Check_Point(2),Check_Point(3)) = Cost;
-                G_Score_MAP(Check_Point(1),Check_Point(2),Check_Point(3)) = G;
-                Parent_Node(Check_Point(1),Check_Point(2),Check_Point(3),:) = CP;
+            % check if the point can be given the current point as a parent
+            [Cost,G] = Cost_Function3D(Current_Node,Neighbor_Node,...
+                Nodes.G_Scores(Current_Node(1),Current_Node(2),Current_Node(3)),...
+                Grid.Occupancy(Neighbor_Node(1),Neighbor_Node(2),Neighbor_Node(3)), Nodes.End);
+
+            % compare costs
+            if Nodes.G_Scores(Neighbor_Node(1),Neighbor_Node(2),Neighbor_Node(3)) > G                    
+                Nodes.Cost_MAP(Neighbor_Node(1),Neighbor_Node(2),Neighbor_Node(3)) = Cost;
+                Nodes.G_Scores(Neighbor_Node(1),Neighbor_Node(2),Neighbor_Node(3)) = G;
+                Nodes.Parent_Node(Neighbor_Node(1),Neighbor_Node(2),Neighbor_Node(3),:) = Current_Node;
             end      
         end
     end   
     
-    Visited_Huh(CP(1),CP(2),CP(3)) = 1;
+    % Mark the current Node as visited, so that we no longer use it as a current node
+    Visited(Current_Node(1),Current_Node(2),Current_Node(3)) = 1;
     
-    Next_Point = Cost_MAP;
-    for i = 1:D(1)
-    for j = 1:D(2)   
-    for k = 1:D(3)
-        if Visited_Huh(i,j,k) == 1
-          Next_Point(i,j,k) = Max_D;
+    Next_Point = Nodes.Cost_MAP;
+    for i = 1:Grid.Dimensions(1)
+    for j = 1:Grid.Dimensions(2)   
+    for k = 1:Grid.Dimensions(3)
+        if Visited(i,j,k) == 1
+          Next_Point(i,j,k) = Grid.Max_Distance;
         end
     end
     end
     end
+
     n = 1;
     minC = min(Next_Point(:));
-    for i = 1:D(1)
-    for j = 1:D(2)   
-    for k = 1:D(3)
+    for i = 1:Grid.Dimensions(1)
+    for j = 1:Grid.Dimensions(2)   
+    for k = 1:Grid.Dimensions(3)
         if Next_Point(i,j,k) == minC
           Potential_Points(n,:) = [i,j,k];
           n = n + 1;
@@ -136,43 +137,36 @@ while Visited_Huh(End(1),End(2),End(3)) ~=  1
         next = 1;
     end
 
-    %% Visualization Tools for path growth.
- 
-%%
-    CP = Potential_Points(next,:);
+    Current_Node = Potential_Points(next,:);
 end
 clear r2 CCost MaxD i j r c
 hold off
 
 %% Path Generation
     % we work backwards with this method
-    CP = End;
+    Current_Node = Nodes.End;
     i = 1;
-while ((CP(1) ~= Start(1)) + (CP(2) ~= Start(2)) + (CP(3) ~= Start(3))) > 0
+while ((Current_Node(1) ~= Nodes.Start(1)) + (Current_Node(2) ~= Nodes.Start(2)) + (Current_Node(3) ~= Nodes.Start(3))) > 0
 %loop start
-    Path(i,:) = CP;
-    CP = Parent_Node(CP(1),CP(2),CP(3),:);
+    Path(i,:) = Current_Node;
+    Current_Node = Nodes.Parent_Node(Current_Node(1),Current_Node(2),Current_Node(3),:);
     i = i + 1;
 end
-    Path(i,:) = Start;
+    Path(i,:) = Nodes.Start;
 
 %%
 toc
-% Final Visualization Tools
-clear i j
-Vis_MAP = G_Score_MAP;
-for i = 1:D(1)
-for j = 1:D(2)
-for k = 1:D(3)
-    if Visited_Huh(i,j,k) == 0
-        Vis_MAP(i,j,k) = NaN;
-    end
-end
-end
-end
 
-Vis.Obstacle_Visualization(D,1);
+clear i j
+
+% Visualization Tools, not very optimized
+Vis = Visualization;
+Vis.Start = Nodes.Start;
+Vis.End = Nodes.End;
+Vis = Obstacle_Point_Generation(Vis,Grid.Occupancy,Grid.Dimensions);
+
+Vis.Obstacle_Visualization(Grid.Dimensions,1);
 Vis.Path_Visualization(Path,1);
 
 
-clear i j k adj3D checks Cost CP D G minC n Neighbor_Num next Next_Point ties
+clear i j k adj3D checks Cost Current_Node G minC n Neighbor_Num next Next_Point ties Potential_Points
