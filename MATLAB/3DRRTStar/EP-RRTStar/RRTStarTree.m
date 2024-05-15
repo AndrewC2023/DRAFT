@@ -59,7 +59,7 @@ classdef RRTStarTree
             while NodeGenerated ~=1
                 if Tree.SamplingRestrictionCheck == 1
                     % sample
-                    sampledNode = [rand*Grid.indexDimensions(1), rand*Grid.indexDimensions(2)];
+                    sampledNode = [rand*Grid.indexDimensions(1), rand*Grid.indexDimensions(2), rand*Grid.indexDimensions(3)];
                     % check if we're in an obstacle
                     if 1 ~= Grid.ContainsObstacle(sampledNode)
                         % region Check
@@ -104,7 +104,7 @@ classdef RRTStarTree
                         NodeGenerated = 1;
                     % sample
                     else
-                    sampledNode = [rand*Grid.indexDimensions(1), rand*Grid.indexDimensions(2)];
+                    sampledNode = [rand*Grid.indexDimensions(1), rand*Grid.indexDimensions(2), rand*Grid.indexDimensions(3)];
                     isEndNode = 0;
                     end
 
@@ -270,22 +270,25 @@ classdef RRTStarTree
         function Index = FindNearestNode(Tree,Node)
             ManhattanDistancesSqrd = zeros(Tree.numNodes,1);
             for i = 1:Tree.numNodes
-                ManhattanDistancesSqrd(i) = ((Node(1) - Tree.nodes(i,1))^2 + (Node(2) - Tree.nodes(i,2))^2);
+                ManhattanDistancesSqrd(i) = ((Node(1) - Tree.nodes(i,1))^2 + (Node(2) - Tree.nodes(i,2))^2 + (Node(3) - Tree.nodes(i,3))^2);
             end
             [~,Index] = min(ManhattanDistancesSqrd);
         end
         
         function Tree = PlotTree(Tree,Grid)
             for i = 1:Tree.numEdges
-                Tree.TreePlot = plot(Grid.getIndex([Tree.nodes(Tree.edges(i,1),1),Tree.nodes(Tree.edges(i,2),1)]),Grid.getIndex([Tree.nodes(Tree.edges(i,1),2),Tree.nodes(Tree.edges(i,2),2)]),'r');
+                index1 = Grid.getIndex(Tree.nodes(Tree.edges(i,1),:));
+                index2 = Grid.getIndex(Tree.nodes(Tree.edges(i,2),:));
+                Tree.TreePlot = plot3([index1(1), index2(1)],[index1(2), index2(2)],[index1(3), index2(3)],'r');
                 hold on
             end
         end
 
         function Tree = PlotPath(Tree,Grid)
             for i = 1:Tree.sizePath - 1
-                Tree.PathPlot = plot(Grid.getIndex([Tree.nodes(Tree.Path(i),1),Tree.nodes(Tree.Path(i + 1),1)]),Grid.getIndex([Tree.nodes(Tree.Path(i),2),Tree.nodes(Tree.Path(i + 1),2)])...
-                    ,'g',"LineWidth",2);
+                index1 = Grid.getIndex(Tree.nodes(Tree.Path(i),:));
+                index2 = Grid.getIndex(Tree.nodes(Tree.Path(i + 1),:));
+                Tree.PathPlot = plot3([index1(1), index2(1)],[index1(2), index2(2)],[index1(3), index2(3)],'g',"LineWidth",2);
                 hold on
             end
         end

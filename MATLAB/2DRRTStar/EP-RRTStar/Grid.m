@@ -62,7 +62,6 @@ classdef Grid
             xStep = increment*sin(theta);
             yStep = increment*cos(theta);
         
-            lastPoint = Index1;
             tempPoint = [Index1(1) + xStep, Index1(2) + yStep];
             
             if ((Index1(1) - Index2(1)) + (Index1(2) - Index2(2))) < 2*increment
@@ -83,7 +82,6 @@ classdef Grid
                     obstacleFree = 1;
                     exit = 1;
                 end
-                lastPoint = tempPoint;
                 tempPoint = [tempPoint(1) + xStep, tempPoint(2) + yStep];
             end
         end

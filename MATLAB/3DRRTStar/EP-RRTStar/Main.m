@@ -51,7 +51,7 @@ while iteration <= Constraints.MaxIterations
     count = 1;
     for i = 1:RRTStarTree.numNodes
             % TODO: Heavily optimize this step !!!!!!!!!!!!!!
-        if 1.1*Constraints.MaxEdgeLength > sqrt((RRTStarTree.nodes(i,1) - newPoint(1))^2 + (RRTStarTree.nodes(i,2) - newPoint(2))^2)
+        if 1.1*Constraints.MaxEdgeLength > sqrt((RRTStarTree.nodes(i,1) - newPoint(1))^2 + (RRTStarTree.nodes(i,2) - newPoint(2))^2 + (RRTStarTree.nodes(i,3) - newPoint(3))^2)
 
             % 1 means obstacle free
             if 1 == Grid.lineCollisionCheck(Grid.getIndex(RRTStarTree.nodes(i,:)),newPointIndexPosition)
@@ -70,7 +70,7 @@ while iteration <= Constraints.MaxIterations
     RRTStarTree = RRTStarTree.AddNode(Grid,newPoint,Temp.ParentNode);
     % now we check if the new point in the end node
 
-    if newPoint(1) == RRTStarTree.endNode(1) && newPoint(2) == RRTStarTree.endNode(2)
+    if newPoint(1) == RRTStarTree.endNode(1) && newPoint(2) == RRTStarTree.endNode(2) && newPoint(3) == RRTStarTree.endNode(3)
         RRTStarTree.SamplingRestrictionCheck = 1;
         RRTStarTree.endNodeIndex = RRTStarTree.numNodes;
 
@@ -84,7 +84,7 @@ while iteration <= Constraints.MaxIterations
         [~,Temp.PathSize] = size(RRTStarTree.Path);
         fprintf("The current path is: \nIndex: \t X: \t Y: \n")
         for i = 1:Temp.PathSize
-            fprintf("%i   \t(%4.3f \t, %4.3f) \n",RRTStarTree.Path(i),RRTStarTree.nodes(RRTStarTree.Path(i),1),RRTStarTree.nodes(RRTStarTree.Path(i),2))
+            fprintf("%i   \t(%4.3f \t, %4.3f, \t %4.3f) \n",RRTStarTree.Path(i),RRTStarTree.nodes(RRTStarTree.Path(i),1),RRTStarTree.nodes(RRTStarTree.Path(i),2),RRTStarTree.nodes(RRTStarTree.Path(i),3))
         end
 
         figure(1)
@@ -122,7 +122,7 @@ fprintf("Current Path Cost: %f \n",RRTStarTree.costs(RRTStarTree.endNodeIndex))
 [~,Temp.PathSize] = size(RRTStarTree.Path);
 fprintf("The Final path is: \nIndex: \t X: \t Y: \n")
 for i = 1:Temp.PathSize
-    fprintf("%i   \t(%4.3f \t, %4.3f) \n",RRTStarTree.Path(i),RRTStarTree.nodes(RRTStarTree.Path(i),1),RRTStarTree.nodes(RRTStarTree.Path(i),2))
+    fprintf("%i   \t(%4.3f \t, %4.3f, \t %4.3f) \n",RRTStarTree.Path(i),RRTStarTree.nodes(RRTStarTree.Path(i),1),RRTStarTree.nodes(RRTStarTree.Path(i),2),RRTStarTree.nodes(RRTStarTree.Path(i),3))
 end
 clear i iteration regenerateCount
 figure(2)

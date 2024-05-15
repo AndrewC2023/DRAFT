@@ -8,32 +8,24 @@ function [sucessful,newPoint] = steer(Grid,parentPoint,goalPoint,MaxEdgeLength)
     sucessful = 0;
     increment = 0.05;
 
-    dx = (goalPoint(1) - parentPoint(1));
-    dy = (goalPoint(2) - parentPoint(2));
-    dz = (goalPoint(3) - parentPoint(3));
-    r = dx/dy;
-    theta = atan(r);
-    
-    % region check
-    if dy < 0 && dx >= 0
-        theta = pi + theta;
-    elseif dy < 0 && dx <= 0
-        theta = theta + pi;
-    end
+    vector = goalPoint - parentPoint;
+    unit_vector = [vector(1)/norm(vector), vector(2)/norm(vector), vector(3)/norm(vector)];
 
-    xStep = increment*sin(theta);
-    yStep = increment*cos(theta);
+
+    xStep = increment*unit_vector(1);
+    yStep = increment*unit_vector(2);
+    zStep = increment*unit_vector(3);
 
     lastPoint = parentPoint;
-    tempPoint = [parentPoint(1) + xStep, parentPoint(2) + yStep];
+    tempPoint = [parentPoint(1) + xStep, parentPoint(2) + yStep, parentPoint(3) + zStep];
     travelled = increment;
 
-    if ((parentPoint(1) - goalPoint(1)) + (parentPoint(2) - goalPoint(2))) < 2*increment
-        if (sqrt((parentPoint(1) - goalPoint(1))^2 + (parentPoint(2) - goalPoint(2))^2)) < increment
-            newPoint = goalPoint;
-            sucessful = 1;
-        end
+
+    if norm(goalPoint - parentPoint) < increment
+        newPoint = goalPoint;
+        sucessful = 1;
     end
+
     while sucessful ~= 1
         
         if 1 == Grid.ContainsObstacle(tempPoint)
@@ -44,13 +36,13 @@ function [sucessful,newPoint] = steer(Grid,parentPoint,goalPoint,MaxEdgeLength)
             % max length
             newPoint = lastPoint;
             sucessful = 1;
-        elseif sum(abs(tempPoint - goalPoint)) < increment*2
+        elseif norm(tempPoint - goalPoint) < increment*1.1
             % reached point
             newPoint = goalPoint;
             sucessful = 1;
         end
         lastPoint = tempPoint;
-        tempPoint = [tempPoint(1) + xStep, tempPoint(2) + yStep];
+        tempPoint = [tempPoint(1) + xStep, tempPoint(2) + yStep, tempPoint(3) + zStep];
         travelled = travelled + increment;
     end
  
