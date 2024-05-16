@@ -50,7 +50,7 @@ classdef Grid
             increment = 0.1;
             
             vector = Index2 - Index1;
-            unit_vector = [vector(1)/norm(vector), vector(2)/norm(vector), vector(3)/norm(vector)];
+            unit_vector = vector./norm(vector);
     
             xStep = increment*unit_vector(1);
             yStep = increment*unit_vector(2);

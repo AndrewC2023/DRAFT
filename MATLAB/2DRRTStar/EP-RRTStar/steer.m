@@ -7,20 +7,12 @@ function [sucessful,newPoint] = steer(Grid,parentPoint,goalPoint,MaxEdgeLength)
     sucessful = 0;
     increment = 0.05;
 
-    dx = (goalPoint(1) - parentPoint(1));
-    dy = (goalPoint(2) - parentPoint(2));
-    r = dx/dy;
-    theta = atan(r);
-    
-    % region check
-    if dy < 0 && dx >= 0
-        theta = pi + theta;
-    elseif dy < 0 && dx <= 0
-        theta = theta + pi;
-    end
+    vector = goalPoint - parentPoint;
+    unit_vector = vector./norm(vector);
 
-    xStep = increment*sin(theta);
-    yStep = increment*cos(theta);
+
+    xStep = increment*unit_vector(1);
+    yStep = increment*unit_vector(2);
 
     lastPoint = parentPoint;
     tempPoint = [parentPoint(1) + xStep, parentPoint(2) + yStep];
@@ -42,7 +34,7 @@ function [sucessful,newPoint] = steer(Grid,parentPoint,goalPoint,MaxEdgeLength)
             % max length
             newPoint = lastPoint;
             sucessful = 1;
-        elseif sum(abs(tempPoint - goalPoint)) < increment*2
+        elseif norm(tempPoint - goalPoint) < increment*1.1
             % reached point
             newPoint = goalPoint;
             sucessful = 1;

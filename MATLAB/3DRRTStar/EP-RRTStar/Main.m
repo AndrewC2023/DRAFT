@@ -50,7 +50,7 @@ while iteration <= Constraints.MaxIterations
     % wire the new point to the tree
     count = 1;
     for i = 1:RRTStarTree.numNodes
-            % TODO: Heavily optimize this step !!!!!!!!!!!!!!
+            % TODO: Heavily optimize this step
         if 1.1*Constraints.MaxEdgeLength > sqrt((RRTStarTree.nodes(i,1) - newPoint(1))^2 + (RRTStarTree.nodes(i,2) - newPoint(2))^2 + (RRTStarTree.nodes(i,3) - newPoint(3))^2)
 
             % 1 means obstacle free

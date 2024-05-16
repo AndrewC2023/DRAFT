@@ -9,7 +9,7 @@ function [sucessful,newPoint] = steer(Grid,parentPoint,goalPoint,MaxEdgeLength)
     increment = 0.05;
 
     vector = goalPoint - parentPoint;
-    unit_vector = [vector(1)/norm(vector), vector(2)/norm(vector), vector(3)/norm(vector)];
+    unit_vector = vector./norm(vector);
 
 
     xStep = increment*unit_vector(1);

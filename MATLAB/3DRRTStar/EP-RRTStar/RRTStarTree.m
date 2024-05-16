@@ -13,9 +13,7 @@ classdef RRTStarTree
         numNodes
         
         SamplingRestrictionCheck
-        SamplingRestrictionRegions = []; % four point Tree.SampilingRestrictionRegionss
-        SamplingRestrictionRegionAreas = []
-        SamplingRestrictionDistance = 0.2 % meters
+        SamplingRestrictionDistance = 0.3 % meters
 
         Path = [];
         sizePath = [];
@@ -39,8 +37,6 @@ classdef RRTStarTree
             Tree.numNodes = 1;
 
             Tree.SamplingRestrictionCheck = 0;
-            Tree.SamplingRestrictionRegions = [];
-            
         end
         
         function Tree = AddNode(Tree,Grid,newNode,parentNodeIndex)
@@ -57,46 +53,67 @@ classdef RRTStarTree
             % This function Samples a new node in the 
             NodeGenerated = 0;
             while NodeGenerated ~=1
+                % check if we are restricting our sampling process
                 if Tree.SamplingRestrictionCheck == 1
                     % sample
                     sampledNode = [rand*Grid.indexDimensions(1), rand*Grid.indexDimensions(2), rand*Grid.indexDimensions(3)];
                     % check if we're in an obstacle
                     if 1 ~= Grid.ContainsObstacle(sampledNode)
+
                         % region Check
                         sampledNodePoint = Grid.getPoint(sampledNode);
-                        for i = 1:Tree.sizePath - 1
-                            % Point R1 R2
-                            A1 = abs(0.5*( sampledNodePoint(1)*(Tree.SamplingRestrictionRegions(1,2,i) - Tree.SamplingRestrictionRegions(2,2,i))...
-                                           + Tree.SamplingRestrictionRegions(1,1,i)*(Tree.SamplingRestrictionRegions(2,2,i) - sampledNodePoint(2))...
-                                           + Tree.SamplingRestrictionRegions(2,1,i)*(sampledNodePoint(2) - Tree.SamplingRestrictionRegions(1,2,i))) );
-                            % Point R2 R3
-                            A2 = abs(0.5*( sampledNodePoint(1)*(Tree.SamplingRestrictionRegions(2,2,i) - Tree.SamplingRestrictionRegions(3,2,i))...
-                                           + Tree.SamplingRestrictionRegions(2,1,i)*(Tree.SamplingRestrictionRegions(3,2,i) - sampledNodePoint(2))...
-                                           + Tree.SamplingRestrictionRegions(3,1,i)*(sampledNodePoint(2) - Tree.SamplingRestrictionRegions(2,2,i))) );
-                            % Point R3 R4
-                            A3 = abs(0.5*( sampledNodePoint(1)*(Tree.SamplingRestrictionRegions(3,2,i) - Tree.SamplingRestrictionRegions(4,2,i))...
-                                           + Tree.SamplingRestrictionRegions(3,1,i)*(Tree.SamplingRestrictionRegions(4,2,i) - sampledNodePoint(2))...
-                                           + Tree.SamplingRestrictionRegions(4,1,i)*(sampledNodePoint(2) - Tree.SamplingRestrictionRegions(3,2,i))) );
-                            % Point R4 R1
-                            A4 = abs(0.5*( sampledNodePoint(1)*(Tree.SamplingRestrictionRegions(4,2,i) - Tree.SamplingRestrictionRegions(1,2,i))...
-                                           + Tree.SamplingRestrictionRegions(4,1,i)*(Tree.SamplingRestrictionRegions(1,2,i) - sampledNodePoint(2))...
-                                           + Tree.SamplingRestrictionRegions(1,1,i)*(sampledNodePoint(2) - Tree.SamplingRestrictionRegions(4,2,i))) );
-                            CheckArea = A1 + A2 + A3 + A4;
 
-                            if CheckArea < 1.05*Tree.SamplingRestrictionRegionAreas(i)
+                        % find the nearest path point, so we only check two cylinders
+                        ManhattanDistancesSqrd = zeros(Tree.numNodes,1);
+                        for i = 1:Tree.sizePath
+                            ManhattanDistancesSqrd(i) = ((Node(1) - Tree.nodes(Tree.Path(i),1))^2 + (Node(2) - Tree.nodes(Tree.Path(i),2))^2 + (Node(3) - Tree.nodes(Tree.Path(i),3))^2);
+                        end 
+                        [~,Index] = min(ManhattanDistancesSqrd);
+
+                    end
+                    
+                    if Index == 1
+                        % nearest to start of the path
+                        if norm(sampledNodePoint - Tree.nodes(Tree.Path(Index),:)) < Tree.SamplingRestrictionDistance
+                            % we are near the end node
+                            NodeGenerated = 1;
+                        else
+                            % check if we are within a radius of the path cylinder
+                            nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
+                            if nearLine == 1
                                 NodeGenerated = 1;
-                                
-                                break
-                                
                             end
                         end
-                            % debug: Visualize where sampling occurs
-                            % figure(1)
-                            %     scatter(sampledNode(1),sampledNode(2),60,"x")
-                            %     hold on
+
+                    elseif Index == Tree.sizePath
+                        % nearest to end of the path
+                        if norm(sampledNodePoint - Tree.nodes(Tree.Path(Index),:)) < Tree.SamplingRestrictionDistance
+                            % we are near the end node
+                            NodeGenerated = 1;
+                        else
+                            % check if we are within a radius of the path cylinder
+                            nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
+                            if nearLine == 1
+                                NodeGenerated = 1;
+                            end
+                        end
+
+                    else
+                        % we are closest to one of the middle points
+                        % here we check the regions behind and in front
+                        nearLineForward = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
+                        if nearLineForward == 1
+                            NodeGenerated = 1;
+                        else
+                            nearLineBackwards = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
+                            if nearLineBackwards == 1
+                                NodeGenerated = 1;
+                            end
+                        end
                     end
                     
                 else
+                    % normal sampling process
                     % add end Bias
                     if rand < Tree.endBias
                         sampledNode = Tree.endNode;
@@ -114,88 +131,9 @@ classdef RRTStarTree
                     end
                 end
             end
-
+            
         end
 
-        function Tree = GenerateSampleRegions(Tree)
-
-            % calculate the vectors
-            expansionPoints = zeros(Tree.sizePath,2,2);
-            for i = 1:Tree.sizePath
-
-                if i == 1 % first Point
-                    pathVector = Tree.nodes(Tree.Path(i + 1),:) - Tree.nodes(Tree.Path(i),:);
-                    unitPathVector = pathVector./(norm(pathVector));
-
-                    expansionPoints(i,:,1) = Tree.SamplingRestrictionDistance*([-unitPathVector(2) - unitPathVector(1) , unitPathVector(1) - unitPathVector(2)]);
-                    expansionPoints(i,:,2) = Tree.SamplingRestrictionDistance*([unitPathVector(2) - unitPathVector(1) ,- unitPathVector(1) - unitPathVector(2)]);
-
-                    expansionPoints(i,:,1) = expansionPoints(i,:,1) + Tree.nodes(Tree.Path(i),:);
-                    expansionPoints(i,:,2) = expansionPoints(i,:,2) + Tree.nodes(Tree.Path(i),:);
-                elseif i == Tree.sizePath % last Point
-                    pathVector = Tree.nodes(Tree.Path(i - 1),:) - Tree.nodes(Tree.Path(i),:);
-                    unitPathVector = pathVector./(norm(pathVector));
-                    
-                    expansionPoints(i,:,2) = Tree.SamplingRestrictionDistance*([-unitPathVector(2) - unitPathVector(1) , unitPathVector(1) - unitPathVector(2)]);
-                    expansionPoints(i,:,1) = Tree.SamplingRestrictionDistance*([unitPathVector(2) - unitPathVector(1) , -unitPathVector(1) - unitPathVector(2)]);
-                    
-                    expansionPoints(i,:,1) = expansionPoints(i,:,1) + Tree.nodes(Tree.Path(i),:);
-                    expansionPoints(i,:,2) = expansionPoints(i,:,2) + Tree.nodes(Tree.Path(i),:);
-                else % middle Points
-                    forwardVector = [(Tree.nodes(Tree.Path(i + 1),1) - Tree.nodes(Tree.Path(i),1)),(Tree.nodes(Tree.Path(i + 1),2) - Tree.nodes(Tree.Path(i),2))];
-                    backwardVector = [(Tree.nodes(Tree.Path(i - 1),1) - Tree.nodes(Tree.Path(i),1)),(Tree.nodes(Tree.Path(i - 1),2) - Tree.nodes(Tree.Path(i),2))];
-
-                    magnitudeBackwards = (norm(backwardVector));
-                    magnitudeForwards = (norm(forwardVector));
-                    unitExpansionVector = (backwardVector./magnitudeBackwards + forwardVector./magnitudeForwards);
-                    unitExpansionVector = unitExpansionVector./norm(unitExpansionVector);
-                    sintheta = (forwardVector(1)*unitExpansionVector(2) - (unitExpansionVector(1)*forwardVector(2)))/(magnitudeForwards);
-                    dist = Tree.SamplingRestrictionDistance/sintheta;
-                    ExpansionVector = unitExpansionVector*dist;
-                    
-                    expansionPoints(i,:,1) = Tree.nodes(Tree.Path(i),:) + ExpansionVector;
-                    expansionPoints(i,:,2) = Tree.nodes(Tree.Path(i),:) - ExpansionVector;
-                    
-                end
-
-            end
-            % Debug
-                % for i = 1:Tree.sizePath
-                %     point2Plot1 = Grid.getIndex(expansionPoints(i,:,1));
-                %     point2Plot2 = Grid.getIndex(expansionPoints(i,:,2));
-                %     figure(1)
-                %         scatter(point2Plot1(1),point2Plot1(2))
-                %         scatter(point2Plot2(1),point2Plot2(2))
-                % end
-            %
-            % use the vectors to generate the zones
-            SampleRegions = zeros(4,2,Tree.sizePath - 1);
-            Tree.SamplingRestrictionRegionAreas = zeros(Tree.sizePath - 1,1);
-            for i = 1:(Tree.sizePath - 1)
-                SampleRegions(1,:,i) = expansionPoints(i,:,1);
-                SampleRegions(2,:,i) = expansionPoints(i + 1,:,1);
-                SampleRegions(3,:,i) = expansionPoints(i + 1,:,2);
-                SampleRegions(4,:,i) = expansionPoints(i,:,2);
-
-                % Debug
-                    % figure(1)
-                    %     plot(((SampleRegions(:,1,i) + (1/2)*Grid.Resolution)/Grid.Resolution),(SampleRegions(:,2,i) + (1/2)*Grid.Resolution)/Grid.Resolution);
-                    %     hold on
-
-                Tree.SamplingRestrictionRegionAreas(i) = abs((0.5)*((SampleRegions(1,1,i)*SampleRegions(2,2,i)...
-                                                           + SampleRegions(2,1,i)*SampleRegions(3,2,i)...
-                                                           + SampleRegions(3,1,i)*SampleRegions(4,2,i)...
-                                                           + SampleRegions(4,1,i)*SampleRegions(1,2,i))...
-                                                           - (SampleRegions(2,1,i)*SampleRegions(1,2,i)...
-                                                           + SampleRegions(3,1,i)*SampleRegions(2,2,i)...
-                                                           + SampleRegions(4,1,i)*SampleRegions(3,2,i)...
-                                                           + SampleRegions(1,1,i)*SampleRegions(4,2,i))));
-            end
-
-            Tree.SamplingRestrictionRegions = SampleRegions;
-
-        end
-        
         function cost = CostFunction(Tree,Grid,Node,ParentNodeindex)
             dist = sqrt( (Node(1) - Tree.nodes(ParentNodeindex,1))^2 + (Node(2) - Tree.nodes(ParentNodeindex,2))^2);
             near_obs_count = 0;
@@ -311,4 +249,29 @@ classdef RRTStarTree
         end
     end
 end
-
+        % helper funciton to clean up sampling code
+        function bool = isPointNearLine(Point, Center1, Center2, Radius)
+            CenterlineVector = Center2 - Center1;
+            Center2 = Center2 + CenterlineVector./norm(CenterlineVector);
+            Center1 = Center1 - CenterlineVector./norm(CenterlineVector);
+            CenterlineVector = Center2 - Center1;
+            
+            VectorProjection = (dot(Point,CenterlineVector)/dot(CenterlineVector,CenterlineVector))*CenterlineVector;
+            ProjectedPoint = Center1 + VectorProjection;
+            % check ranges of the 
+            xMin = min(Center1(1),Center2(1));
+            xMax = max(Center1(1),Center2(1));
+            yMin = min(Center1(2),Center2(2));
+            yMax = max(Center1(2),Center2(2));
+            zMin = min(Center1(3),Center2(3));
+            zMax = max(Center1(3),Center2(3));
+            if (ProjectedPoint(1) > xMin && ProjectedPoint(1) < xMax && ProjectedPoint(2) > yMin && ProjectedPoint(2) < yMax && ProjectedPoint(3) > zMin && ProjectedPoint(3) < zMax)
+                if norm(ProjectedPoint - Point) <= Radius
+                    bool = 1;
+                else
+                    bool = 0;
+                end
+            else
+                bool = 0;
+            end
+        end
