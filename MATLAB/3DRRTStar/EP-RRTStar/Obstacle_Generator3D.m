@@ -1,5 +1,5 @@
 %% Map Generation
-% This is for testing the algorithm of choice
+% This is for testing the algorithm of choice with a random set of obstacles
 
 Occupancy = zeros(h,w,z);
 
@@ -7,8 +7,8 @@ Occupancy = zeros(h,w,z);
 numob = 1;
 
 % the obstacles will have a confidence value, ranging from 0 to 256 with 0 being empty
-for i = 1:h
-for j = 1:w
+for i = 1:x
+for j = 1:y
 for k = 1:z
     c = rand;          
     if c < 0.001
@@ -81,4 +81,4 @@ end
 end
 end
 
-clear c i j h w z Obstacle_Centers k q numob cheks dist2ob Predefined dist2start dist2end
+clear c i j x y z Obstacle_Centers k q numob cheks dist2ob Predefined dist2start dist2end

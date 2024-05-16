@@ -3,15 +3,15 @@ classdef Grid
     %   Detailed explanation goes here
     
     properties
-        Occupancy = []  ; % Corresponds to indexspace
-        indexDimensions = [];
-        Resolution
-        trueDimensions = [];
+        Occupancy = []; % CThe array where each index contains a true false for if the grid is occupied there, this is in index space
+        indexDimensions = []; % the number of grid cells on each axis
+        Resolution; % the size of the gris cell in true space (meters)
+        trueDimensions = []; % the true dimensions of each axis
     end
     
     methods
         function Grid = Grid(Resolution,Occupancy)
-            %GRID Construct an instance of this class
+            % GRID Constructor
             %   The Grid class conatains the information of the grid occupancy as well as helper functions to provide translation between index space and true space 
             Grid.indexDimensions = size(Occupancy);
             Grid.Resolution = Resolution;
@@ -31,44 +31,41 @@ classdef Grid
         end
 
         function check = ContainsObstacle(Grid,gridindex)
+            % round to the nearest index as the obstacles extend by 0.5 indexes in all directions and it is easier to directly check the value
             roundedIndex = [round(gridindex(1)),round(gridindex(2))];
             if roundedIndex(1) == 0 || roundedIndex(2) == 0
+                % point is out of bounds
                 check = false;
             elseif roundedIndex(1) >= Grid.indexDimensions(1) || roundedIndex(2) >= Grid.indexDimensions(2)
+                % point is out of bounds
                 check = false;
             elseif 1 == Grid.Occupancy(round(gridindex(1)),round(gridindex(2)))
+                % grid is empty
                 check = true;
             else
+                % default behavior if an error occurs
                 check = false;
             end
         end
 
+        % function to chek if a line intersects an obstacle
         function obstacleFree = lineCollisionCheck(Grid,Index1,Index2)
+            % structure is similar to RRT* steer function
             exit = 0;
             increment = 0.1;
         
-            dx = (Index2(1) - Index1(1));
-            dy = (Index2(2) - Index1(2));
-            r = dx/dy;
-            theta = atan(r);
-            
-            % region check
-            if dy < 0 && dx >= 0
-                theta = pi + theta;
-            elseif dy < 0 && dx <= 0
-                theta = theta + pi;
-            end
+            vector = Index2 - Index1;
+            unit_vector = vector./norm(vector);
+    
+            xStep = increment*unit_vector(1);
+            yStep = increment*unit_vector(2);
         
-            xStep = increment*sin(theta);
-            yStep = increment*cos(theta);
-        
-            tempPoint = [Index1(1) + xStep, Index1(2) + yStep];
+            tempPoint = [Index1(1) + xStep, Index1(2) + yStep];        
             
-            if ((Index1(1) - Index2(1)) + (Index1(2) - Index2(2))) < 2*increment
-                if (sqrt((Index1(1) - Index2(1))^2 + (Index1(2) - Index2(2))^2)) < increment
-                    exit = 1;
-                    obstacleFree = 1;
-                end
+            % check if we need to calculate any of this at all, if the two points are super close it is unnecessary
+            if norm(Index2 - Index1) < increment
+                exit = 1;
+                obstacleFree = 1;
             end
 
             while exit ~= 1
@@ -77,7 +74,7 @@ classdef Grid
                     % hit obstacle, exit
                     obstacleFree = 0;
                     exit = 1;
-                elseif sum(abs(tempPoint - Index2)) < increment
+                elseif norm(tempPoint - Index2) < 1.1*increment
                     % reached point
                     obstacleFree = 1;
                     exit = 1;

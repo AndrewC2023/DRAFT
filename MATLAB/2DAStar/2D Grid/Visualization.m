@@ -1,6 +1,5 @@
 classdef Visualization
-    %VISUALIZATION Summary of this class goes here
-    %   Detailed explanation goes here
+    % Set of tools to visualize the A* path, older and somewhat outdated
     
     properties
         Start

@@ -1,6 +1,5 @@
 classdef Visualization
-    %VISUALIZATION Summary of this class goes here
-    %   Unused
+    % visualization helpers for A*, somewhat unnecessary after refactor
     
     properties
         Obstacle_Points

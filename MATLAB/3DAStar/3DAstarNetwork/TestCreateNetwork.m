@@ -2,7 +2,6 @@
 % it is not very clean as everything is hardcoded, btu in matlab and for development purposes
 % it servves its purpose, in C++ this would be loaded from a config
 
-
 Node.Points = [100,	15, 30;
                85,	20, 30;
                60,	25, 20;

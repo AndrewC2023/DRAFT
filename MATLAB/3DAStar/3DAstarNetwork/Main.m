@@ -42,6 +42,7 @@ Node.G_Scores(Node.Current) = 0;
 
 while Node.Visited(Node.End) ~= 1
 
+    % find the nodes connected with the current node
     [a,b] = find(Node.Connections == Node.Current);
     [numNeighbors,~] = size(a);
     Node.EdgeIndex = [a,b];
@@ -56,7 +57,7 @@ while Node.Visited(Node.End) ~= 1
     
     % we now have our neighbor and can start calculating and assigning costs
     for i = 1:numNeighbors
-        [Temp.Cost,Temp.G_Score,Node.H_Scores(Node.Current)]....
+        [Temp.Cost, Temp.G_Score, Node.H_Scores(Node.Current)]....
             = Cost_Function(Node.Points(Node.Current,:)...
                            ,Node.Points(Node.Neighbors(i),:)...
                            ,Node.G_Scores(Node.Current)...
@@ -68,9 +69,11 @@ while Node.Visited(Node.End) ~= 1
             Node.Parent(Node.Neighbors(i)) = Node.Current;
         end
     end
+
     Node.Visited(Node.Current) = 1;
     clear a b i
-    % Next Point
+
+    % Determine Next Point
     a = 1;
     for i = 1:Node.Count
         if Node.Visited(i) == 0 
@@ -128,5 +131,3 @@ end
 hold off
 clear a 
 %% Genearate a blockage
-
-

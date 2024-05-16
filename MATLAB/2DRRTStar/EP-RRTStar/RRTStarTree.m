@@ -3,18 +3,20 @@ classdef RRTStarTree
     %   Class contains helper fucntions for RRT* however the main script still does the bulk of the calculation loop
     
     properties
-        nodes = [];
-        edges = []; % [Parent,child] --> Rewire changes parent
-        costs = [];
-        endNode = [];
-        endNodeIndex;
-        endBias = 0.1;
-        numEdges 
-        numNodes
+        nodes = []; % the list of Nodes in true space (Point) with each row being a node (node index corresponds to the order it was added to the tree)
+        edges = []; % [Parent,child] ~ Rewire function only changes parent ~ 
+        costs = []; % the lists of cost for each node, each index lines up with corresponding node index
+        endNode = []; % end node in true space
+        endNodeIndex; % end node in Index (occupancy grid) space
+        % the proportion of times the end point is sampled when running the normal RRT* Algorithm, 
+        % this stops when the initial path is found and the sample restriction begins
+        endBias = 0.1; 
+        numEdges {int32}
+        numNodes {int32}
         
-        SamplingRestrictionCheck
-        SamplingRestrictionRegions = []; % four point Tree.SampilingRestrictionRegionss
-        SamplingRestrictionRegionAreas = []
+        SamplingRestrictionCheck {logical}
+        SamplingRestrictionRegions = []; % four point Polugons that mark where sampling of new points is allowed
+        SamplingRestrictionRegionAreas = [] % precalculated areas for the regios above
         SamplingRestrictionDistance = 0.2 % meters
 
         Path = [];
@@ -27,9 +29,9 @@ classdef RRTStarTree
     
     methods
         function Tree = RRTStarTree(startNode,endNode)
-            %RRTSTAR Construct an instance of this class
+            % RRTSTAR Constructs an instance of this class
             %   Creates an object that contains the RRT* tree and the
-            %   methods to manipulate it
+            %   methods to manipulate the tree
 
             Tree.edges = [];
             Tree.costs(1) = 0;
@@ -38,19 +40,18 @@ classdef RRTStarTree
             Tree.numEdges = 0;
             Tree.numNodes = 1;
 
-            Tree.SamplingRestrictionCheck = 0;
+            Tree.SamplingRestrictionCheck = false;
             Tree.SamplingRestrictionRegions = [];
             
         end
         
-        function Tree = AddNode(Tree,Grid,newNode,parentNodeIndex)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+        function Tree = AddNode(Tree,newNode,parentNodeIndex)
+            % Appends the fed node to the node list in the class and assigns the edge with the fed parent as well
             Tree.numNodes = Tree.numNodes + 1;
             Tree.nodes(Tree.numNodes,:) = newNode;
             Tree.numEdges = Tree.numEdges + 1; 
             Tree.edges(Tree.numEdges,:) = [parentNodeIndex,Tree.numNodes];
-            Tree.costs(Tree.numNodes)  = Tree.CostFunction(Grid,newNode,parentNodeIndex);
+            Tree.costs(Tree.numNodes)  = Tree.CostFunction(newNode,parentNodeIndex);
         end
         
         function sampledNode = SampleNewNode(Tree,Grid)
@@ -90,31 +91,29 @@ classdef RRTStarTree
                                 
                             end
                         end
-                            % debug: Visualize where sampling occurs
-                            % figure(1)
-                            %     scatter(sampledNode(1),sampledNode(2),60,"x")
-                            %     hold on
+
                     end
                     
                 else
                     % add end Bias
                     if rand < Tree.endBias
+                        % "Sample" the end node
                         sampledNode = Tree.endNode;
-                        isEndNode = 1;
-                        NodeGenerated = 1;
-                    % sample
+                        isEndNode = true;
+                        NodeGenerated = true;
                     else
-                    sampledNode = [rand*Grid.indexDimensions(1), rand*Grid.indexDimensions(2)];
-                    isEndNode = 0;
+                        % sample a random point
+                        sampledNode = [rand*Grid.indexDimensions(1), rand*Grid.indexDimensions(2)];
+                        isEndNode = false;
                     end
 
-                    if 1 ~= Grid.ContainsObstacle(sampledNode) && isEndNode ~= 1
-                        NodeGenerated = 1;
+                    if 1 ~= Grid.ContainsObstacle(sampledNode) && isEndNode ~= true
+                        NodeGenerated = true;
                         sampledNode = Grid.getPoint(sampledNode);
                     end
                 end
             end
-
+            
         end
 
         function Tree = GenerateSampleRegions(Tree)
@@ -159,15 +158,7 @@ classdef RRTStarTree
                 end
 
             end
-            % Debug
-                % for i = 1:Tree.sizePath
-                %     point2Plot1 = Grid.getIndex(expansionPoints(i,:,1));
-                %     point2Plot2 = Grid.getIndex(expansionPoints(i,:,2));
-                %     figure(1)
-                %         scatter(point2Plot1(1),point2Plot1(2))
-                %         scatter(point2Plot2(1),point2Plot2(2))
-                % end
-            %
+
             % use the vectors to generate the zones
             SampleRegions = zeros(4,2,Tree.sizePath - 1);
             Tree.SamplingRestrictionRegionAreas = zeros(Tree.sizePath - 1,1);
@@ -176,11 +167,6 @@ classdef RRTStarTree
                 SampleRegions(2,:,i) = expansionPoints(i + 1,:,1);
                 SampleRegions(3,:,i) = expansionPoints(i + 1,:,2);
                 SampleRegions(4,:,i) = expansionPoints(i,:,2);
-
-                % Debug
-                    % figure(1)
-                    %     plot(((SampleRegions(:,1,i) + (1/2)*Grid.Resolution)/Grid.Resolution),(SampleRegions(:,2,i) + (1/2)*Grid.Resolution)/Grid.Resolution);
-                    %     hold on
 
                 Tree.SamplingRestrictionRegionAreas(i) = abs((0.5)*((SampleRegions(1,1,i)*SampleRegions(2,2,i)...
                                                            + SampleRegions(2,1,i)*SampleRegions(3,2,i)...
@@ -195,60 +181,22 @@ classdef RRTStarTree
             Tree.SamplingRestrictionRegions = SampleRegions;
 
         end
-        
-        function cost = CostFunction(Tree,Grid,Node,ParentNodeindex)
+
+        function cost = CostFunction(Tree,Node,ParentNodeindex)
+            % Cost function, current implementation only accounts for distance, but can be modified easily
             dist = sqrt( (Node(1) - Tree.nodes(ParentNodeindex,1))^2 + (Node(2) - Tree.nodes(ParentNodeindex,2))^2);
-            near_obs_count = 0;
-
-            % Obstacle Proximity
-            % Check_Points =  [ 1, 0;
-            %                  -1, 0;
-            %                   1, 1;
-            %                  -1,-1;
-            %                   0, 1;
-            %                   0,-1;
-            %                   1,-1;
-            %                  -1, 1;
-            %                   2, 0;
-            %                   2, 1;
-            %                   2,-1;
-            %                   2, 2;
-            %                   2,-2;
-            %                   1, 2;
-            %                   1,-2;
-            %                   0, 2;
-            %                   0,-2;
-            %                  -1, 2;
-            %                  -1,-2;
-            %                  -2, 0;
-            %                  -2, 1;
-            %                  -2,-1;
-            %                  -2, 2;
-            %                  -2,-2];
-
-            % Rounded = round(Grid.getIndex(Node));
-            % for i = 1:24
-            %     Check = Rounded + Check_Points(i,:);
-            %     if Check(1) <= 0 || Check(1) >= (Grid.indexDimensions(1) + 1) || Check(2) <= 0 || Check(2) >= (Grid.indexDimensions(2) + 1)
-            %         % dont check
-            %     else
-            %         if Grid.Occupancy(Check(1),Check(2)) == 1
-            %             near_obs_count = near_obs_count + 1;
-            %         end
-            %     end
-        
-            % end
-
-            cost = Tree.costs(ParentNodeindex) + dist + near_obs_count;
-
+            cost = Tree.costs(ParentNodeindex) + dist;
         end
 
-        function Tree = Rewire(Tree,Grid,SeedNodeIndex,nearNodeIndexes)
+        function Tree = Rewire(Tree,nearNodeIndexes)
+            % rewire function recieves a list of nodes that are near the newly sampled node, 
+            % we check if making the new node the parent of these new ones would reduce their
+            % costs and if so we rewire the tree to make this the case
 
             % The seed node is the most recently added node
             numchecks = size(nearNodeIndexes);
             for i = 1:numchecks(2)
-                tempcost = Tree.CostFunction(Grid,Tree.nodes(nearNodeIndexes(i),:),Tree.numNodes);
+                tempcost = Tree.CostFunction(Tree.nodes(nearNodeIndexes(i),:),Tree.numNodes);
 
                 if tempcost < Tree.costs(nearNodeIndexes(i))
                     % trigger rewire
@@ -256,18 +204,15 @@ classdef RRTStarTree
                     Tree.edges(I,:) = [Tree.numNodes,nearNodeIndexes(i)];
                     Tree.costs(nearNodeIndexes(i)) = tempcost;
 
-                    % % Debug
-                    % if Tree.SamplingRestrictionCheck == 1
-                    %     disp("Rewired close node")
-                    % end
-
                 end
                 
             end
 
         end
 
+        % helper to find the nearest node in the tree to some point fed to the function
         function Index = FindNearestNode(Tree,Node)
+            % using sqared manhattan distances allows us to avoid using a square root
             ManhattanDistancesSqrd = zeros(Tree.numNodes,1);
             for i = 1:Tree.numNodes
                 ManhattanDistancesSqrd(i) = ((Node(1) - Tree.nodes(i,1))^2 + (Node(2) - Tree.nodes(i,2))^2);
@@ -275,6 +220,7 @@ classdef RRTStarTree
             [~,Index] = min(ManhattanDistancesSqrd);
         end
         
+        % helper to visualize the tree
         function Tree = PlotTree(Tree,Grid)
             for i = 1:Tree.numEdges
                 Tree.TreePlot = plot(Grid.getIndex([Tree.nodes(Tree.edges(i,1),1),Tree.nodes(Tree.edges(i,2),1)]),Grid.getIndex([Tree.nodes(Tree.edges(i,1),2),Tree.nodes(Tree.edges(i,2),2)]),'r');
@@ -282,6 +228,7 @@ classdef RRTStarTree
             end
         end
 
+        % helper to visualize the path
         function Tree = PlotPath(Tree,Grid)
             for i = 1:Tree.sizePath - 1
                 Tree.PathPlot = plot(Grid.getIndex([Tree.nodes(Tree.Path(i),1),Tree.nodes(Tree.Path(i + 1),1)]),Grid.getIndex([Tree.nodes(Tree.Path(i),2),Tree.nodes(Tree.Path(i + 1),2)])...
@@ -290,6 +237,8 @@ classdef RRTStarTree
             end
         end
 
+        % helper that sets the path for the class by back tracing parents from the end node
+        % this needs to be called before the sampling restriction process begins
         function Tree = setPath(Tree)
             % can only be called once the end node has been found
             currentNode = Tree.endNodeIndex;

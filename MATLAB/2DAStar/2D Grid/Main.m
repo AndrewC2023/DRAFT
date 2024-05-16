@@ -4,9 +4,6 @@
 % the obstacle generator script simply populates an Obstacle_MAP variable, but any script or 
 % configuration could populate this grid and the script would work
 
-%% Needed Changes and Notes
-    % Need to only pass the G score through for each node and then 
-
 clc;
 clear;
 close all;
@@ -54,7 +51,7 @@ Cost_MAP(Waypoint.Start(1),Waypoint.Start(2)) = 0;
 G_Score_MAP = Cost_MAP;
 
 % Loop initialization
-CP = Waypoint.Start;
+currentPoint = Waypoint.Start;
 % in an assumed grid space this is all the adjacent points, this predefined array simplifies computation
 adj2D = [ 1, 0;
          -1, 0;
@@ -72,39 +69,39 @@ while Visited(Waypoint.End(1),Waypoint.End(2)) ~=  1
 
     % Run a check for each neighbor
     for n = 1:Temp.Neighbor_Num(1)
-        Temp.Check_Point = CP + adj2D(n,:);
+        Temp.Check_Point = currentPoint + adj2D(n,:);
         % Check if the point we are checking is within the array bounds
         if Temp.Check_Point(1) == 0 || Temp.Check_Point(1) == (MAP_Size(1) + 1) || Temp.Check_Point(2) == 0 || Temp.Check_Point(2) == (MAP_Size(2) + 1)
             % Point to be Checked is outside Array Bounds
         else
-            [Cost,Temp.G,Hueristic_MAP(Temp.Check_Point(1),Temp.Check_Point(2))] = Cost_Function2D(CP,Temp.Check_Point,...
-                G_Score_MAP(CP(1),CP(2)),...
+            [Cost,Temp.G,Hueristic_MAP(Temp.Check_Point(1),Temp.Check_Point(2))] = Cost_Function2D(currentPoint,Temp.Check_Point,...
+                G_Score_MAP(currentPoint(1),currentPoint(2)),...
                 Obstacle_MAP(Temp.Check_Point(1),Temp.Check_Point(2)), Waypoint.End);
             
             if G_Score_MAP(Temp.Check_Point(1),Temp.Check_Point(2)) > Temp.G                    
                 Cost_MAP(Temp.Check_Point(1),Temp.Check_Point(2)) = Cost;
                 G_Score_MAP(Temp.Check_Point(1),Temp.Check_Point(2)) = Temp.G;
-                Parent_Node(Temp.Check_Point(1),Temp.Check_Point(2),:) = CP;
+                Parent_Node(Temp.Check_Point(1),Temp.Check_Point(2),:) = currentPoint;
             end      
         end
     end   
-    Visited(CP(1),CP(2)) = 1;
+    Visited(currentPoint(1),currentPoint(2)) = 1;
 
-    %% Visualization Tools for path growth.
+    % %% Visualization Tools for path growth.
     % These can be uncommented to show the growth of the path
-%     Figure_num = 2;
-%     Cost_Map_Visualization(Visualize,G_Score_MAP,MAP_Size,Visited,Figure_num);
-%     Path_Visualization(Visualize,CP,Parent_Node,Figure_num);
-% 
-%     % gif creation
-%     if iteration == 1
-%         gif('A_Star.gif','overwrite',true)
-%     else
-%         gif
-%     end
-%    iteration = iteration + 1;
+    % Figure_num = 2;
+    % Cost_Map_Visualization(Visualize,G_Score_MAP,MAP_Size,Visited,Figure_num);
+    % Path_Visualization(Visualize,currentPoint,Parent_Node,Figure_num);
+
+    % % gif creation
+    % if iteration == 1
+    %     gif('A_Star.gif','overwrite',true)
+    % else
+    %     gif
+    % end
+   iteration = iteration + 1;
    
-%% Calc next Point   
+   % Determine the next Point to visit
     Temp.Next_Point = Cost_MAP;
     for i = 1:MAP_Size(1)
         for j = 1:MAP_Size(2)   
@@ -114,7 +111,7 @@ while Visited(Waypoint.End(1),Waypoint.End(2)) ~=  1
         end
     end
     
-    % tie breaker
+    % tie breaker if costs are equal
     minC = min(Temp.Next_Point(:));
     [r,c] = find(Temp.Next_Point == minC);
     Temp.ties = size(r);
@@ -135,26 +132,25 @@ while Visited(Waypoint.End(1),Waypoint.End(2)) ~=  1
     else
         Temp.next = 1;
     end
-    CP = [r(Temp.next),c(Temp.next)];
+    currentPoint = [r(Temp.next),c(Temp.next)];
     clear H_Vals index 
 end
 clear Temp i j r c iteration minC
 
 %% Path Generation
     % we work backwards with this method
-    CP = Waypoint.End;
+    currentPoint = Waypoint.End;
     i = 1;
-while (CP(1) ~= Waypoint.Start(1)) + (CP(2) ~= Waypoint.Start(2)) > 0
+while (currentPoint(1) ~= Waypoint.Start(1)) + (currentPoint(2) ~= Waypoint.Start(2)) > 0
 %loop Waypoint.Start
-    Path(i,:) = CP;
-    CP = Parent_Node(CP(1),CP(2),:);
+    Path(i,:) = currentPoint;
+    currentPoint = Parent_Node(currentPoint(1),currentPoint(2),:);
     i = i + 1;
 end 
 Path(i,:) = Waypoint.Start;
 clear i
 toc
-% Final Visualization Tools
-%     Figure_num = Figure_num + 1;
+% Final Visualization 
         Cost_Map_Visualization(Visualize,G_Score_MAP,MAP_Size,Visited,3);
         Path_Visualization(Visualize,Waypoint.End,Parent_Node,3);
 figure(4)

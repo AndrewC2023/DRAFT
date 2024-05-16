@@ -26,25 +26,18 @@ Grid.Occupancy = Obstacle_MAP;
 clear Obstacle_MAP
 Grid.Max_Distance = Grid.Dimensions(1)*Grid.Dimensions(2)*Grid.Dimensions(3)*sqrt(2);
 
-%% A* Loop
-
 % sanity check
 if Nodes.Start(1) == Nodes.End(1) && Nodes.Start(2) == Nodes.End(2) && Nodes.Start(3) == Nodes.End(3)
     error('no path to find')
 end
 
+% Loop initialization
+% initialize variables
 Visited = zeros(Grid.Dimensions(1),Grid.Dimensions(2),Grid.Dimensions(3));
 Nodes.Parent_Node = zeros(Grid.Dimensions(1),Grid.Dimensions(2),Grid.Dimensions(3),3);
-    % this will give from which point is best to get to the current one 
-    % using 1 through 8 with 1 being the right half x ax
-    
-% For A* we need to pass the G score through and combine it with the H score
 Nodes.Cost_MAP = ones(Grid.Dimensions(1),Grid.Dimensions(2),Grid.Dimensions(3))*Grid.Max_Distance; 
 Nodes.Cost_MAP(Nodes.Start(1),Nodes.Start(2),Nodes.Start(3)) = 0;
 Nodes.G_Scores = Nodes.Cost_MAP;
-
-% Loop initialization
-Current_Node = Nodes.Start;
 % in an assumed grid space this is all the adjacent points, it is messy but faster to predefone all these points
 adj3D = [ 1, 0, 0;
           0, 1, 0;
@@ -72,9 +65,12 @@ adj3D = [ 1, 0, 0;
          -1, 1,-1;
           1, 1,-1;
          -1, 1, 1];
-Neighbor_Num = size(adj3D);      
-% Check condition will be if the final node has been visited or not
 
+Neighbor_Num = size(adj3D);      
+
+%% A* Loop
+Current_Node = Nodes.Start;
+% Check condition will be if the final node has been visited or not
 while Visited(Nodes.End(1),Nodes.End(2),Nodes.End(3)) ~=  1
     for n = 1:Neighbor_Num(1)
         Neighbor_Node = Current_Node + adj3D(n,:);
@@ -102,23 +98,23 @@ while Visited(Nodes.End(1),Nodes.End(2),Nodes.End(3)) ~=  1
     % Mark the current Node as visited, so that we no longer use it as a current node
     Visited(Current_Node(1),Current_Node(2),Current_Node(3)) = 1;
     
-    Next_Point = Nodes.Cost_MAP;
+    nextPointCost = Nodes.Cost_MAP;
     for i = 1:Grid.Dimensions(1)
     for j = 1:Grid.Dimensions(2)   
     for k = 1:Grid.Dimensions(3)
         if Visited(i,j,k) == 1
-          Next_Point(i,j,k) = Grid.Max_Distance;
+            nextPointCost(i,j,k) = Grid.Max_Distance;
         end
     end
     end
     end
 
     n = 1;
-    minC = min(Next_Point(:));
+    minCost = min(nextPointCost(:));
     for i = 1:Grid.Dimensions(1)
     for j = 1:Grid.Dimensions(2)   
     for k = 1:Grid.Dimensions(3)
-        if Next_Point(i,j,k) == minC
+        if nextPointCost(i,j,k) == minCost
           Potential_Points(n,:) = [i,j,k];
           n = n + 1;
         end
@@ -166,4 +162,4 @@ Vis.Obstacle_Visualization(Grid.Dimensions,1);
 Vis.Path_Visualization(Path,1);
 
 
-clear i j k adj3D checks Cost Current_Node G minC n Neighbor_Num next Next_Point ties Potential_Points
+clear i j k adj3D checks Cost Current_Node G minCost n Neighbor_Num next Next_Point ties Potential_Points

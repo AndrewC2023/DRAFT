@@ -1,6 +1,6 @@
 function [sucessful,newPoint] = steer(Grid,parentPoint,goalPoint,MaxEdgeLength)
-%STEER Summary of this function goes here
-%   Detailed explanation goes here
+% steer function effectively extends the tree in the direction of the sampled 
+% node until it hits an obstacle, reaches max length, or reaches the node
 
     parentPoint = Grid.getIndex(parentPoint);
     goalPoint = Grid.getIndex(goalPoint);
@@ -14,15 +14,14 @@ function [sucessful,newPoint] = steer(Grid,parentPoint,goalPoint,MaxEdgeLength)
     xStep = increment*unit_vector(1);
     yStep = increment*unit_vector(2);
 
+    % loop set up
     lastPoint = parentPoint;
     tempPoint = [parentPoint(1) + xStep, parentPoint(2) + yStep];
     travelled = increment;
 
-    if ((parentPoint(1) - goalPoint(1)) + (parentPoint(2) - goalPoint(2))) < 2*increment
-        if (sqrt((parentPoint(1) - goalPoint(1))^2 + (parentPoint(2) - goalPoint(2))^2)) < increment
-            newPoint = goalPoint;
-            sucessful = 1;
-        end
+    if norm(goalPoint - parentPoint) < increment
+        newPoint = goalPoint;
+        sucessful = true;
     end
     while sucessful ~= 1
         
