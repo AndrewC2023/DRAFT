@@ -1,7 +1,7 @@
 %% Map Generation
 % This is for testing the algorithm of choice
 
-Obstacle_MAP = zeros(h,w,z);
+Occupancy = zeros(h,w,z);
 
 % initialize obstacle centers array
 numob = 1;
@@ -13,7 +13,7 @@ for k = 1:z
     c = rand;          
     if c < 0.001
         % Randomly general obstacle centers
-        Obstacle_MAP(i,j,k) = randi([20,256]);
+        Occupancy(i,j,k) = 1;
         
         % Store these locations
         Obstacle_Centers(numob,:) = [i,j,k];
@@ -24,10 +24,10 @@ end
 end
 
 % Predefined option
-Predefined = 0;
+Predefined = 1; % switch this value to pick if you want predefined or random obstacles
 if Predefined == 1
     clear Obstacle_Centers
-    Obstacle_MAP = zeros(h,w,z);
+    Occupancy = zeros(h,w,z);
     Obstacle_Centers(1,:) = [15,15,15];
     Obstacle_Centers(2,:) = [19,15,13];
     Obstacle_Centers(3,:) = [10,10,10];
@@ -47,7 +47,7 @@ if Predefined == 1
     Obstacle_Centers(17,:) = [15,13,11];
     a = size(Obstacle_Centers);
     for i = 1:a(1)
-        Occupancy(Obstacle_Centers(i,1),Obstacle_Centers(i,2),Obstacle_Centers(i,3)) = 150;
+        Occupancy(Obstacle_Centers(i,1),Obstacle_Centers(i,2),Obstacle_Centers(i,3)) = 1;
     end
 end
 
@@ -68,14 +68,17 @@ for k = 1:z
             Occupancy(i,j,k) = Occupancy(Obstacle_Centers(q,1),Obstacle_Centers(q,2),Obstacle_Centers(q,3));
         end
         % Use this oppourtunity to make sure the starts and ends are clear
-        dist2start = sqrt((Start(1) - i)^2 + (Start(2) - j)^2 + (Start(3) - k)^2);
+        dist2start = sqrt((Start_End_Indexes(1,1) - i)^2 + (Start_End_Indexes(1,2) - j)^2 + (Start_End_Indexes(1,3) - k)^2);
         if dist2start < 3
             Occupancy(i,j,k) = 0;
         end
-
+        dist2end = sqrt((Start_End_Indexes(2,1) - i)^2 + (Start_End_Indexes(2,2) - j)^2 + (Start_End_Indexes(2,3) - k)^2);
+        if dist2end < 3
+            Occupancy(i,j,k) = 0;
+        end
     end
 end
 end
 end
 
-clear c i j h w z Obstacle_Centers k q numob cheks dist2ob Predefined
+clear c i j h w z Obstacle_Centers k q numob cheks dist2ob Predefined dist2start dist2end

@@ -21,8 +21,7 @@ Obstacle_Generator3D;
 Grid = Grid(Constraints.GridResolution,Occupancy);
 clear IndexSize Occupancy Constraints.GridResolution
 
-RRTStarTree = RRTStarTree(Grid.getPoint([Start_End_Indexes(1,:)]), ...
-    Grid.getPoint([Start_End_Indexes(2,:)]));
+RRTStarTree = RRTStarTree(Grid.getPoint([Start_End_Indexes(1,:)]), Grid.getPoint([Start_End_Indexes(2,:)]));
 clear Start_End_Indexes
 
 iteration = 2;
@@ -38,7 +37,6 @@ while iteration <= Constraints.MaxIterations
 
         % steer Function
         [Temp.newPointCheck,newPointIndexPosition] = steer(Grid,Temp.nearPoint,Temp.newPoint,Constraints.MaxEdgeLength/Grid.Resolution);
-        
     end
     
     newPoint = Grid.getPoint(newPointIndexPosition);
@@ -68,59 +66,26 @@ while iteration <= Constraints.MaxIterations
     if newPoint(1) == RRTStarTree.endNode(1) && newPoint(2) == RRTStarTree.endNode(2) && newPoint(3) == RRTStarTree.endNode(3)
         RRTStarTree.SamplingRestrictionCheck = 1;
         RRTStarTree.endNodeIndex = RRTStarTree.numNodes;
-
-        % Run the initial Sampling Restriction
-        RRTStarTree = RRTStarTree.setPath();
-
-        % Debug/Info:
-        fprintf("Found End Point after %i iterations \n",iteration)
-        fprintf("Current Path Cost: %f \n",RRTStarTree.costs(iteration))
-        [~,Temp.PathSize] = size(RRTStarTree.Path);
-        fprintf("The current path is: \nIndex: \t X: \t Y: \n")
-        for i = 1:Temp.PathSize
-            fprintf("%i   \t(%4.3f \t, %4.3f, \t %4.3f) \n",RRTStarTree.Path(i),RRTStarTree.nodes(RRTStarTree.Path(i),1),RRTStarTree.nodes(RRTStarTree.Path(i),2),RRTStarTree.nodes(RRTStarTree.Path(i),3))
-        end
-
-        figure(1)
-           RRTStarTree = RRTStarTree.PlotTree(Grid);
-           RRTStarTree = RRTStarTree.PlotPath(Grid);
-           Grid.visualizeGrid();
-           title("Initial Found Path")
-           legend([RRTStarTree.TreePlot,RRTStarTree.PathPlot],'Tree','Path')
-           hold off
-
-        regenerateCount = 1;
     end
 
     % rewire step
     RRTStarTree = RRTStarTree.Rewire(Grid,newPoint,Temp.nearNodes);
     clear Temp i newPoint newPointIndexPosition count 
 
-    % If we need to restrict samples we need to get our path and generate
-    % sample spaces
-    if RRTStarTree.SamplingRestrictionCheck == 1
-        regenerateCount = regenerateCount + 1;
-        if regenerateCount == 300
-            RRTStarTree = RRTStarTree.setPath();
-            regenerateCount = 1;
-            
-        end
-    end
-
     iteration = iteration + 1;
 
 end
 
 RRTStarTree = RRTStarTree.setPath();
-fprintf("Current Path Cost: %f \n",RRTStarTree.costs(RRTStarTree.endNodeIndex))
+fprintf("Path Cost: %f \n",RRTStarTree.costs(RRTStarTree.endNodeIndex))
 [~,Temp.PathSize] = size(RRTStarTree.Path);
 fprintf("The Final path is: \nIndex: \t X: \t Y: \n")
 for i = 1:Temp.PathSize
     fprintf("%i   \t(%4.3f \t, %4.3f, \t %4.3f) \n",RRTStarTree.Path(i),RRTStarTree.nodes(RRTStarTree.Path(i),1),RRTStarTree.nodes(RRTStarTree.Path(i),2),RRTStarTree.nodes(RRTStarTree.Path(i),3))
 end
-clear i iteration regenerateCount
-figure(2)
-    RRTStarTree = RRTStarTree.PlotTree(Grid);
+clear i regenerateCount
+figure(1)
+    % RRTStarTree = RRTStarTree.PlotTree(Grid);
     RRTStarTree = RRTStarTree.PlotPath(Grid);
     Grid.visualizeGrid();
     legend([RRTStarTree.TreePlot,RRTStarTree.PathPlot],'Tree','Path')

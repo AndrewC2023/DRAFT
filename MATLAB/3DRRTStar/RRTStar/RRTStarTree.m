@@ -53,98 +53,23 @@ classdef RRTStarTree
             % This function Samples a new node in the 
             NodeGenerated = 0;
             while NodeGenerated ~=1
-                % check if we are restricting our sampling process
-                if Tree.SamplingRestrictionCheck == 1
-                    % sample
-                    sampledNode = [rand*Grid.indexDimensions(1), rand*Grid.indexDimensions(2), rand*Grid.indexDimensions(3)];
-                    % check if we're in an obstacle
-                    if 1 ~= Grid.ContainsObstacle(sampledNode)
-
-                        % region Check
-                        sampledNodePoint = Grid.getPoint(sampledNode);
-
-                        % find the nearest path point, so we only check two cylinders
-                        ManhattanDistancesSqrd = zeros(Tree.sizePath,1);
-    
-                        for i = 1:Tree.sizePath
-                            ManhattanDistancesSqrd(i) = ((sampledNodePoint(1) - Tree.nodes(Tree.Path(i),1))^2 + (sampledNodePoint(2) - Tree.nodes(Tree.Path(i),2))^2 + (sampledNodePoint(3) - Tree.nodes(Tree.Path(i),3))^2);
-                        end 
-                        [~,Index] = min(ManhattanDistancesSqrd);
-      
-                        if Index == 1
-                            % CASE 1
-                            % nearest to start of the path
-                            if norm(sampledNodePoint - Tree.nodes(Tree.Path(Index),:)) < Tree.SamplingRestrictionDistance
-                                % we are near enough to the end node that we can confirm this as a valid sample
-                                NodeGenerated = 1;
-                                sampledNode = sampledNodePoint;
-                            else
-                                % check if we are within a radius of the path cylinder coming off the end
-                                nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
-                                if nearLine == 1
-                                    NodeGenerated = 1;
-                                    sampledNode = sampledNodePoint;
-                                end
-                            end
-    
-                        elseif Index == Tree.sizePath
-                            % CASE 2
-                            % nearest to end of the path
-                            if norm(sampledNodePoint - Tree.nodes(Tree.Path(Index),:)) < Tree.SamplingRestrictionDistance
-                                % we are near the end node
-                                NodeGenerated = 1;
-                                sampledNode = sampledNodePoint;
-                            else
-                                % check if we are within a radius of the path cylinder
-                                nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index - 1),:),Tree.SamplingRestrictionDistance);
-                                if nearLine == 1
-                                    NodeGenerated = 1;
-                                    sampledNode = sampledNodePoint;
-                                end
-                            end
-    
-                        else
-                            % we are closest to one of the middle points
-                            % here we check the regions behind and in front
-                            nearLineForward = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
-                            if nearLineForward == 1
-                                NodeGenerated = 1;
-                                sampledNode = sampledNodePoint;
-                            else
-                                nearLineBackwards = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
-                                if nearLineBackwards == 1
-                                    NodeGenerated = 1;
-                                    sampledNode = sampledNodePoint;
-                                end
-                            end
-                        end
-
-                    end
-                    
+                
+                % normal sampling process
+                if rand < Tree.endBias
+                    sampledNode = Tree.endNode;
+                    isEndNode = 1;
+                    NodeGenerated = 1;
+                % sample
                 else
-                    % normal sampling process
-                    % add end Bias
-                    if rand < Tree.endBias
-                        sampledNode = Tree.endNode;
-                        isEndNode = 1;
-                        NodeGenerated = 1;
-                    % sample
-                    else
-                    sampledNode = [rand*Grid.indexDimensions(1), rand*Grid.indexDimensions(2), rand*Grid.indexDimensions(3)];
-                    isEndNode = 0;
-                    end
-
-                    if 1 ~= Grid.ContainsObstacle(sampledNode) && isEndNode ~= 1
-                        NodeGenerated = 1;
-                        sampledNode = Grid.getPoint(sampledNode);
-                    end
+                sampledNode = [rand*Grid.indexDimensions(1), rand*Grid.indexDimensions(2), rand*Grid.indexDimensions(3)];
+                isEndNode = 0;
                 end
 
-                if NodeGenerated == 1
-                    figure(1)
-                        scatter3(sampledNode(1),sampledNode(2),sampledNode(3),'r')
-                        hold on
+                if 1 ~= Grid.ContainsObstacle(sampledNode) && isEndNode ~= 1
+                    NodeGenerated = 1;
+                    sampledNode = Grid.getPoint(sampledNode);
                 end
+                
             end
             
         end
@@ -152,6 +77,7 @@ classdef RRTStarTree
         function cost = CostFunction(Tree,Grid,Node,ParentNodeindex)
             dist = sqrt( (Node(1) - Tree.nodes(ParentNodeindex,1))^2 + (Node(2) - Tree.nodes(ParentNodeindex,2))^2);
             cost = Tree.costs(ParentNodeindex) + dist;
+
         end
 
         function Tree = Rewire(Tree,Grid,SeedNodeIndex,nearNodeIndexes)

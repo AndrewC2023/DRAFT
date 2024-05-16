@@ -4,9 +4,6 @@
 
 % This is the main script
 
-%% Needed Changes and Notes
-    % Currently removing visualization, create standalone visualization functions
-
 clc;
 clear;
 close all;

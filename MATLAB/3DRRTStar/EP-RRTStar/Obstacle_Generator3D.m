@@ -1,7 +1,7 @@
 %% Map Generation
 % This is for testing the algorithm of choice
 
-Obstacle_MAP = zeros(h,w,z);
+Occupancy = zeros(h,w,z);
 
 % initialize obstacle centers array
 numob = 1;
@@ -13,7 +13,7 @@ for k = 1:z
     c = rand;          
     if c < 0.001
         % Randomly general obstacle centers
-        Obstacle_MAP(i,j,k) = randi([20,256]);
+        Occupancy(i,j,k) = 1;
         
         % Store these locations
         Obstacle_Centers(numob,:) = [i,j,k];
@@ -24,10 +24,10 @@ end
 end
 
 % Predefined option
-Predefined = 0;
+Predefined = 1;
 if Predefined == 1
     clear Obstacle_Centers
-    Obstacle_MAP = zeros(h,w,z);
+    Occupancy = zeros(h,w,z);
     Obstacle_Centers(1,:) = [15,15,15];
     Obstacle_Centers(2,:) = [19,15,13];
     Obstacle_Centers(3,:) = [10,10,10];
@@ -47,7 +47,7 @@ if Predefined == 1
     Obstacle_Centers(17,:) = [15,13,11];
     a = size(Obstacle_Centers);
     for i = 1:a(1)
-        Occupancy(Obstacle_Centers(i,1),Obstacle_Centers(i,2),Obstacle_Centers(i,3)) = 150;
+        Occupancy(Obstacle_Centers(i,1),Obstacle_Centers(i,2),Obstacle_Centers(i,3)) = 1;
     end
 end
 
@@ -81,4 +81,4 @@ end
 end
 end
 
-clear c i j h w z Obstacle_Centers k q numob cheks dist2ob Predefined
+clear c i j h w z Obstacle_Centers k q numob cheks dist2ob Predefined dist2start dist2end
