@@ -13,7 +13,7 @@ classdef RRTStarTree
         numNodes
         
         SamplingRestrictionCheck
-        SamplingRestrictionDistance = 0.3 % meters
+        SamplingRestrictionDistance = 0.2 % meters
 
         Path = [];
         sizePath = [];
@@ -139,12 +139,6 @@ classdef RRTStarTree
                         sampledNode = Grid.getPoint(sampledNode);
                     end
                 end
-
-                if NodeGenerated == 1
-                    figure(1)
-                        scatter3(sampledNode(1),sampledNode(2),sampledNode(3),'r')
-                        hold on
-                end
             end
             
         end
@@ -225,11 +219,13 @@ end
         % helper funciton to clean up sampling code
         function bool = isPointNearLine(Point, Center1, Center2, Radius)
             CenterlineVector = Center2 - Center1;
-            Center2 = Center2 + CenterlineVector./norm(CenterlineVector);
-            Center1 = Center1 - CenterlineVector./norm(CenterlineVector);
+            Center2 = Center2 + (CenterlineVector./norm(CenterlineVector))*Radius;
+            Center1 = Center1 - (CenterlineVector./norm(CenterlineVector))*Radius;
             CenterlineVector = Center2 - Center1;
-            
-            VectorProjection = (dot(Point,CenterlineVector)/dot(CenterlineVector,CenterlineVector))*CenterlineVector;
+            PointVector = Point - Center1;
+
+
+            VectorProjection = (dot(PointVector,CenterlineVector)/dot(CenterlineVector,CenterlineVector))*CenterlineVector;
             ProjectedPoint = Center1 + VectorProjection;
             % check ranges of the 
             xMin = min(Center1(1),Center2(1));

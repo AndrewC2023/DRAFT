@@ -7,8 +7,8 @@ close all;
 
 % Inputs 
 
-Constraints.MaxIterations = 3000;
-Constraints.MaxEdgeLength = 0.3; % meters
+Constraints.MaxIterations = 5000;
+Constraints.MaxEdgeLength = 0.08; % meters
 Constraints.GridResolution = 0.05; % meters
 Constraints.EndTolerance = 0.05; % meters
 Start_End_Indexes = [2,2,2;
