@@ -19,7 +19,9 @@ class Node:
         #self.children = []
         self.location = point
         self.path = []
-    
+
+    # calcCost iterates through the path of the node and finds the magnitude
+    # of the distance between all of the points.
     def calcCost(self):
        self.cost = 0
        for i in range(len(self.path)):
@@ -30,7 +32,12 @@ class Node:
                    distSqr += dist[j]*dist[j]
                self.cost += (distSqr)**0.5
        return self.cost
-    
+
+    # closest_point takes a 3D state of x,y,z and iterates through the Node
+    # path to find the point in the path that is closest to the input state.
+    # This function returns the 3D state of the closest point, the distance
+    # between the input state and the closest point and the index for the
+    # closest point in the Node's path.
     def closest_point(self,point):
         prox = []
         for i in range(len(self.path)):
@@ -42,6 +49,11 @@ class Node:
         proxc = prox[np.argmin(prox)]
         ind = np.argmin(prox)
         return vclose,proxc,ind
+
+    # checkCol iterates through the path of the nodes
+    # to see if any of the nodes connected by a straight
+    # line are intersecting the spherical static objects from the RRT*
+    # algorithm.
     def checkCol(self,RRT):
         safe = True
         for y in range(len(self.path)):
@@ -78,10 +90,16 @@ class RRTstar:
         eNode = Node(end)
         eNode.nodeNum = -1
         eNode.path = [end]
+        # self.tree is the tree that extends from the start point
         self.tree = [stNode]
+        # self.btree is the tree that extends from the end point
         self.btree = [eNode]
+        # self.ctree is the tree that contains all of the paths that
+        # start at the starting point and end at the end point.
         self.ctree = []
-    
+
+    # This function takes a mean object radius, standard deviation of object radius, and number of objects and
+    # places spherical obstacles with a uniform randomness across the 3D gridspace.
     def randObj(self,mean,std,num):
         for i in range(num):
             length = np.random.normal(mean,std)
@@ -91,11 +109,15 @@ class RRTstar:
             self.stat_obj.append([xi,yi,zi,length])
         return self.stat_obj
     
-    # This requires the input to be a list of [xi,yi,zi,length] for objects
+    # This requires the input to be a list of [xi,yi,zi,length] obstacles
+    # and sets the objects in the 3D gridspace
     def plcObj(self,objL):
         self.stat_obj = objL
         return self.stat_obj
-    
+
+    # This is the function used to run the RRT*-Connect Algorithm
+    # Iterations is the number of points that are attempted to be placed
+    # in the gridspace
     def run(self,iterations,plot=True):
         done = False
         runs = 0
@@ -119,11 +141,13 @@ class RRTstar:
             
             # Create a Node object for the new point
             nNode = Node(vnew)
-            #nNode.nodeNum = nodeCount
-            #nodeCount += 1
+            
             
             # Find the closest point to this new point
-            
+
+            # This RRT*-Connect Algorithm alternates between trying to place points near
+            # the starting point and the end point. So if start is true then the algorithm
+            # attempts to place the new point near the starting point.
             start = runs % 2 == 0
             if start:
                 valL = []
@@ -264,7 +288,9 @@ class RRTstar:
                                 self.btree[i].path = pathcopy
                 
                 # See if there are any collisions by connecting with
-                # The btree, if not then the algorithm can end
+                # The btree, if not then the algorithm can end. Note
+                # That this only occurs if the algorithm is on the last
+                # attempt to place a node.
                 if runs == iterations:
                     for i in range(len(self.tree)):
                         for j in range(len(self.btree)):
