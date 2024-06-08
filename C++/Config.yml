@@ -1,7 +1,7 @@
 
 Grid:
   cellSize:
-  # the folling are test rooms that could be loaded for planners to use and be tesed with, listed with preloaded obstacles in the space
+  # the following are test rooms that could be loaded for planners to use and be tesed with, listed with preloaded obstacles in the space
   # units are in meters ALWAYS
   # obstacles are boxes, a center point, length(x), width(y), height(z), and roll, pitch, yaw in rads: [x,y,z ,l,w,h ,r,p,y]
   TestSpaces:
