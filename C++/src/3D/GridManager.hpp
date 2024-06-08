@@ -11,7 +11,7 @@
 // custom types
 #include "GridTypes.hpp"
 
-namespace lamb::cpp::threedee {
+namespace Algorithms::ThreeD {
 
 class GridManager   {
     public:

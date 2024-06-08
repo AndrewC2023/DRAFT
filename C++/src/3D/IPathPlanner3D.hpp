@@ -5,7 +5,7 @@
 // Eigen
 #include <Eigen/Dense>
 
-namespace algorithms::ThreeD
+namespace Algorithms::ThreeD
 {
     class IPathPlanner3D
     {

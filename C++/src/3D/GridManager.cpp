@@ -1,8 +1,9 @@
 #include "GridManager.hpp"
 
-namespace lamb::cpp::threedee {
+namespace Algorithms::ThreeD {
 // TODO: implement pre calculation of number of cells -> mild performance saving
-GridManager::GridManager(float p_maxX, float p_maxY, float p_maxZ, float p_cellSize) : _cellUpdateThreadRunning(true) {
+GridManager::GridManager(float p_maxX, float p_maxY, float p_maxZ, float p_cellSize):
+                         _cellUpdateThreadRunning(true) {
     xSize = p_maxX;
     ySize = p_maxY;
     zSize = p_maxZ;

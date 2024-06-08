@@ -9,7 +9,7 @@
 // base class
 #include "IPathPlanner3D.hpp"
 
-namespace algorithms::ThreeD::Planners
+namespace Algorithms::ThreeD::Planners
 {
     struct AStarNode{
         Eigen::Vector3f Position;
