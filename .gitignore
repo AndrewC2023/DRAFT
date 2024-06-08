@@ -19,3 +19,6 @@ C++/build/
 
 # ignore cached python
 __pycache__
+
+# ignore installed libraries
+reqLib

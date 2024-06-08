@@ -1,7 +1,6 @@
 set -e
 
-MATPLOT_INSTALL_DIR="matplotplusplus_install"
-
+# these will be installed locally on the user's machine if they're not already installed
 echo "Updating package lists ..."
 sudo apt-get update
 
@@ -11,22 +10,79 @@ sudo apt-get install -y libeigen3-dev
 echo "Installing YAML ..."
 sudo apt-get install -y libyaml-dev
 
-if [ ! -d "$MATPLOT_INSTALL_DIR"]; then
+# the following is for libraries that are either not on apt or are large enough to justify
+# allowing the user to have it conveniently removed when they delete the entire project
+
+ADMIN_DIR=$(realpath .)
+echo "in admin directory: ${ADMIN_DIR}"
+
+echo "-------------------------------------------------------------------------------------------------------------------------"
+echo 'Would you like to install Matplot++ in the project directory or locally on ubuntu with the rest of your static libraries?'
+printf '1: In usr    2: In Project: '
+read answer
+
+if [ "$answer" = "1" ]
+then 
+    echo "installing in /usr/include"
+    cd /usr/include
+
     echo "Cloning Matplot++ ..."
+    set +e
     git clone https://github.com/alandefreitas/matplotplusplus.git
+    set -e
 
     echo "Building Matplot++ ..."
     cd matplotplusplus
     mkdir -p build
     cd build
-    cmake -DCMAKE_INSTALL_PREFIX=../../$INSTALL_DIR ..
-    make -j2make 
+
+    # set the instal directory
+    INSTALL_DIR=$(realpath ../../../)
+    echo "in project install directory: ${INSTALL_DIR}"
+
+    # set the cmake variable for matplot 
+    cmake -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ..
+    make -j4 
 
     echo "Installing Matplot++ ..."
     sudo make install
-    cd ../..
+
+    cd $ADMIN_DIR
+
+    exit 0
+elif [ "$answer" = "2" ]
+then
+    echo "installing in admin/reqLib/matplotpp"
+
+    cd reqLib
+
+    echo "Cloning Matplot++ ..."
+    set +e
+    git clone https://github.com/alandefreitas/matplotplusplus.git
+    set -e
+
+    echo "Building Matplot++ ..."
+    cd matplotplusplus
+    mkdir -p build
+    cd build
+
+    # set the instal directory
+    INSTALL_DIR=$(realpath ../../)
+    echo "install directory: ${INSTALL_DIR}"
+    
+    # set the cmake variable for matplot
+    cmake -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ..
+    make -j4 
+
+    echo "Installing Matplot++ ..."
+    sudo make install
+
+    # return to admin directory
+    cd $ADMIN_DIR
+
+    exit 0
 else
-    echo "Matplot++ is Already installed!"
+    echo "please specify 1 or 2"
 fi
 
 echo "Installation of required packages complete!"
