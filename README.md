@@ -1,11 +1,13 @@
 # Planning Algorithm Development
+
 A collection of MATLAB, Python, & C++ Planning/navigation algorithms and their tracked development
 
-# Development Environment Setup
+## Development Environment Setup
 
 It is recommended to clone and develop the repository in ubuntu (20.04 or later) as the setup scripts are in shell
 
 To clone the repository:
+
 ```console
 # ssh
 git clone git@github.com:AndrewC2023/PlanningAlgorithmDevelopment.git
@@ -17,6 +19,7 @@ git clone https://github.com/AndrewC2023/PlanningAlgorithmDevelopment.git
 ### C++ Setup
 
 The required dependencies for the C++ algorithm library are:
+
 * Eigen 3
 * Yaml-cpp
 * Matplot++
@@ -51,6 +54,7 @@ sudo ./setup.sh
 ```
 
 ### Python Setup
+
 Make sure you have python installed. in windows you can easily go to the website and instal python and add it to your PATH variable. In ubuntu you can get python using your package manager:
 
 ```console
@@ -63,4 +67,5 @@ this will also instal pip which with manage your python libraries
 there is a required libraries shell script in the python folder, but the process of manually using pip in the terminal is not difficult so either approach is fine.
 
 ### MATLAB Setup
+
 Make sure you have matlab lnstalled with your desired toolboxes
