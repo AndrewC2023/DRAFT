@@ -7,7 +7,7 @@
 // Eigen
 #include <Eigen/Dense>
 
-namespace algorithms::TwoD
+namespace Algorithms::TwoD
 {
     typedef struct Penalties{
         ObstaclePentalty;

@@ -5,7 +5,7 @@
 // Eigen
 #include <Eigen/Dense>
 
-namespace algorithms::TwoD
+namespace Algorithms::TwoD
 {
     class IPathValidator2D
     {
