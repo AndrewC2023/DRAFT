@@ -67,7 +67,6 @@ while iteration <= Constraints.MaxIterations
     % now we check if the new point in the end node
 
     if newPoint(1) == RRTStarTree.endNode(1) && newPoint(2) == RRTStarTree.endNode(2) && newPoint(3) == RRTStarTree.endNode(3)
-        RRTStarTree.SamplingRestrictionCheck = 1;
         RRTStarTree.endNodeIndex = RRTStarTree.numNodes;
     end
 

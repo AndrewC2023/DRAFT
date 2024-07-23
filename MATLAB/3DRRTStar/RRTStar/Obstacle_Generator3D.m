@@ -1,7 +1,7 @@
 %% Map Generation
-% This is for testing the algorithm of choice
+% This is for testing the algorithm of choice with a random set of obstacles
 
-Occupancy = zeros(h,w,z);
+Occupancy = zeros(x,y,z);
 
 % initialize obstacle centers array
 numob = 1;
@@ -24,10 +24,10 @@ end
 end
 
 % Predefined option
-Predefined = 1; % switch this value to pick if you want predefined or random obstacles
+Predefined = 1;
 if Predefined == 1
     clear Obstacle_Centers
-    Occupancy = zeros(h,w,z);
+    Occupancy = zeros(x,y,z);
     Obstacle_Centers(1,:) = [15,15,15];
     Obstacle_Centers(2,:) = [19,15,13];
     Obstacle_Centers(3,:) = [10,10,10];
@@ -57,8 +57,8 @@ if numob == 0
 end
 % Obstacle Expansion
 checks = size(Obstacle_Centers);
-for i = 1:h
-for j = 1:w
+for i = 1:x
+for j = 1:y
 for k = 1:z
     % this is based upon distance
     % and for general form we can check all obstacles

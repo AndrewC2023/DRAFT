@@ -88,6 +88,7 @@ while iteration <= Constraints.MaxIterations
            Grid.visualizeGrid();
            title("Initial Found Path")
            legend([RRTStarTree.TreePlot,RRTStarTree.PathPlot],'Tree','Path')
+           axis([0 x 0 y 0 z])
            hold off
 
         regenerateCount = 1;
@@ -121,9 +122,19 @@ for i = 1:Temp.PathSize
 end
 clear i regenerateCount
 figure(2)
-    % RRTStarTree = RRTStarTree.PlotTree(Grid);
+    RRTStarTree = RRTStarTree.PlotTree(Grid);
     RRTStarTree = RRTStarTree.PlotPath(Grid);
     Grid.visualizeGrid();
     legend([RRTStarTree.TreePlot,RRTStarTree.PathPlot],'Tree','Path')
     Temp.iterationString = num2str(Constraints.MaxIterations);
     title("Final Path")
+    axis([0 x 0 y 0 z])
+
+figure(3)
+    % RRTStarTree = RRTStarTree.PlotTree(Grid);
+    RRTStarTree = RRTStarTree.PlotPath(Grid);
+    Grid.visualizeGrid();
+    legend([RRTStarTree.PathPlot],'Path')
+    Temp.iterationString = num2str(Constraints.MaxIterations);
+    title("Final Path")
+    axis([0 x 0 y 0 z])

@@ -149,7 +149,7 @@ classdef RRTStarTree
 
         function cost = CostFunction(Tree,Node,ParentNodeindex)
             % Cost function, current implementation only accounts for distance, but can be modified easily
-            dist = sqrt( (Node(1) - Tree.nodes(ParentNodeindex,1))^2 + (Node(2) - Tree.nodes(ParentNodeindex,2))^2);
+            dist = sqrt( (Node(1) - Tree.nodes(ParentNodeindex,1))^2 + (Node(2) - Tree.nodes(ParentNodeindex,2))^2 + (Node(3) - Tree.nodes(ParentNodeindex,3))^2);
             cost = Tree.costs(ParentNodeindex) + dist;
         end
 
