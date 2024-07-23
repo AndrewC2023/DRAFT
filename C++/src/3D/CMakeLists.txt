@@ -1,9 +1,16 @@
 add_library(
-    ThreeDee
+    ThreeD
 
     GridManager.cpp
+    Planners/AStarGrid.cpp
 )
 
+target_link_libraries(
+    ThreeD
+    
+    Config
+    ${EIGEN3_LIBRARIES}
+)
 
 add_subdirectory(Planners)
 add_subdirectory(Validators)

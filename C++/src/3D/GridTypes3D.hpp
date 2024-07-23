@@ -21,16 +21,18 @@ enum State  {
 
 class Cell {
     public:
-        Cell(PointXYZ p_center)   {
+        Cell(PointXYZ p_center, float cellSize)   {
             _center = p_center;
             //TODO: calculate corners
+            _corners{}
+
         }
 
         PointXYZ getCenter()    {
             return _center;
         }
 
-        std::vector<int> getCorners()   {
+        std::vector<float> getCorners()   {
             return _corners;
         }
 
@@ -52,7 +54,7 @@ class Cell {
 
     private:
         PointXYZ _center;
-        std::vector<int> _corners;
+        std::vector<PointXYZ> _corners;
         State _state;
         float odds;
 

@@ -1,24 +1,22 @@
-// STL
-#include <deque>
-#include <vector>
-#include <cmath>
+// Grid Manager
+#include <3D/GridManager.hpp>
 
 // Eigen
-#include <Eigen/Core>
+#include <Eigen/Dense>
 
 // base class
 #include "IPathPlanner3D.hpp"
 
+// STL
+#include <deque>
+#include <vector>
+#include <cmath>
 namespace Algorithms::ThreeD::Planners
 {
-    struct AStarNode{
-        Eigen::Vector3f Position;
-        int Children[]; // or array potentially
-    };
 
     class AStarGridPlanner
     {
         public:
-            std::vector<>
-    }
+            
+    };
 }
