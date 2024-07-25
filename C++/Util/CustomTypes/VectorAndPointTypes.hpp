@@ -208,7 +208,7 @@ namespace Algorithms::ThreeD
     typedef Util::Custom_Types::Vectors::vector3<float> PointXYZ;              // XYZ Point
     typedef Util::Custom_Types::Vectors::vector3<float> AnglesRollPitchYaw;    // Roll Pitch Yaw angles
     typedef Util::Custom_Types::Vectors::vector3<float> CylindricalRhoPhiZ;    // Cylindrical Coordinates
-    typedef Util::Custom_Types::Vectors::vector3<float> SphericalRThPhi;        // Shperical Coordinates 
+    typedef Util::Custom_Types::Vectors::vector3<float> SphericalRThPhi;       // Shperical Coordinates 
 }
 
 namespace Util::Custom_Types::Vectors
@@ -230,7 +230,7 @@ namespace Util::Custom_Types::Vectors
         statevector6dof(statevector6dof& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
         statevector6dof(const statevector6dof& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
         statevector6dof(const statevector6dof&& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
-        statevector6dof(Algorithms::ThreeD::PointXYZ& points, Algorithms::ThreeD::AnglesRollPitchYaw angles) noexcept : x(points.x), y(points.y), z(points.z), roll(angles.roll)
+        statevector6dof(Algorithms::ThreeD::PointXYZ& points, Algorithms::ThreeD::AnglesRollPitchYaw angles) noexcept : x(points.x), y(points.y), z(points.z), roll(angles.roll), pitch(other.pitch), yaw(other.yaw) {};
         ~statevector6dof() = default;
 
         statevector6dof& operator=(const statevector6dof& other) noexcept
@@ -296,7 +296,7 @@ namespace Util::Custom_Types::Vectors
 
 namespace Algorithms::ThreeD
 {
-    
+    // TODO: duh
 }
 
 #endif // VECTORANDPOINTS_H
