@@ -29,5 +29,5 @@ configure_file(Config.yml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Config.yml COPYONLY)
 ### Targets
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Services")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/util")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Util")
 

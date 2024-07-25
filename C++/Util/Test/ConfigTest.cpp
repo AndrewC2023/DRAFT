@@ -17,11 +17,7 @@ int main()
     const std::string configPath = "Config.yml";
     const Algorithms::Configuration::Config config = Algorithms::Configuration::loadConfig(configPath);
 
-    bool noneLeft2Print = false;
-    while(!noneLeft2Print)
-    {
-        config;
-    }
+    std::cout << "config Loaded" << std::endl;
 
     return 0;
 }

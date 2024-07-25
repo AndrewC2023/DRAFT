@@ -1,2 +1,2 @@
 add_subdirectory(Config)
-add_subdirectory(test)
+add_subdirectory(Test)

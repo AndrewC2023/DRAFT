@@ -2,7 +2,7 @@ add_library(
     ThreeD
 
     GridManager.cpp
-    Planners/AStarGrid.cpp
+    # Planners/AStar/AstarGrid.cpp
 )
 
 target_link_libraries(

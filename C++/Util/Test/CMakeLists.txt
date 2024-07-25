@@ -10,3 +10,9 @@ target_link_libraries(
     Config
     ${YAMLCPP_LIBRARIES}
 )
+
+add_executable(
+    Test_CustomTypes
+
+    CustomTypesTest.cpp
+)
