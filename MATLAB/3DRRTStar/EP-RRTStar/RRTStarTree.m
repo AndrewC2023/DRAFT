@@ -83,7 +83,7 @@ classdef RRTStarTree
                                 sampledNode = sampledNodePoint;
                             else
                                 % check if we are within a radius of the path cylinder coming off the end
-                                nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
+                                nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:), Tree.nodes(Tree.Path(Index + 1),:), Tree.SamplingRestrictionDistance);
                                 if nearLine
                                     NodeGenerated = true;
                                     sampledNode = sampledNodePoint;
@@ -99,7 +99,7 @@ classdef RRTStarTree
                                 sampledNode = sampledNodePoint;
                             else
                                 % check if we are within a radius of the path cylinder coming off the end
-                                nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index - 1),:),Tree.SamplingRestrictionDistance);
+                                nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:), Tree.nodes(Tree.Path(Index - 1),:), Tree.SamplingRestrictionDistance);
                                 if nearLine
                                     NodeGenerated = true;
                                     sampledNode = sampledNodePoint;
@@ -109,12 +109,12 @@ classdef RRTStarTree
                         else
                             % we are closest to one of the middle points
                             % here we check the cylinders behind and in front
-                            nearLineForward = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
+                            nearLineForward = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:), Tree.nodes(Tree.Path(Index + 1),:), Tree.SamplingRestrictionDistance);
                             if nearLineForward
                                 NodeGenerated = true;
                                 sampledNode = sampledNodePoint;
                             else
-                                nearLineBackwards = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
+                                nearLineBackwards = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:), Tree.nodes(Tree.Path(Index + 1),:), Tree.SamplingRestrictionDistance);
                                 if nearLineBackwards
                                     NodeGenerated = true;
                                     sampledNode = sampledNodePoint;

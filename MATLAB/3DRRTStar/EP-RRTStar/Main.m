@@ -5,9 +5,20 @@ close all;
 
 %% Initialize
 
+makeVideo = 1;
+iterationPerFrame = 15;
+videoCount = iterationPerFrame;
+if makeVideo == 1
+    video1 = VideoWriter("EPRRTSTarTree.avi");
+    video1.FrameRate = 10;
+    video2 = VideoWriter("EPRRTSTarPath.avi");
+    video2.FrameRate = 10; 
+    open(video1)
+    open(video2)
+end
 % Problem setup
-Constraints.MaxIterations = 5000;
-Constraints.MaxEdgeLength = 0.08; % meters
+Constraints.MaxIterations = 7000;
+Constraints.MaxEdgeLength = 0.1; % meters
 Constraints.GridResolution = 0.05; % meters
 Constraints.EndTolerance = 0.05; % meters
 Start_End_Indexes = [2,2,2;
@@ -68,6 +79,8 @@ while iteration <= Constraints.MaxIterations
 
     if newPoint(1) == RRTStarTree.endNode(1) && newPoint(2) == RRTStarTree.endNode(2) && newPoint(3) == RRTStarTree.endNode(3)
         RRTStarTree.SamplingRestrictionCheck = true;
+        iterationPerFrame = 80;
+        videoCount = iterationPerFrame;
         RRTStarTree.endNodeIndex = RRTStarTree.numNodes;
 
         % Run the initial Sampling Restriction
@@ -85,10 +98,12 @@ while iteration <= Constraints.MaxIterations
         figure(1)
            RRTStarTree = RRTStarTree.PlotTree(Grid);
            RRTStarTree = RRTStarTree.PlotPath(Grid);
-           Grid.visualizeGrid();
+           Grid.visualizeGrid(wallsTF, walls);
            title("Initial Found Path")
-           legend([RRTStarTree.TreePlot,RRTStarTree.PathPlot],'Tree','Path')
+           legend([RRTStarTree.TreePlot,RRTStarTree.PathPlot],'Tree','Path','Location','northeast')
            axis([0 x 0 y 0 z])
+           view(-14,18.8)
+           grid on
            hold off
 
         regenerateCount = 1;
@@ -107,6 +122,63 @@ while iteration <= Constraints.MaxIterations
             regenerateCount = 1;
             
         end
+        
+        
+    end
+
+    if makeVideo == 1
+
+        if videoCount == iterationPerFrame
+
+            if RRTStarTree.SamplingRestrictionCheck == true
+
+                figure(5)
+                    RRTStarTree = RRTStarTree.PlotTree(Grid);
+                    RRTStarTree = RRTStarTree.PlotPath(Grid);
+                    Grid.visualizeGrid(wallsTF, walls);
+                    legend([RRTStarTree.TreePlot,RRTStarTree.PathPlot],'Tree','Path','Location','northeast')
+                    title("EP-RRT*")
+                    view(-14,18.8)
+                    axis([0 x 0 y 0 z])
+                    grid on
+                    hold off
+                frame = getframe(gcf);
+                writeVideo(video1,frame)
+                
+
+                figure(6)
+                    RRTStarTree = RRTStarTree.PlotPath(Grid);
+                    Grid.visualizeGrid(wallsTF, walls);
+                    legend([RRTStarTree.PathPlot],'Path','Location','northeast')
+                    title("EP-RRT*")
+                    view(-14,18.8)
+                    axis([0 x 0 y 0 z])
+                    grid on
+                    hold off
+                frame = getframe(gcf);
+                writeVideo(video2,frame)
+
+                videoCount = 0;
+            else
+                figure(4)
+                    RRTStarTree = RRTStarTree.PlotTree(Grid);
+                    Grid.visualizeGrid(wallsTF, walls);
+                    legend([RRTStarTree.TreePlot],'Tree','Location','northeast')
+                    title("EP-RRT*")
+                    view(-14,18.8)
+                    axis([0 x 0 y 0 z])
+                    grid on
+                    frame = getframe(gcf);
+                    writeVideo(video1,frame)
+                    writeVideo(video2,frame)
+                    videoCount = 0;
+                    hold off
+            end
+
+        else
+            videoCount = videoCount + 1;
+        end
+
     end
 
     iteration = iteration + 1;
@@ -124,17 +196,24 @@ clear i regenerateCount
 figure(2)
     RRTStarTree = RRTStarTree.PlotTree(Grid);
     RRTStarTree = RRTStarTree.PlotPath(Grid);
-    Grid.visualizeGrid();
-    legend([RRTStarTree.TreePlot,RRTStarTree.PathPlot],'Tree','Path')
-    Temp.iterationString = num2str(Constraints.MaxIterations);
+    Grid.visualizeGrid(wallsTF, walls);
+    legend([RRTStarTree.TreePlot,RRTStarTree.PathPlot],'Tree','Path','Location','northeast')
     title("Final Path")
+    view(-14,18.8)
     axis([0 x 0 y 0 z])
+    grid on
 
 figure(3)
     % RRTStarTree = RRTStarTree.PlotTree(Grid);
     RRTStarTree = RRTStarTree.PlotPath(Grid);
-    Grid.visualizeGrid();
-    legend([RRTStarTree.PathPlot],'Path')
-    Temp.iterationString = num2str(Constraints.MaxIterations);
+    Grid.visualizeGrid(wallsTF, walls);
+    legend([RRTStarTree.PathPlot],'Path','Location','northeast')
     title("Final Path")
+    view(-14,18.8)
     axis([0 x 0 y 0 z])
+    grid on
+
+if makeVideo == 1
+    close(video1)
+    close(video2)
+end
