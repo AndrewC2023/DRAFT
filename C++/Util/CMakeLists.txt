@@ -1,2 +1,2 @@
 add_subdirectory(Config)
-# add_subdirectory(Main)
+add_subdirectory(Test)

@@ -83,7 +83,7 @@ classdef RRTStarTree
                                 sampledNode = sampledNodePoint;
                             else
                                 % check if we are within a radius of the path cylinder coming off the end
-                                nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
+                                nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:), Tree.nodes(Tree.Path(Index + 1),:), Tree.SamplingRestrictionDistance);
                                 if nearLine
                                     NodeGenerated = true;
                                     sampledNode = sampledNodePoint;
@@ -99,7 +99,7 @@ classdef RRTStarTree
                                 sampledNode = sampledNodePoint;
                             else
                                 % check if we are within a radius of the path cylinder coming off the end
-                                nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index - 1),:),Tree.SamplingRestrictionDistance);
+                                nearLine = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:), Tree.nodes(Tree.Path(Index - 1),:), Tree.SamplingRestrictionDistance);
                                 if nearLine
                                     NodeGenerated = true;
                                     sampledNode = sampledNodePoint;
@@ -109,12 +109,12 @@ classdef RRTStarTree
                         else
                             % we are closest to one of the middle points
                             % here we check the cylinders behind and in front
-                            nearLineForward = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
+                            nearLineForward = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:), Tree.nodes(Tree.Path(Index + 1),:), Tree.SamplingRestrictionDistance);
                             if nearLineForward
                                 NodeGenerated = true;
                                 sampledNode = sampledNodePoint;
                             else
-                                nearLineBackwards = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:),Tree.nodes(Tree.Path(Index + 1),:),Tree.SamplingRestrictionDistance);
+                                nearLineBackwards = isPointNearLine(sampledNodePoint, Tree.nodes(Tree.Path(Index),:), Tree.nodes(Tree.Path(Index + 1),:), Tree.SamplingRestrictionDistance);
                                 if nearLineBackwards
                                     NodeGenerated = true;
                                     sampledNode = sampledNodePoint;
@@ -149,7 +149,7 @@ classdef RRTStarTree
 
         function cost = CostFunction(Tree,Node,ParentNodeindex)
             % Cost function, current implementation only accounts for distance, but can be modified easily
-            dist = sqrt( (Node(1) - Tree.nodes(ParentNodeindex,1))^2 + (Node(2) - Tree.nodes(ParentNodeindex,2))^2);
+            dist = sqrt( (Node(1) - Tree.nodes(ParentNodeindex,1))^2 + (Node(2) - Tree.nodes(ParentNodeindex,2))^2 + (Node(3) - Tree.nodes(ParentNodeindex,3))^2);
             cost = Tree.costs(ParentNodeindex) + dist;
         end
 

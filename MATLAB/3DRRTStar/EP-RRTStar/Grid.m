@@ -89,16 +89,49 @@ classdef Grid
         end
 
         % helper to visualize the grid
-        function visualizeGrid(Grid)
-            for i = 1:Grid.indexDimensions(1)
-            for j = 1:Grid.indexDimensions(2)
-            for k = 1:Grid.indexDimensions(3)
-                if Grid.Occupancy(i,j,k) == 1
-                    scatter3(i,j,k,"black","filled","square");
-                    hold on
+        function visualizeGrid(Grid, wallsTF, walls)
+
+            if wallsTF == 1
+                % for ease plot just walls for speed
+                numwalls = size(walls);
+                for i = 1:numwalls(1)
+
+                    % const z:
+                    fill3([walls(i,1,1), walls(i,1,1), walls(i,1,2), walls(i,1,2)],...
+                          [walls(i,2,1), walls(i,2,2), walls(i,2,2), walls(i,2,1)],...
+                          [walls(i,3,1), walls(i,3,1), walls(i,3,1), walls(i,3,1)],'black');
+                    fill3([walls(i,1,1), walls(i,1,1), walls(i,1,2), walls(i,1,2)],...
+                          [walls(i,2,1), walls(i,2,2), walls(i,2,2), walls(i,2,1)],...
+                          [walls(i,3,2), walls(i,3,2), walls(i,3,2), walls(i,3,2)],'black');
+                    
+                    % const y:
+                    fill3([walls(i,1,1), walls(i,1,1), walls(i,1,2), walls(i,1,2)],...
+                          [walls(i,2,1), walls(i,2,1), walls(i,2,1), walls(i,2,1)],...
+                          [walls(i,3,1), walls(i,3,2), walls(i,3,2), walls(i,3,1)],'black');
+                    fill3([walls(i,1,1), walls(i,1,1), walls(i,1,2), walls(i,1,2)],...
+                          [walls(i,2,2), walls(i,2,2), walls(i,2,2), walls(i,2,2)],...
+                          [walls(i,3,1), walls(i,3,2), walls(i,3,2), walls(i,3,1)],'black');
+                    
+                    % const x:
+                    fill3([walls(i,1,1), walls(i,1,1), walls(i,1,1), walls(i,1,1)],...
+                          [walls(i,2,1), walls(i,2,1), walls(i,2,2), walls(i,2,2)],...
+                          [walls(i,3,1), walls(i,3,2), walls(i,3,2), walls(i,3,1)],'black');
+                    fill3([walls(i,1,2), walls(i,1,2), walls(i,1,2), walls(i,1,2)],...
+                          [walls(i,2,1), walls(i,2,1), walls(i,2,2), walls(i,2,2)],...
+                          [walls(i,3,1), walls(i,3,2), walls(i,3,2), walls(i,3,1)],'black');
                 end
-            end
-            end
+                
+            else
+                for i = 1:Grid.indexDimensions(1)
+                for j = 1:Grid.indexDimensions(2)
+                for k = 1:Grid.indexDimensions(3)
+                    if Grid.Occupancy(i,j,k) == 1
+                        scatter3(i,j,k,"black","filled","square");
+                        hold on
+                    end
+                end
+                end
+                end
             end
         end
     end

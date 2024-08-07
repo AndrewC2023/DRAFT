@@ -12,6 +12,10 @@ find_library ( YAMLCPP_LIBRARY libyaml-cpp.a /usr/lib /usr/local/lib)
 set ( YAMLCPP_LIBRARIES ${YAMLCPP_LIBRARY} )
 set ( YAMLCPP_INCLUDE_DIRS ${YAMLCPP_INCLUDE_DIR} )
 
+if (YAMLCPP_INCLUDE_DIRS AND YAMLCPP_LIBRARY)
+    message(STATUS "yaml-cpp found")
+endif()
+
 include ( FindPackageHandleStandardArgs )
 # Set YAMLCPP_FOUND to TRUE if all listed variables are TRUE
 find_package_handle_standard_args ( YAMLCPP DEFAULT_MSG YAMLCPP_LIBRARY YAMLCPP_INCLUDE_DIR )

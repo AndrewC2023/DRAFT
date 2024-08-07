@@ -25,7 +25,7 @@ std::vector<Cell> GridManager::getCells()   {
         return _grid;
     }
     else    {
-        // TODO: implement error handling here -> actual logging for now just return frid
+        // TODO: implement error handling here -> actual logging for now just return grid
         return _grid;
     }
 }
@@ -199,21 +199,4 @@ void GridManager::pushUpdatesToGrid()   {
 
 }
 
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -16,6 +16,7 @@ sudo apt-get install -y libyaml-dev
 ADMIN_DIR=$(realpath .)
 echo "in admin directory: ${ADMIN_DIR}"
 
+echo ""
 echo "-------------------------------------------------------------------------------------------------------------------------"
 echo 'Would you like to install Matplot++ in the project directory or locally on ubuntu with the rest of your static libraries?'
 printf '1: In usr    2: In Project: '
@@ -85,6 +86,7 @@ else
     echo "please specify 1 or 2"
 fi
 
+echo ""
 echo "Installation of required packages complete!"
 echo "Run setup.sh in the c++ root dir to build the project"
 echo "Happy hacking!"

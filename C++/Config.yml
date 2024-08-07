@@ -1,61 +1,121 @@
-
+---
+# TODO: update and add values for whole config
 Grid:
-  cellSize:
   # the following are test rooms that could be loaded for planners to use and be tesed with, listed with preloaded obstacles in the space
   # units are in meters ALWAYS
   # obstacles are boxes, a center point, length(x), width(y), height(z), and roll, pitch, yaw in rads: [x,y,z ,l,w,h ,r,p,y]
-  TestSpaces:
-    Room1:
-      xMin: 0.0
-      xMax: 2.0
-      yMin: 0.0
-      yMax: 2.0
-      zMin: -1.0
-      zMax: 1.0
-      obstacle1: 
-      obstacle2:
-      obstacle3:
-      obstacle4:
-    Room2:
-      xMin:
-      xMax:
-      yMin:
-      yMax:
-      zMin:
-      zMax:
-      obstacle1:
-      obstacle2:
-      obstacle3:
-      obstacle4:
-    Room3:
-      xMin:
-      xMax:
-      yMin:
-      yMax:
-      zMin:
-      zMax:
-      obstacle1:
-      obstacle2:
-      obstacle3:
-      obstacle4:
-    Room4:
-      xMin:
-      xMax:
-      yMin:
-      yMax:
-      zMin:
-      zMax:
-      obstacle1:
-      obstacle2:
-      obstacle3:
-      obstacle4:
+    # Two D will not include 
+  TwoD:
+    cellSize: 0.1 # meters
+    updateFrequency: 10
+    TestSpace:
+      RoomName: "Room1"
+      Room1:
+        xMin: 0.0
+        xMax: 2.0
+        yMin: 0.0
+        yMax: 2.0
+        obstacles: 
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+      Room2: #TODO update these and their structures
+        xMin: 0.0
+        xMax: 2.0
+        yMin: 0.0
+        yMax: 2.0
+        obstacles: 
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+      Room3:
+        xMin: 0.0
+        xMax: 2.0
+        yMin: 0.0
+        yMax: 2.0
+        obstacles: 
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+      Room4:
+        xMin: 0.0
+        xMax: 2.0
+        yMin: 0.0
+        yMax: 2.0
+        obstacles: 
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.1]
+
+  ThreeD:
+    cellSize: 0.1 # meters
+    updateFrequency: 10
+    TestSpace:
+      RoomName: "Room1"
+      Room1:
+        xMin: 0.0
+        xMax: 2.0
+        yMin: 0.0
+        yMax: 2.0
+        zMin: -1.0
+        zMax: 1.0
+        obstacles: 
+          - [0.5,0.5,0.5, 0.5,0.5,0.5, 0.1,0.1,0.1]
+          - [0.5,0.5,0.5, 0.5,0.5,0.5, 0.1,0.1,0.1]
+          - [0.5,0.5,0.5, 0.5,0.5,0.5, 0.1,0.1,0.1]
+          - [0.5,0.5,0.5, 0.5,0.5,0.5, 0.1,0.1,0.1]
+      Room2: #TODO update these and their structures
+        xMin: 0.0
+        xMax: 2.0
+        yMin: 0.0
+        yMax: 2.0
+        zMin: -1.0
+        zMax: 1.0
+        obstacles: 
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+      Room3:
+        xMin: 0.0
+        xMax: 2.0
+        yMin: 0.0
+        yMax: 2.0
+        zMin: -1.0
+        zMax: 1.0
+        obstacles: 
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+      Room4:
+        xMin: 0.0
+        xMax: 2.0
+        yMin: 0.0
+        yMax: 2.0
+        zMin: -1.0
+        zMax: 1.0
+        obstacles: 
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
+          - [0.5,0.5, 0.5, 0.5, 0.5, 0.1,0.1,0.1]
 
 Planners:
   RRTStar:
-    maxEdgeLength:
+    maxEdgeLength: 0.1
+    maxIterations: 10000
   EP_RRTStar:
+    maxSamplingRange: 0.1
   LQR_RRTStar:
   CL_RRTStar:
   RRTSharp:
   RH_ELQR:
   AStar:
+    distanceCostFactor: 10.0
+    heuristicCostFactor: 1.0
+    isInvalidPenalty: 1000.0

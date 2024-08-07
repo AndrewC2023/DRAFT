@@ -8,6 +8,7 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/admin/cmake_mod
 
 # Add libraries
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/src" )
+include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/util" )
 
 # YAML library
 find_package(yaml-cpp REQUIRED)
@@ -22,9 +23,11 @@ find_package(Matplot++ REQUIRED)
 
 ## Configures cmake to output binaries in build/bin
 ## make sure to run cmake configuration command cmake -S . -B build in the C++ directory
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+configure_file(Config.yml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Config.yml COPYONLY)
 
 ### Targets
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Services")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Util")
 

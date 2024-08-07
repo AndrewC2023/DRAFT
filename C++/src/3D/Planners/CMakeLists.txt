@@ -1,4 +1,4 @@
-add_subdirectory(AStarGrid)
+add_subdirectory(AStar)
 # add_subdirectory(AStarTree)
 # add_subdirectory(RH-ELQR)
 # add_subdirectory(RRG)
