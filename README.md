@@ -58,7 +58,7 @@ sudo apt update
 sudo apt install python3
 ```
 
-this will also instal pip which with manage your python libraries
+this will also instal pip which will manage your python libraries
 
 there is a required libraries shell script in the python folder, but the process of manually using pip in the terminal is not difficult so either approach is fine.
 
