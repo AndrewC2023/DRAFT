@@ -8,7 +8,7 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/admin/cmake_mod
 
 # Add libraries
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/src" )
-include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/util" )
+include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/Util" )
 
 # YAML library
 find_package(yaml-cpp REQUIRED)
