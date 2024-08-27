@@ -3,7 +3,7 @@
  * Date: 07-25-2024
  */
 
-#include "CustomTypes/VectorAndPointTypes.hpp"
+#include "../CustomTypes/VectorAndPointTypes.hpp"
 
 #include <iostream>
 

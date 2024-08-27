@@ -4,7 +4,7 @@
  */
 
 // Config
-#include <Config/Config.hpp>
+#include <../Config/Config.hpp>
 
 // STL
 #include <iostream>

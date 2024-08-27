@@ -7,5 +7,5 @@ add_executable(
 target_link_libraries(
     Service_3DGridManagerTest
 
-    ThreeDee
+    ThreeD
 )
