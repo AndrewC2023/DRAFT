@@ -172,13 +172,11 @@ namespace Util::Custom_Types::Vectors
         angle3() noexcept : roll(0), pitch(0), yaw(0) {};
         angle3(T& x, T& y, T& z) noexcept : roll(x), pitch(y), yaw(z) {};
         angle3(const T& x, const T& y, const float& z) noexcept : roll(x), pitch(y), yaw(z) {};
-        angle3(vector3& other) noexcept : roll(other.x), pitch(other.y), yaw(other.z) {};
-        angle3(const vector3& other) noexcept : x(other.x), y(other.y), z(other.z) {};
-        angle3(const vector3&& other) noexcept : x(other.x), y(other.y), z(other.z) {};
+        angle3(angle3& other) noexcept : roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
+        angle3(const angle3& other) noexcept : roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
+        angle3(const angle3&& other) noexcept : roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
         ~angle3() = default;
 
-        private:
-            using vector3<T>::x;
     };
     
     /// Macros with same name as Eigen types
