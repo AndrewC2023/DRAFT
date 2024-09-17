@@ -10,6 +10,7 @@ target_link_libraries(
     
     Config
     ${EIGEN3_LIBRARIES}
+    pthread
 )
 
 add_subdirectory(Planners)

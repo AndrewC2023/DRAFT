@@ -8,7 +8,6 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/admin/cmake_mod
 
 # Add libraries
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/src" )
-include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/util" )
 
 # YAML library
 find_package(yaml-cpp REQUIRED)
@@ -29,5 +28,4 @@ configure_file(Config.yml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Config.yml COPYONLY)
 ### Targets
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Services")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Util")
 

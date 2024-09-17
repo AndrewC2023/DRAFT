@@ -160,25 +160,58 @@ namespace Util::Custom_Types::Vectors
     };
 
     template<typename T>
-    struct angle3 : vector3<T>
+    struct angle3
     {
-        using vector3<T>::vector3;
-        
-        union {
-            struct { T roll, pitch, yaw; };
-            struct { T x, y, z; };
-        };
-
         angle3() noexcept : roll(0), pitch(0), yaw(0) {};
-        angle3(T& x, T& y, T& z) noexcept : roll(x), pitch(y), yaw(z) {};
-        angle3(const T& x, const T& y, const float& z) noexcept : roll(x), pitch(y), yaw(z) {};
-        angle3(vector3& other) noexcept : roll(other.x), pitch(other.y), yaw(other.z) {};
-        angle3(const vector3& other) noexcept : x(other.x), y(other.y), z(other.z) {};
-        angle3(const vector3&& other) noexcept : x(other.x), y(other.y), z(other.z) {};
+        angle3(T& roll, T& pitch, T& yaw) noexcept : roll(roll), pitch(pitch), yaw(yaw) {};
+        angle3(const T& roll, const T& pitch, const T& yaw) noexcept : roll(roll), pitch(pitch), yaw(yaw) {};
+        angle3(angle3& other) noexcept : roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
+        angle3(const angle3& other) noexcept : roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
+        angle3(const angle3&& other) noexcept : roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
         ~angle3() = default;
 
-        private:
-            using vector3<T>::x;
+        angle3& operator=(const angle3& other) noexcept
+        {
+            roll = other.roll;
+            pitch = other.pitch;
+            yaw = other.yaw;
+            return *this;
+        };
+        angle3& operator=(angle3&& other) noexcept
+        {
+            roll = other.roll;
+            pitch = other.pitch;
+            yaw = other.yaw;
+            return *this;
+        };
+
+        bool operator==(angle3& other) const { return roll == other.roll && pitch == other.pitch && yaw == other.yaw; };
+        bool operator==(const angle3& other) const { return roll == other.roll && pitch == other.pitch && yaw == other.yaw; };
+        bool operator!=(angle3& other) const { return roll != other.roll || pitch != other.pitch || yaw != other.yaw; };
+        bool operator!=(const angle3& other) const { return roll != other.roll || pitch != other.pitch || yaw != other.yaw; };
+        
+        // Vector addition
+        angle3 operator+(angle3& other) const { return angle3(roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
+        angle3 operator+(const angle3& other) const { return angle3(roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
+        angle3 operator-(angle3& other) const { return angle3(roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
+        angle3 operator-(const angle3& other) const { return angle3(roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
+
+        // not vectors, no need to have dot or cross product or most vector math
+
+        friend std::ostream& operator<<(std::ostream& stream, const angle3& data)
+        {
+            stream << "( " << data.roll << ", " << data.pitch << ", " << data.yaw << " )";
+            return stream;
+        };
+
+        [[nodiscard]] std::string string() const {
+            return std::string("( " + std::to_string(roll) + ", " + std::to_string(pitch) + ", " + std::to_string(yaw) + " )");
+        }
+
+        T roll;
+        T pitch;
+        T yaw;
+
     };
     
     /// Macros with same name as Eigen types
@@ -190,7 +223,8 @@ namespace Util::Custom_Types::Vectors
     typedef vector3<float> Vector3f;
     typedef vector3<double> Vector3d;
 
-    typedef angle3<float> AnglesRollPitchYaw;
+    typedef angle3<float> angle3f;
+    typedef angle3<double> angle3d;
 }
 
 /// Macros for use in navigation
@@ -206,9 +240,9 @@ namespace Algorithms::ThreeD
 {
     typedef Util::Custom_Types::Vectors::vector3<int> IndexXYZ;                // Index type for 3D grid manager
     typedef Util::Custom_Types::Vectors::vector3<float> PointXYZ;              // XYZ Point
-    typedef Util::Custom_Types::Vectors::vector3<float> AnglesRollPitchYaw;    // Roll Pitch Yaw angles
-    typedef Util::Custom_Types::Vectors::vector3<float> CylindricalRhoPhiZ;    // Cylindrical Coordinates
-    typedef Util::Custom_Types::Vectors::vector3<float> SphericalRThPhi;       // Shperical Coordinates 
+    typedef Util::Custom_Types::Vectors::angle3<float> AnglesRollPitchYaw;     // Roll Pitch Yaw angles
+    typedef Util::Custom_Types::Vectors::angle3<float> CylindricalRhoPhiZ;     // Cylindrical Coordinates
+    typedef Util::Custom_Types::Vectors::vector3<float> SphericalRThetaPhi;    // Shperical Coordinates 
 }
 
 namespace Util::Custom_Types::Vectors
@@ -222,18 +256,18 @@ namespace Util::Custom_Types::Vectors
      * 
      */
     template<typename T>
-    struct statevector6dof
+    struct statevector6DOF
     {
-        statevector6dof() noexcept : x(0), y(0), z(0), roll(0), pitch(0), yaw(0) {};
-        statevector6dof(T& x, T& y, T& z, T& roll, T& pitch, T& yaw) noexcept : x(x), y(y), z(z), roll(roll), pitch(pitch), yaw(yaw) {};
-        statevector6dof(const T& x, const T& y, const T& z) noexcept : x(x), y(y), z(z), roll(roll), pitch(pitch), yaw(yaw) {};
-        statevector6dof(statevector6dof& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
-        statevector6dof(const statevector6dof& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
-        statevector6dof(const statevector6dof&& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
-        statevector6dof(Algorithms::ThreeD::PointXYZ& points, Algorithms::ThreeD::AnglesRollPitchYaw angles) noexcept : x(points.x), y(points.y), z(points.z), roll(angles.roll), pitch(other.pitch), yaw(other.yaw) {};
-        ~statevector6dof() = default;
+        statevector6DOF() noexcept : x(0), y(0), z(0), roll(0), pitch(0), yaw(0) {};
+        statevector6DOF(T& x, T& y, T& z, T& roll, T& pitch, T& yaw) noexcept : x(x), y(y), z(z), roll(roll), pitch(pitch), yaw(yaw) {};
+        statevector6DOF(const T& x, const T& y, const T& z) noexcept : x(x), y(y), z(z), roll(roll), pitch(pitch), yaw(yaw) {};
+        statevector6DOF(statevector6DOF& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
+        statevector6DOF(const statevector6DOF& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
+        statevector6DOF(const statevector6DOF&& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
+        statevector6DOF(Algorithms::ThreeD::PointXYZ& points, Algorithms::ThreeD::AnglesRollPitchYaw angles) noexcept : x(points.x), y(points.y), z(points.z), roll(angles.roll), pitch(angles.pitch), yaw(angles.yaw) {};
+        ~statevector6DOF() = default;
 
-        statevector6dof& operator=(const statevector6dof& other) noexcept
+        statevector6DOF& operator=(const statevector6DOF& other) noexcept
         {
             x = other.x;
             y = other.y;
@@ -243,7 +277,7 @@ namespace Util::Custom_Types::Vectors
             yaw = other.yaw;
             return *this;
         };
-        statevector6dof& operator=(statevector6dof&& other) noexcept
+        statevector6DOF& operator=(statevector6DOF&& other) noexcept
         {
             x = other.x;
             y = other.y;
@@ -254,28 +288,28 @@ namespace Util::Custom_Types::Vectors
             return *this;
         };
 
-        bool operator==(statevector6dof& other) const { return x == other.x && y == other.y && z == other.z && roll == other.roll && pitch == other.pitch && yaw == other.yaw; };
-        bool operator==(const statevector6dof& other) const { return x == other.x && y == other.y && z == other.z && roll == other.roll && pitch == other.pitch && yaw == other.yaw; };
-        bool operator!=(statevector6dof& other) const { return x != other.x || y != other.y || z != other.z || roll != other.roll || pitch != other.pitch || yaw == other.yaw; };
-        bool operator!=(const statevector6dof& other) const { return x != other.x || y != other.y || z != other.z || roll != other.roll || pitch != other.pitch || yaw == other.yaw; };
+        bool operator==(statevector6DOF& other) const { return x == other.x && y == other.y && z == other.z && roll == other.roll && pitch == other.pitch && yaw == other.yaw; };
+        bool operator==(const statevector6DOF& other) const { return x == other.x && y == other.y && z == other.z && roll == other.roll && pitch == other.pitch && yaw == other.yaw; };
+        bool operator!=(statevector6DOF& other) const { return x != other.x || y != other.y || z != other.z || roll != other.roll || pitch != other.pitch || yaw == other.yaw; };
+        bool operator!=(const statevector6DOF& other) const { return x != other.x || y != other.y || z != other.z || roll != other.roll || pitch != other.pitch || yaw == other.yaw; };
         
         // Vector addition
-        statevector6dof operator+(statevector6dof& other) const { return statevector6dof(x + other.x, y + other.y, z + other.z, roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
-        statevector6dof operator+(const statevector6dof& other) const { return statevector6dof(x + other.x, y + other.y, z + other.z, roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
-        statevector6dof operator+(Algorithms::ThreeD::PointXYZ& other) const {return statevector6dof(x + other.x, y + other.y, z + other.z, roll, pitch, yaw); }
-        statevector6dof operator+(const Algorithms::ThreeD::PointXYZ& other) const {return statevector6dof(x + other.x, y + other.y, z + other.z, roll, pitch, yaw); }
-        statevector6dof operator+(Algorithms::ThreeD::AnglesRollPitchYaw& other) const {return statevector6dof(x, y, z, roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
-        statevector6dof operator+(const Algorithms::ThreeD::AnglesRollPitchYaw& other) const {return statevector6dof(x, y, z, roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
-        statevector6dof operator-(statevector6dof& other) const { return statevector6dof(x - other.x, y - other.y, z - other.z, roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
-        statevector6dof operator-(const statevector6dof& other) const { return statevector6dof(x - other.x, y - other.y, z - other.z, roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
-        statevector6dof operator-(Algorithms::ThreeD::PointXYZ& other) const {return statevector6dof(x - other.x, y - other.y, z - other.z, roll, pitch, yaw); }
-        statevector6dof operator-(const Algorithms::ThreeD::PointXYZ& other) const {return statevector6dof(x - other.x, y - other.y, z - other.z, roll, pitch, yaw); }
-        statevector6dof operator-(Algorithms::ThreeD::AnglesRollPitchYaw& other) const {return statevector6dof(x, y, z, roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
-        statevector6dof operator-(const Algorithms::ThreeD::AnglesRollPitchYaw& other) const {return statevector6dof(x, y, z, roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
+        statevector6DOF operator+(statevector6DOF& other) const { return statevector6DOF(x + other.x, y + other.y, z + other.z, roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
+        statevector6DOF operator+(const statevector6DOF& other) const { return statevector6DOF(x + other.x, y + other.y, z + other.z, roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
+        statevector6DOF operator+(Algorithms::ThreeD::PointXYZ& other) const {return statevector6DOF(x + other.x, y + other.y, z + other.z, roll, pitch, yaw); }
+        statevector6DOF operator+(const Algorithms::ThreeD::PointXYZ& other) const {return statevector6DOF(x + other.x, y + other.y, z + other.z, roll, pitch, yaw); }
+        statevector6DOF operator+(Algorithms::ThreeD::AnglesRollPitchYaw& other) const {return statevector6DOF(x, y, z, roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
+        statevector6DOF operator+(const Algorithms::ThreeD::AnglesRollPitchYaw& other) const {return statevector6DOF(x, y, z, roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
+        statevector6DOF operator-(statevector6DOF& other) const { return statevector6DOF(x - other.x, y - other.y, z - other.z, roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
+        statevector6DOF operator-(const statevector6DOF& other) const { return statevector6DOF(x - other.x, y - other.y, z - other.z, roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
+        statevector6DOF operator-(Algorithms::ThreeD::PointXYZ& other) const {return statevector6DOF(x - other.x, y - other.y, z - other.z, roll, pitch, yaw); }
+        statevector6DOF operator-(const Algorithms::ThreeD::PointXYZ& other) const {return statevector6DOF(x - other.x, y - other.y, z - other.z, roll, pitch, yaw); }
+        statevector6DOF operator-(Algorithms::ThreeD::AnglesRollPitchYaw& other) const {return statevector6DOF(x, y, z, roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
+        statevector6DOF operator-(const Algorithms::ThreeD::AnglesRollPitchYaw& other) const {return statevector6DOF(x, y, z, roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
 
         [[nodiscard]] double norm() const { return static_cast<double>(std::sqrt(x * x + y * y + z * z)); }
 
-        friend std::ostream& operator<<(std::ostream& stream, const statevector6dof& data)
+        friend std::ostream& operator<<(std::ostream& stream, const statevector6DOF& data)
         {
             stream << "state 6dof:\n (X: " << data.x << ", Y: " << data.y << ", Z: " << data.z << " )\n(Roll: " << data.roll << ", Pitch: " << data.pitch << ", Yaw: " << data.yaw << " )";
             return stream;
@@ -296,7 +330,8 @@ namespace Util::Custom_Types::Vectors
 
 namespace Algorithms::ThreeD
 {
-    // TODO: duh
+    typedef Util::Custom_Types::Vectors::statevector6DOF<float> State6DOFf;
+    typedef Util::Custom_Types::Vectors::statevector6DOF<double> State6DOFd;
 }
 
 #endif // VECTORANDPOINTS_H

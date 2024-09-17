@@ -9,7 +9,7 @@
 #include <chrono>
 
 // custom types
-#include "Util/CustomTypes/VectorAndPointTypes.hpp"
+#include "GridTypes3D.hpp"
 
 namespace Algorithms::ThreeD {
 
