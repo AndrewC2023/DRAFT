@@ -160,22 +160,57 @@ namespace Util::Custom_Types::Vectors
     };
 
     template<typename T>
-    struct angle3 : vector3<T>
+    struct angle3
     {
-        using vector3<T>::vector3;
-        
-        union {
-            struct { T roll, pitch, yaw; };
-            struct { T x, y, z; };
-        };
-
         angle3() noexcept : roll(0), pitch(0), yaw(0) {};
-        angle3(T& x, T& y, T& z) noexcept : roll(x), pitch(y), yaw(z) {};
-        angle3(const T& x, const T& y, const float& z) noexcept : roll(x), pitch(y), yaw(z) {};
+        angle3(T& roll, T& pitch, T& yaw) noexcept : roll(roll), pitch(pitch), yaw(yaw) {};
+        angle3(const T& roll, const T& pitch, const T& yaw) noexcept : roll(roll), pitch(pitch), yaw(yaw) {};
         angle3(angle3& other) noexcept : roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
         angle3(const angle3& other) noexcept : roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
         angle3(const angle3&& other) noexcept : roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
         ~angle3() = default;
+
+        angle3& operator=(const angle3& other) noexcept
+        {
+            roll = other.roll;
+            pitch = other.pitch;
+            yaw = other.yaw;
+            return *this;
+        };
+        angle3& operator=(angle3&& other) noexcept
+        {
+            roll = other.roll;
+            pitch = other.pitch;
+            yaw = other.yaw;
+            return *this;
+        };
+
+        bool operator==(angle3& other) const { return roll == other.roll && pitch == other.pitch && yaw == other.yaw; };
+        bool operator==(const angle3& other) const { return roll == other.roll && pitch == other.pitch && yaw == other.yaw; };
+        bool operator!=(angle3& other) const { return roll != other.roll || pitch != other.pitch || yaw != other.yaw; };
+        bool operator!=(const angle3& other) const { return roll != other.roll || pitch != other.pitch || yaw != other.yaw; };
+        
+        // Vector addition
+        angle3 operator+(angle3& other) const { return angle3(roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
+        angle3 operator+(const angle3& other) const { return angle3(roll + other.roll, pitch + other.pitch, yaw + other.yaw); }
+        angle3 operator-(angle3& other) const { return angle3(roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
+        angle3 operator-(const angle3& other) const { return angle3(roll - other.roll, pitch - other.pitch, yaw - other.yaw); }
+
+        // not vectors, no need to have dot or cross product or most vector math
+
+        friend std::ostream& operator<<(std::ostream& stream, const angle3& data)
+        {
+            stream << "( " << data.roll << ", " << data.pitch << ", " << data.yaw << " )";
+            return stream;
+        };
+
+        [[nodiscard]] std::string string() const {
+            return std::string("( " + std::to_string(roll) + ", " + std::to_string(pitch) + ", " + std::to_string(yaw) + " )");
+        }
+
+        T roll;
+        T pitch;
+        T yaw;
 
     };
     
@@ -188,7 +223,8 @@ namespace Util::Custom_Types::Vectors
     typedef vector3<float> Vector3f;
     typedef vector3<double> Vector3d;
 
-    typedef angle3<float> AnglesRollPitchYaw;
+    typedef angle3<float> angle3f;
+    typedef angle3<double> angle3d;
 }
 
 /// Macros for use in navigation
@@ -204,9 +240,9 @@ namespace Algorithms::ThreeD
 {
     typedef Util::Custom_Types::Vectors::vector3<int> IndexXYZ;                // Index type for 3D grid manager
     typedef Util::Custom_Types::Vectors::vector3<float> PointXYZ;              // XYZ Point
-    typedef Util::Custom_Types::Vectors::vector3<float> AnglesRollPitchYaw;    // Roll Pitch Yaw angles
-    typedef Util::Custom_Types::Vectors::vector3<float> CylindricalRhoPhiZ;    // Cylindrical Coordinates
-    typedef Util::Custom_Types::Vectors::vector3<float> SphericalRThPhi;       // Shperical Coordinates 
+    typedef Util::Custom_Types::Vectors::angle3<float> AnglesRollPitchYaw;     // Roll Pitch Yaw angles
+    typedef Util::Custom_Types::Vectors::angle3<float> CylindricalRhoPhiZ;     // Cylindrical Coordinates
+    typedef Util::Custom_Types::Vectors::vector3<float> SphericalRThetaPhi;    // Shperical Coordinates 
 }
 
 namespace Util::Custom_Types::Vectors
@@ -228,7 +264,7 @@ namespace Util::Custom_Types::Vectors
         statevector6DOF(statevector6DOF& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
         statevector6DOF(const statevector6DOF& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
         statevector6DOF(const statevector6DOF&& other) noexcept : x(other.x), y(other.y), z(other.z), roll(other.roll), pitch(other.pitch), yaw(other.yaw) {};
-        statevector6DOF(Algorithms::ThreeD::PointXYZ& points, Algorithms::ThreeD::AnglesRollPitchYaw angles) noexcept : x(points.x), y(points.y), z(points.z), roll(angles.roll), pitch(other.pitch), yaw(other.yaw) {};
+        statevector6DOF(Algorithms::ThreeD::PointXYZ& points, Algorithms::ThreeD::AnglesRollPitchYaw angles) noexcept : x(points.x), y(points.y), z(points.z), roll(angles.roll), pitch(angles.pitch), yaw(angles.yaw) {};
         ~statevector6DOF() = default;
 
         statevector6DOF& operator=(const statevector6DOF& other) noexcept

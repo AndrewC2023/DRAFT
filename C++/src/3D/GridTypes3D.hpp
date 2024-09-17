@@ -2,11 +2,10 @@
 #include <cmath>
 #include <vector>
 
-struct PointXYZ {
-    float x;
-    float y;
-    float z; 
-};
+#include "Util/CustomTypes/VectorAndPointTypes.hpp"
+
+namespace Algorithms::ThreeD {
+
 
 struct UpdateRequest    {
     int index;
@@ -21,41 +20,84 @@ enum State  {
 
 class Cell {
     public:
-        Cell(PointXYZ p_center, float cellSize)   {
+        Cell(Algorithms::ThreeD::PointXYZ p_center, float cellSize)
+        {
             _center = p_center;
-            //TODO: calculate corners
-            _corners{}
+            _cellSize = cellSize;
+            
+            _corners = {
+                Algorithms::ThreeD::PointXYZ(p_center.x - (cellSize/2.0f),p_center.y - (cellSize/2.0f),p_center.z - (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x - (cellSize/2.0f),p_center.y + (cellSize/2.0f),p_center.z - (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x - (cellSize/2.0f),p_center.y + (cellSize/2.0f),p_center.z + (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x - (cellSize/2.0f),p_center.y - (cellSize/2.0f),p_center.z + (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x + (cellSize/2.0f),p_center.y - (cellSize/2.0f),p_center.z - (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x + (cellSize/2.0f),p_center.y + (cellSize/2.0f),p_center.z - (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x + (cellSize/2.0f),p_center.y + (cellSize/2.0f),p_center.z + (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x + (cellSize/2.0f),p_center.y - (cellSize/2.0f),p_center.z + (cellSize/2.0f)),
+            };
 
+            // default if not specified
+            _state = State::CLEAR;
+            _odds = 0;
         }
 
-        PointXYZ getCenter()    {
+        Cell(Algorithms::ThreeD::PointXYZ p_center, float cellSize, State state, float odds)
+        {
+            _center = p_center;
+            _cellSize = cellSize;
+
+            _corners = {
+                Algorithms::ThreeD::PointXYZ(p_center.x - (cellSize/2.0f),p_center.y - (cellSize/2.0f),p_center.z - (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x - (cellSize/2.0f),p_center.y + (cellSize/2.0f),p_center.z - (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x - (cellSize/2.0f),p_center.y + (cellSize/2.0f),p_center.z + (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x - (cellSize/2.0f),p_center.y - (cellSize/2.0f),p_center.z + (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x + (cellSize/2.0f),p_center.y - (cellSize/2.0f),p_center.z - (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x + (cellSize/2.0f),p_center.y + (cellSize/2.0f),p_center.z - (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x + (cellSize/2.0f),p_center.y + (cellSize/2.0f),p_center.z + (cellSize/2.0f)),
+                Algorithms::ThreeD::PointXYZ(p_center.x + (cellSize/2.0f),p_center.y - (cellSize/2.0f),p_center.z + (cellSize/2.0f)),
+            };
+
+            _state = state;
+            _odds = odds;
+        }
+
+        Algorithms::ThreeD::PointXYZ getCenter()    
+        {
             return _center;
         }
 
-        std::vector<float> getCorners()   {
+        std::vector<Algorithms::ThreeD::PointXYZ> getCorners()   
+        {
             return _corners;
         }
 
-        State getState()    {
+        State getState()    
+        {
             return _state;
         }
-        void setState(State p_state) {
+        void setState(State p_state) 
+        {
             _state = p_state;
         }
 
-        void incrementOdds(int increment) {
-            odds += increment;
+        void incrementOdds(int increment) 
+        {
+            _odds += increment;
         }
 
-        float getOdds() {
-            return (1 - (1/(1-(std::pow(2, odds)))));
+        float getOdds() 
+        {
+            return (1 - (1/(1-(std::pow(2, _odds)))));
         }
 
 
     private:
-        PointXYZ _center;
-        std::vector<PointXYZ> _corners;
+        Algorithms::ThreeD::PointXYZ _center;
+        std::vector<Algorithms::ThreeD::PointXYZ> _corners;
         State _state;
-        float odds;
+        float _odds;
+        float _cellSize;
 
 };
+
+}

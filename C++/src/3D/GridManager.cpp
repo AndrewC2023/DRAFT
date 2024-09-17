@@ -44,7 +44,7 @@ void GridManager::createEmptyGrid(float p_maxX, float p_maxY, float p_maxZ, floa
                 float centerY = (j + 0.5) * p_cellSize;
                 float centerZ = (k + 0.5) * p_cellSize;
 
-                _grid.emplace_back(PointXYZ{centerX, centerY, centerZ});
+                _grid.emplace_back(Cell(Algorithms::ThreeD::PointXYZ(centerX, centerY, centerZ), p_cellSize));
             }
         }
     }
@@ -72,7 +72,7 @@ Cell GridManager::getCell(float x, float y, float z) {
 }
 
 // returns the cell that contains PointXYZ point
-Cell GridManager::getCell(PointXYZ point) {
+Cell GridManager::getCell(Algorithms::ThreeD::PointXYZ point) {
     int numCellsX = static_cast<int>(xSize / cellSize);
     int numCellsY = static_cast<int>(ySize / cellSize);
     int numCellsZ = static_cast<int>(zSize / cellSize);
@@ -142,7 +142,7 @@ void GridManager::addObstacles(float x, float y, float z)   {
     }
 }
 
-void GridManager::addObstacles(PointXYZ point)   {
+void GridManager::addObstacles(Algorithms::ThreeD::PointXYZ point)   {
     int numCellsX = static_cast<int>(xSize / cellSize);
     int numCellsY = static_cast<int>(ySize / cellSize);
     int numCellsZ = static_cast<int>(zSize / cellSize);
