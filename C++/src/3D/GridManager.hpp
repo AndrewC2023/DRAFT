@@ -61,7 +61,5 @@ namespace Algorithms::ThreeD {
 
         void createEmptyGrid(float p_maxX, float p_maxY, float p_maxZ, float p_cellSize);
 
-        
-
     };
 }
