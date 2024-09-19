@@ -3,6 +3,7 @@
 # remove the old build directory if there is one
 # set -euxo pipefail
 
+# It is recommended to run the required libraries script prior to this one
 cd ..
 
 mkdir build

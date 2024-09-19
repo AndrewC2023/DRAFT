@@ -37,12 +37,18 @@ then
     mkdir -p build
     cd build
 
-    # set the instal directory
+    # set the install directory
     INSTALL_DIR=$(realpath ../../../)
     echo "in project install directory: ${INSTALL_DIR}"
 
-    # set the cmake variable for matplot 
-    cmake -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ..
+    # set the cmake flags for matplot 
+    cmake -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"  \
+        -DMATPLOTPP_BUILD_EXAMPLES=OFF \
+        -DMATPLOTPP_BUILD_SHARED_LIBS=ON \
+        -DMATPLOTPP_BUILD_TESTS=OFF \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
+        ..
     make -j4 
 
     echo "Installing Matplot++ ..."
@@ -54,7 +60,8 @@ then
 elif [ "$answer" = "2" ]
 then
     echo "installing in admin/reqLib/matplotpp"
-
+    
+    mkdir reqLib
     cd reqLib
 
     echo "Cloning Matplot++ ..."
@@ -67,17 +74,23 @@ then
     mkdir -p build
     cd build
 
-    # set the instal directory
+    # set the install directory
     INSTALL_DIR=$(realpath ../../)
     echo "install directory: ${INSTALL_DIR}"
     
-    # set the cmake variable for matplot
-    cmake -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ..
+    # set the cmake flags for matplot
+    cmake -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"  \
+        -DMATPLOTPP_BUILD_EXAMPLES=OFF \
+        -DMATPLOTPP_BUILD_SHARED_LIBS=ON \
+        -DMATPLOTPP_BUILD_TESTS=OFF \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
+        ..
     make -j4 
 
     echo "Installing Matplot++ ..."
     sudo make install
-
+    
     # return to admin directory
     cd $ADMIN_DIR
 
