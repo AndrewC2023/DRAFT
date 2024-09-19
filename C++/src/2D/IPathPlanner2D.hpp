@@ -21,7 +21,7 @@ namespace Algorithms::TwoD
     {
         public:
 
-        virtual std::deque<Eigen::vector3f> PlanPath(Eigen::vector3f start, Eigen::vector3f goal);
+        virtual std::deque<PointXY> PlanPath(Eigen::vector3f start, Eigen::vector3f goal);
 
     };
 
