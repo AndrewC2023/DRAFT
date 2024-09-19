@@ -3,7 +3,7 @@
 Grid:
   # the following are test rooms that could be loaded for planners to use and be tesed with, listed with preloaded obstacles in the space
   # units are in meters ALWAYS
-  # obstacles are boxes, a center point, length(x), width(y), height(z), and roll, pitch, yaw in rads: [x,y,z ,l,w,h ,r,p,y]
+  # obstacles are boxes, a center point, length(x) in the direction of the yaw, width(y) perpendicular to the yaw, and yaw in rads: [x,y, l,w, y]
     # Two D will not include 
   TwoD:
     cellSize: 0.1 # meters
