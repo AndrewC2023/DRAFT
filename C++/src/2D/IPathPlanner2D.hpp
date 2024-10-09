@@ -1,27 +1,29 @@
+/*
+ * Author: Andrew Campbell
+ * Date: 08-24-2024
+ */
 
 // STL
 #include <deque>
 #include <functional>
 #include <iostream>
 
-// Eigen
-#include <Eigen/Dense>
+// Custom Types
+#include "Util/CustomTypes/VectorAndPointTypes.hpp"
 
 namespace Algorithms::TwoD
 {
     typedef struct Penalties{
-        ObstaclePentalty;
-        InvalidPenalty;
-        UnknownPenalty;
+        const float ObstaclePentalty;
+        const float InvalidPenalty;
+        const float UnknownPenalty;
     };
-
-    typedef std::function<float>(Eigen::vector3f, Eigen::vector3f, Penalties) CostFunction;
 
     class IPathPlanner2D
     {
         public:
 
-        virtual std::deque<PointXY> PlanPath(Eigen::vector3f start, Eigen::vector3f goal);
+        virtual std::deque<PointXY> PlanPath(PointXY start, PointXY goal);
 
     };
 
