@@ -1,7 +1,7 @@
-
-//
-// Created by Andrew C on 04/19/24
-//
+/*
+ * Author: Andrew Campbell
+ * Date: 04-19-2024
+ */
 
 // std
 #include <iostream>

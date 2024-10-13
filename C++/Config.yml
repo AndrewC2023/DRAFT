@@ -109,6 +109,7 @@ Planners:
   RRTStar:
     maxEdgeLength: 0.1
     maxIterations: 10000
+    endBias: 0.5
   EP_RRTStar:
     maxSamplingRange: 0.1
   LQR_RRTStar:

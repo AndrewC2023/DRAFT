@@ -115,6 +115,7 @@ void operator>>(const YAML::Node& node, RRTStarConfig& RRTStar)
     calledLine = __LINE__;
     RRTStar.maxEdgeLength = node["maxEdgeLength"].as<float>();
     RRTStar.maxIterations = node["maxIterations"].as<int>();
+    RRTStar.endBias = node["endBias"].as<float>();
 }
 
 void operator>>(const YAML::Node& node, EP_RRTStarConfig& EP_RRTStar)

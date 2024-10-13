@@ -32,21 +32,37 @@ namespace Algorithms::TwoD
             ~RRTStar2D() = default;
 
             std::deque<PointXY> PlanPath(PointXY start, PointXY goal) override;
+            float getPathCost() override;
 
         private:
             // The tree of nodes
             std::vector<RRTStarNode> Tree;
+            float pathCost;
 
             int numNodes; // Current count of how many nodes we have
             PointXY start; // Start point
-            PointXY goal; // goal point            
+            PointXY goal; // goal point     
+            bool foundEnd;
 
             // smart pointers to the grid and path validator
             std::shared_ptr<GridManager> _Grid;
             std::shared_ptr<IPathValidator> _Validator;
 
-            void sampleNewNode();
+            // Config
+            const int _maxIterations;
+            const float _maxEdgeLength;
+            const float _endBias;
 
+            // other constants
+            const float minX;
+            const float maxX;
+            const float minY;
+            const float maxY;
+
+            PointXY sampleNewNode();
+
+            void steer(PointXY&, PointXY, bool&);
+            
             void Rewire();
 
             float costFunction();
