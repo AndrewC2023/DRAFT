@@ -3,7 +3,7 @@
 //
 
 #include "2DGridManager.hpp"
-//
+
 namespace Algorithms::TwoD {
     // TODO: implement pre calculation of number of cells -> mild performance saving
     GridManager::GridManager(float p_minX, float p_maxX,
