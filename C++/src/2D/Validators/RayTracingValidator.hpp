@@ -4,7 +4,7 @@
  */
 
 #ifndef RAYTRACINGVALIDATOR_H
-#define RAYTRACINGVALIDATO_H
+#define RAYTRACINGVALIDATOR_H
 
 // Config
 #include "Util/Config/Config.hpp"
@@ -29,7 +29,9 @@ namespace algorithms::TwoD
             ~RayTracingValidator() = default;
 
             bool validatePath(std::deque<PointXY>) override;
+            bool validatePathSegment(PointXY, PointXY) override;
             void setVehicle(std::vector<VehicleFeature>) override;
+            float getMinimumSafeDistance() override;
 
         private:
 
@@ -40,9 +42,11 @@ namespace algorithms::TwoD
             // grid
             std::shared_ptr<GridManager> _grid;
 
+            float _minimumSafeDistance; 
+
     };
 
 }
 
 
-#endif // RAYTRACINGVALIDATO_H
+#endif // RAYTRACINGVALIDATOR_H

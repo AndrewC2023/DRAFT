@@ -24,6 +24,8 @@ namespace Algorithms::TwoD
         public:
 
             virtual bool validatePath(std::deque<PointXY>);
+            virtual bool validatePathSegment(PointXY, PointXY);
             virtual void setVehicle(std::vector<VehicleFeature>);
+            virtual float getMinimumSafeDistance();
     };
 }

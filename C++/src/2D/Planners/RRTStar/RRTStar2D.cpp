@@ -32,7 +32,21 @@ namespace Algorithms::TwoD
             while (successfulSample == false)
             {
                 PointXY sample = sampleNewNode();
+                // find nearest node
+                float lowestManhattanDistance = INFINITY;
+                int closestTreeIndex = 0;
+                for(int i = 0; i < numNodes: i++)
+                {
+                    float CurrentManhattanDist = (Tree.at(i).position.x - sample.x)^2 + (Tree.at(i).position.y - sample.y)^2;
+                    if(CurrentManhattanDist < lowestManhattanDistance)
+                    {
+                        closestTreeIndex = i;
+                        lowestManhattanDistance = CurrentManhattanDist;
+                    }
+                }
 
+                steer(sample, Tree.at(closestTreeIndex).position, successfulSample);
+                // steer function handles the while loop condition
             }
 
         }

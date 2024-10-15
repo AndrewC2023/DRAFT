@@ -19,6 +19,7 @@
 //STL
 #include <vector>
 #include <memory>
+#include <cmath>
 
 namespace Algorithms::TwoD
 {
