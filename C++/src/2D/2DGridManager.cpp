@@ -6,14 +6,21 @@
 
 namespace Algorithms::TwoD {
     // TODO: implement pre calculation of number of cells -> mild performance saving
-    GridManager::GridManager(float p_maxX, float p_maxY, float p_cellSize):
-                            _cellUpdateThreadRunning(true) {
-        xSize = p_maxX;
-        ySize = p_maxY;
-        cellSize = p_cellSize;
-
-        createEmptyGrid(p_maxX, p_maxY, p_cellSize);
-
+    GridManager::GridManager(float p_minX, float p_maxX,
+                             float p_minY, float p_maxY,
+                             float p_cellSize):
+                            _cellUpdateThreadRunning(true),
+                            _xSize(p_maxX - p_minX),
+                            _ySize(p_maxY - p_minY),
+                            _cellSize(p_cellSize),
+                            _xMin(p_minX),
+                            _xMax(p_maxX),
+                            _yMin(p_minY),
+                            _yMax(p_maxY)
+    {
+        int _numCellsX = static_cast<int>(_xSize / _cellSize);
+        int _numCellsY = static_cast<int>(_ySize / _cellSize);
+        createEmptyGrid();
         _cellUpdateThread = std::thread([this](){ pushUpdatesToGrid(); });
     }
 
@@ -35,17 +42,17 @@ namespace Algorithms::TwoD {
 
     //TODO: implement multithreaded approach to make grid update
     // e.g updater thread that we push updates to so the thread that holds the grid doesnt risk getting throttled under large data load
-    void GridManager::createEmptyGrid(float p_maxX, float p_maxY, float p_cellSize) {
-        int numX = static_cast<int>(p_maxX / p_cellSize);
-        int numY = static_cast<int>(p_maxY / p_cellSize);
+    void GridManager::createEmptyGrid() {
+        int numX = static_cast<int>(_xSize / _cellSize);
+        int numY = static_cast<int>(_ySize / _cellSize);
 
         for (int i = 0; i < numX; i++)  {
             for (int j = 0; j < numY; j++)  {
                 
-                float centerX = (i + 0.5) * p_cellSize;
-                float centerY = (j + 0.5) * p_cellSize;
+                float centerX = (i + 0.5) * _cellSize + _xMin;
+                float centerY = (j + 0.5) * _cellSize + _yMin;
 
-                _grid.emplace_back(Cell(PointXY(centerX, centerY), p_cellSize));
+                _grid.emplace_back(Cell(PointXY(centerX, centerY), _cellSize));
             }
         }
         initialized = true;
@@ -53,58 +60,57 @@ namespace Algorithms::TwoD {
 
     // returns the cell that contains point at x, y, z
     Cell GridManager::getCell(float x, float y) {
-        int numCellsX = static_cast<int>(xSize / cellSize);
-        int numCellsY = static_cast<int>(ySize / cellSize);
 
-        int cellIndexX = static_cast<int>(std::floor(x / cellSize));
-        int cellIndexY = static_cast<int>(std::floor(y / cellSize));
+        int cellIndexX = static_cast<int>(std::floor((x - _xMin) / _cellSize));
+        int cellIndexY = static_cast<int>(std::floor((y - _yMin) / _cellSize));
 
-        if (cellIndexX < 0 || cellIndexX >= numCellsX || cellIndexY < 0 || cellIndexY >= numCellsY)    {
+        if (cellIndexX < 0 || cellIndexX >= _numCellsX || cellIndexY < 0 || cellIndexY >= _numCellsY)    {
             // TODO: implement actuall error handling system -> could log and return -1, -1, -1 just null for now
-            return _grid[0];
+            std::cout << "WARNING: attempted access of grid outside of defined domain\n";
+            // return a meaningless cell that is listed as an obstacle
+            return Cell(PointXY(0.0f,0.0f), _cellSize, State::OBSTACLE,1.0f);
         }
 
-        int calcIndex = cellIndexX + numCellsX * (cellIndexY + numCellsY);
+        int calcIndex = cellIndexX + _numCellsX * (cellIndexY + _numCellsY);
 
         return _grid[calcIndex];
     }
 
     // returns the cell that contains PointXYZ point
-    Cell GridManager::getCell(PointXY point) {
-        int numCellsX = static_cast<int>(xSize / cellSize);
-        int numCellsY = static_cast<int>(ySize / cellSize);
+    Cell GridManager::getCell(PointXY point) 
+    {
+        int cellIndexX = static_cast<int>(std::floor((point.x - _xMin) / _cellSize));
+        int cellIndexY = static_cast<int>(std::floor((point.y - _yMin) / _cellSize));
 
-        int cellIndexX = static_cast<int>(std::floor(point.x / cellSize));
-        int cellIndexY = static_cast<int>(std::floor(point.y / cellSize));
-
-        if (cellIndexX < 0 || cellIndexX >= numCellsX || cellIndexY < 0 || cellIndexY >= numCellsY)    {
+        if (cellIndexX < 0 || cellIndexX >= _numCellsX || cellIndexY < 0 || cellIndexY >= _numCellsY)    {
             // TODO: implement actuall error handling system -> could log and return -1, -1, -1 just null for now
-            return _grid[0];
+            std::cout << "WARNING: attempted access of grid outside of defined domain\n";
+            // return a meaningless cell that is listed as an obstacle
+            return Cell(PointXY(0.0f,0.0f), _cellSize, State::OBSTACLE,1.0f);
         }
 
-        int calcIndex = cellIndexX + numCellsX * (cellIndexY);
+        int calcIndex = cellIndexX + _numCellsX * (cellIndexY);
 
         return _grid[calcIndex];
     }
 
     // TODO: implement caching. depends on what hardware this runs on bc if we dont care abt space we could just hold a massive lookup table tbh
-    std::vector<Cell> GridManager::getNeighbors(float x, float y, int depth)   {
+    std::vector<Cell> GridManager::getNeighbors(float x, float y, int depth)   
+    {
         std::vector<Cell> neighbors;
-        
-        int numCellsX = static_cast<int>(xSize / cellSize);
-        int numCellsY = static_cast<int>(ySize / cellSize);
 
-        int cellIndexX = static_cast<int>(std::floor(x / cellSize));
-        int cellIndexY = static_cast<int>(std::floor(y / cellSize));
-
+        int cellIndexX = static_cast<int>(std::floor((x - _xMin) / _cellSize));
+        int cellIndexY = static_cast<int>(std::floor((y - _yMin) / _cellSize));
+        // TODO: there is a deterministic way to implement this given we know how the list is structured
+        // TODO: error handling?
         int minX = std::max(0, cellIndexX - depth);
-        int maxX = std::min(numCellsX - 1, cellIndexX + depth);
+        int maxX = std::min(_numCellsX - 1, cellIndexX + depth);
         int minY = std::max(0, cellIndexY - depth);
-        int maxY = std::min(numCellsY - 1, cellIndexY + depth);
+        int maxY = std::min(_numCellsY - 1, cellIndexY + depth);
 
         for (int i = minX; i < maxX; i++)   {
             for (int j = minY; j < maxY; j++)   {
-                int neighborIndex = x + numCellsX * (y);
+                int neighborIndex = x + _numCellsX * (y);
                 neighbors.push_back(_grid[neighborIndex]);
             }
         }
@@ -112,37 +118,36 @@ namespace Algorithms::TwoD {
         return neighbors;
     }
 
-    void GridManager::addObstacles(float x, float y)   {
-        int numCellsX = static_cast<int>(xSize / cellSize);
-        int numCellsY = static_cast<int>(ySize / cellSize);
+    void GridManager::addKnownObstacle(float x, float y)  
+    {
 
-        int cellIndexX = static_cast<int>(std::floor(x / cellSize));
-        int cellIndexY = static_cast<int>(std::floor(y / cellSize));
+        int cellIndexX = static_cast<int>(std::floor((x - _xMin) / _cellSize));
+        int cellIndexY = static_cast<int>(std::floor((y - _yMin) / _cellSize));
 
-        bool invalid = cellIndexX < 0 || cellIndexX >= numCellsX || cellIndexY < 0 || cellIndexY >= numCellsY;
+        bool invalid = cellIndexX < 0 || cellIndexX >= _numCellsX || cellIndexY < 0 || cellIndexY >= _numCellsY;
 
         if (!invalid)   {
             std::scoped_lock lock(_cellUpdateMutex);
             
-            int calcIndex = cellIndexX + numCellsX * (cellIndexY);
+            int calcIndex = cellIndexX + _numCellsX * (cellIndexY);
 
             _updates.push_back(UpdateRequest{calcIndex, 1});
         }
     }
 
-    void GridManager::addObstacles(PointXY point)   {
-        int numCellsX = static_cast<int>(xSize / cellSize);
-        int numCellsY = static_cast<int>(ySize / cellSize);
+    void GridManager::addKnownObstacle(PointXY point)   {
+        int _numCellsX = static_cast<int>(_xSize / _cellSize);
+        int _numCellsY = static_cast<int>(_ySize / _cellSize);
 
-        int cellIndexX = static_cast<int>(std::floor(point.x / cellSize));
-        int cellIndexY = static_cast<int>(std::floor(point.y / cellSize));
+        int cellIndexX = static_cast<int>(std::floor((point.x - _xMin) / _cellSize));
+        int cellIndexY = static_cast<int>(std::floor((point.y - _yMin) / _cellSize));
 
-        bool invalid = cellIndexX < 0 || cellIndexX >= numCellsX || cellIndexY < 0 || cellIndexY >= numCellsY;
+        bool invalid = cellIndexX < 0 || cellIndexX >= _numCellsX || cellIndexY < 0 || cellIndexY >= _numCellsY;
 
         if (!invalid)   {
             std::scoped_lock lock(_cellUpdateMutex);
             
-            int calcIndex = cellIndexX + numCellsX * (cellIndexY);
+            int calcIndex = cellIndexX + _numCellsX * (cellIndexY);
 
             _updates.push_back(UpdateRequest{calcIndex, 1});
         }

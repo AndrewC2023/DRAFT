@@ -41,7 +41,7 @@ namespace Algorithms::TwoD
 
                 // default if not specified
                 _state = State::CLEAR;
-                _odds = 0;
+                _odds = 0; /// only ranges from [0,1]
             }
 
             Cell(Algorithms::TwoD::PointXY p_center, float cellSize, State state, float odds)
