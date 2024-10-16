@@ -25,6 +25,13 @@ namespace Algorithms::TwoD
         OBSTACLE
     };
 
+    struct ObstacleBody{
+        PointXY center;
+        float length; // total length
+        float width; // total width
+        float orientation; // radians
+    };
+
     class Cell {
         public:
             Cell(Algorithms::TwoD::PointXY p_center, float cellSize)

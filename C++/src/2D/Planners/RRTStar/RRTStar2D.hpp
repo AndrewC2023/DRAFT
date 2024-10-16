@@ -9,6 +9,10 @@
 // base class
 #include "IPathPlanner2D.hpp"
 
+// Dependent Classes
+#include "2DGridManager.hpp"
+#include "IPathValidator2D.hpp"
+
 // Config
 #include "Util/Config/Config.hpp"
 
@@ -20,6 +24,7 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <random>
 
 namespace Algorithms::TwoD
 {
@@ -28,7 +33,7 @@ namespace Algorithms::TwoD
         public:
             RRTStar2D(Configuration::Config&, 
                       std::shared_ptr<GridManager>,
-                      std::shared_ptr<IPathValidator>);
+                      std::shared_ptr<IPathValidator2D>);
 
             ~RRTStar2D() = default;
 
@@ -47,18 +52,12 @@ namespace Algorithms::TwoD
 
             // smart pointers to the grid and path validator
             std::shared_ptr<GridManager> _Grid;
-            std::shared_ptr<IPathValidator> _Validator;
+            std::shared_ptr<IPathValidator2D> _Validator;
 
             // Config
             const int _maxIterations;
             const float _maxEdgeLength;
             const float _endBias;
-
-            // other constants
-            const float minX;
-            const float maxX;
-            const float minY;
-            const float maxY;
 
             PointXY sampleNewNode();
 

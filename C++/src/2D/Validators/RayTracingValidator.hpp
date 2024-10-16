@@ -17,7 +17,7 @@
 #include <memory>
 #include <deque>
 
-namespace algorithms::TwoD
+namespace Algorithms::TwoD
 {
     class RayTracingValidator : IPathValidator2D
 

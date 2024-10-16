@@ -9,7 +9,7 @@ namespace Algorithms::TwoD
 {
     RRTStar2D::RRTStar2D(Configuration::Config& Config,
                          std::shared_ptr<GridManager> Grid,
-                         std::shared_ptr<IPathValidator> Validator):
+                         std::shared_ptr<IPathValidator2D> Validator):
                          _Grid(std::move(Grid)),
                          _Validator(std::move(Validator)),
                          _maxIterations(Config.planners.RRTStar.maxIterations),
@@ -17,15 +17,32 @@ namespace Algorithms::TwoD
                          _endBias(Config.planners.RRTStar.endBias)
     {
         Tree.clear();
-    }
+    };
 
-    RRTStar2D::PlanPath(PointXY start, PointXY goal)
+    std::deque<PointXY> RRTStar2D::PlanPath(PointXY start, PointXY goal)
     {
+        // get our sample domain
+        float xMin;
+        float xMax;
+        float yMin;
+        float yMax;
+        _Grid->getGridDomain(xMin, xMax, yMin, yMax); // sets them by reference
+
+        // make our random devices
+        std::mt19937 randGen1 {std::random_device{}()};
+        std::mt19937 randGen2 {std::random_device{}()};
+        std::mt19937 randGen3 {std::random_device{}()};
+
+        // Create floating point distributions for the x and y axes
+        std::uniform_real_distribution<float> xDistribution(xMin, xMax);
+        std::uniform_real_distribution<float> yDistribution(yMin, yMax);
+        std::uniform_real_distribution<float> goalBiasDistribution(0, 1);
+
         // initialize the tree
         Tree.clear();
-        Tree.push_back(RRTStarNode({start, 0f, 0i, 0i}));
+        Tree.push_back(RRTStarNode({start, 0.0f, 0, 0}));
 
-        for(int iteration, iteration < _maxIterations, iteration++)
+        for(int iteration; iteration < _maxIterations; iteration++)
         {
             // sample a new node
             bool successfulSample = false;
@@ -35,9 +52,9 @@ namespace Algorithms::TwoD
                 // find nearest node
                 float lowestManhattanDistance = INFINITY;
                 int closestTreeIndex = 0;
-                for(int i = 0; i < numNodes: i++)
+                for(int i = 0; i < numNodes; i++)
                 {
-                    float CurrentManhattanDist = (Tree.at(i).position.x - sample.x)^2 + (Tree.at(i).position.y - sample.y)^2;
+                    float CurrentManhattanDist = std::pow(Tree.at(i).position.x - sample.x, 2) + std::pow(Tree.at(i).position.y - sample.y,2);
                     if(CurrentManhattanDist < lowestManhattanDistance)
                     {
                         closestTreeIndex = i;
@@ -65,11 +82,11 @@ namespace Algorithms::TwoD
         
     };
 
-    void steer(PointXY& sampledPoint, PointXY nearestNode, bool rejectNode&)
+    void steer(PointXY& sampledPoint, PointXY nearestNode, bool& rejectNode)
     {
         
     };
 
-    float RRTStar2D::getPathCost(){ return pathCost };
+    float RRTStar2D::getPathCost(){ return pathCost; };
 
 } // namespace Algorithm::2D

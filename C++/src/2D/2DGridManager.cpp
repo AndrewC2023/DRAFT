@@ -24,23 +24,23 @@ namespace Algorithms::TwoD {
         _cellUpdateThread = std::thread([this](){ pushUpdatesToGrid(); });
     }
 
-    GridManager::~GridManager() {
+    GridManager::~GridManager(){
         _cellUpdateThreadRunning = false;
         if(_cellUpdateThread.joinable())
             _cellUpdateThread.join();
     }
 
-    std::vector<Cell> GridManager::getCells()   {
-        if (initialized)    {
+    std::vector<Cell> GridManager::getCells(){
+        if (initialized){
             return _grid;
         }
-        else    {
+        else{
             // TODO: implement error handling here -> actual logging for now just return grid
             return _grid;
         }
     }
 
-    //TODO: implement multithreaded approach to make grid update
+    // TODO: implement multithreaded approach to make grid update
     // e.g updater thread that we push updates to so the thread that holds the grid doesnt risk getting throttled under large data load
     void GridManager::createEmptyGrid() {
         int numX = static_cast<int>(_xSize / _cellSize);
@@ -189,5 +189,13 @@ namespace Algorithms::TwoD {
         }
 
     }
+
+    void GridManager::getGridDomain(float& xMin, float& xMax, float& yMin, float& yMax)
+    {
+        xMin = _xMin;
+        xMax = _xMax;
+        yMin = _yMin;
+        yMax = _yMax;
+    };
 
 }

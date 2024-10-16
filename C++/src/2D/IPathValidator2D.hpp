@@ -6,6 +6,9 @@
 // Custom Types
 #include "Util/CustomTypes/VectorAndPointTypes.hpp"
 
+// Grid
+#include "2DGridManager.hpp"
+
 // STL
 #include <deque>
 #include <vector>

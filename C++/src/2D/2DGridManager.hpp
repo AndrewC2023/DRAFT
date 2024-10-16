@@ -63,7 +63,11 @@ namespace Algorithms::TwoD {
 
         void pushUpdatesToGrid();
 
-        
+        /** Helper to get the grid domain values
+         * @param xMin,xMax,yMin,yMax modified by reference
+         */
+        void getGridDomain(float& xMin, float& xMax, float& yMin, float& yMax);
+
         private:
         // The grid as a list of Grid Cells
         std::vector<Cell> _grid;
