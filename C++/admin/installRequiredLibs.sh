@@ -56,7 +56,6 @@ then
 
     cd $ADMIN_DIR
 
-    exit 0
 elif [ "$answer" = "2" ]
 then
     echo "installing in admin/reqLib/matplotpp"
@@ -94,7 +93,6 @@ then
     # return to admin directory
     cd $ADMIN_DIR
 
-    exit 0
 else
     echo "please specify 1 or 2"
 fi
