@@ -11,7 +11,7 @@
 #include <iostream>
 #include <random>
 
-namespace Algorithms::Math
+namespace Math
 {
     template<typename Tfloat>
     Tfloat Degrees2Radians(Tfloat angle) {

@@ -25,11 +25,21 @@ namespace Algorithms::TwoD
         OBSTACLE
     };
 
-    struct ObstacleBody{
-        PointXY center;
-        float length; // total length
-        float width; // total width
-        float orientation; // radians
+    struct Obstacle{
+        
+    };
+
+    struct Obstacle{
+        Obstacle(PointXY Corner1, PointXY COrner2)
+        {
+
+        };
+        Obstacle( PointXY center, float length, float width, float orientation)
+        {
+
+        };
+
+        PointXY Points[4];
     };
 
     class Cell {
