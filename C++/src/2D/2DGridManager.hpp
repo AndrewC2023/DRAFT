@@ -54,11 +54,20 @@ namespace Algorithms::TwoD {
         // gets neighbors of cells given a PointXYZ representation of a point in space -> will be normailized to containing cell
         std::vector<Cell> getNeighbors(PointXY point);
 
-        /** add Obstacles method
-         * 
+        /** Add Known Obstacles method
+         *  @param x,y the x and y position that we want to set as occupied
+         *  will find the cell that contains this point and set it as occupied
          */
         void addKnownObstacle(float x, float y);
+        /** Add Known Obstacles method
+         *  @param point the point that we want to set as occupied
+         *  will find the cell that contains this point and set it as occupied
+         */
         void addKnownObstacle(PointXY point);
+        /** Add Known Obstacles method
+         *  @param Obstacle the x and y position that we want to set as occupied
+         *  will find the cell that contains this point and set it as occupied
+         */
         void addKnownObstacle(); // TODO: obstacle type
 
         void pushUpdatesToGrid();
