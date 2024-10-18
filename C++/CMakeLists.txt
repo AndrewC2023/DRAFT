@@ -11,7 +11,7 @@ include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/src" )
 
 # YAML library
 find_package(yaml-cpp REQUIRED)
-include_directories(${yaml-cpp_INCLUDE_DIRS})
+include_directories(${YAMLCPP_INCLUDE_DIRS})
 
 # Eigen Library
 find_package(Eigen3 REQUIRED)

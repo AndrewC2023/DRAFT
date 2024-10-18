@@ -1,8 +1,8 @@
 find_path(MATPLOT_INCLUDE_DIR 
-    NAMES matplot/matplot.h 
+    NAMES matplot.h 
     HINTS
-    /usr/include 
-    /usr/local/include 
+    /usr/include/matplot 
+    /usr/local/include/matplot 
     ${CMAKE_SOURCE_DIR}/admin/reqLib/include)
 
 find_library(MATPLOT_LIBRARIES 

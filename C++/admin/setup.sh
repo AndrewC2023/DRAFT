@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # setup the build directory
 
 # remove the old build directory if there is one
@@ -5,6 +7,7 @@
 
 # It is recommended to run the required libraries script prior to this one
 cd ..
+sudo rm -r build
 
 mkdir build
 cd build
