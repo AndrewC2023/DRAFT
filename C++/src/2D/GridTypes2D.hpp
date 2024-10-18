@@ -26,20 +26,19 @@ namespace Algorithms::TwoD
     };
 
     struct Obstacle{
-        
-    };
-
-    struct Obstacle{
-        Obstacle(PointXY Corner1, PointXY COrner2)
-        {
-
-        };
         Obstacle( PointXY center, float length, float width, float orientation)
         {
+            PointXY points[4];
+            // make unit vectors:
+            Util::Custom_Types::Vectors::Vector2f e1(std::cos(orientation), std::sin(orientation));
+            Util::Custom_Types::Vectors::Vector2f e2(std::cos(orientation + M_PI/2), std::sin(orientation + M_PI/2));
 
+            // TODO Start Here
         };
+        Obstacle(PointXY OtherPoints[4]): points(OtherPoints);
 
-        PointXY Points[4];
+        /// @brief Obstacle.points is the four points one can use to define a rectangle in a counterclockwise order
+        PointXY points[4];
     };
 
     class Cell {
