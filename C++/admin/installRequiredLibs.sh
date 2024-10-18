@@ -1,4 +1,5 @@
 set -e
+declare -i THREADS=${1:-4}
 
 # these will be installed locally on the user's machine if they're not already installed
 echo "Updating package lists ..."
