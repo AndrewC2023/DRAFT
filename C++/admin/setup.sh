@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # setup the build directory
 
 # remove the old build directory if there is one

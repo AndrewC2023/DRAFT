@@ -5,7 +5,10 @@
 # YAMLCPP_LIBRARIES - The libraries needed to use YAMLCPP
 # YAMLCPP_DEFINITIONS - Compiler switches required for using YAMLCPP
 
-find_path ( YAMLCPP_INCLUDE_DIR yaml.h /usr/include /usr/include/yaml-cpp /usr/local/include /usr/local/include/yaml-cpp)
+find_path ( YAMLCPP_INCLUDE_DIR 
+            yaml.h 
+            /usr/include/yaml-cpp  
+            /usr/local/include/yaml-cpp)
 
 # First, try to find libyaml-cpp.a
 find_library ( YAMLCPP_OLD_LIBRARY NAMES libyaml-cpp.a 
