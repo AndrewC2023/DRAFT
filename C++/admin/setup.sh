@@ -5,6 +5,7 @@
 
 # It is recommended to run the required libraries script prior to this one
 cd ..
+sudo rm -r build
 
 mkdir build
 cd build

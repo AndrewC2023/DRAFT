@@ -7,7 +7,7 @@
 #define CONFIG_HPP
 
 // YAML
-#include "yaml-cpp/yaml.h"
+#include "yaml.h"
 
 // STL
 #include <iostream>

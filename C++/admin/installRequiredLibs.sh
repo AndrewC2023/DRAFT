@@ -18,7 +18,7 @@ echo "in admin directory: ${ADMIN_DIR}"
 
 echo ""
 echo "-------------------------------------------------------------------------------------------------------------------------"
-echo 'Would you like to install Matplot++ in the project directory or locally on ubuntu with the rest of your static libraries?'
+echo 'Would you like to install Matplot++ in the project directory or locally with the rest of your libraries?'
 printf '1: In usr    2: In Project: '
 read answer
 
@@ -99,5 +99,5 @@ fi
 
 echo ""
 echo "Installation of required packages complete!"
-echo "Run setup.sh in the c++ root dir to build the project"
+echo "Run setup.sh to build the project"
 echo "Happy hacking!"
