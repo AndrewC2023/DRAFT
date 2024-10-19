@@ -49,10 +49,14 @@ namespace Algorithms::TwoD
             PointXY start; // Start point
             PointXY goal; // goal point     
             bool foundEnd;
+            float xMin;
+            float xMax;
+            float yMin;
+            float yMax;
 
             // smart pointers to the grid and path validator
-            std::shared_ptr<GridManager> _Grid;
-            std::shared_ptr<IPathValidator2D> _Validator;
+            std::shared_ptr<GridManager> Grid;
+            std::shared_ptr<IPathValidator2D> Validator;
 
             // Config
             const int _maxIterations;
@@ -67,6 +71,10 @@ namespace Algorithms::TwoD
 
             float costFunction();
 
+            void setDomain();
+
+            int FindNearestNode(PointXY);
+            
     };
 
 }

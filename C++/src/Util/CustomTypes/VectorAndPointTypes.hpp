@@ -62,6 +62,7 @@ namespace Util::Custom_Types::Vectors
         vector2 operator-(const vector2& other) const { return vector2(x - other.x, y - other.y); }
         
         // Scalar operations
+        // TODO get these to be communicative
         vector2 operator*(const float n) const { return vector2(x * n, y * n); }
         vector2 operator*(const double n) const { return vector2(x * n, y * n); }
         vector2 operator*(const int n) const { return vector2(x * n, y * n); }

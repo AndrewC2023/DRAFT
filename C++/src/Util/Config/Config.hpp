@@ -9,6 +9,9 @@
 // YAML
 #include "yaml.h"
 
+// CustomTypes
+#include <CustomTypes/GridTypes2D.hpp>
+
 // STL
 #include <iostream>
 #include <istream>

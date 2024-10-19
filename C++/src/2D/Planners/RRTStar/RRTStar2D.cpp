@@ -8,10 +8,10 @@
 namespace Algorithms::TwoD
 {
     RRTStar2D::RRTStar2D(Configuration::Config& Config,
-                         std::shared_ptr<GridManager> Grid,
-                         std::shared_ptr<IPathValidator2D> Validator):
-                         _Grid(std::move(Grid)),
-                         _Validator(std::move(Validator)),
+                         std::shared_ptr<GridManager> grid,
+                         std::shared_ptr<IPathValidator2D> validator):
+                         Grid(std::move(grid)),
+                         Validator(std::move(validator)),
                          _maxIterations(Config.planners.RRTStar.maxIterations),
                          _maxEdgeLength(Config.planners.RRTStar.maxEdgeLength),
                          _endBias(Config.planners.RRTStar.endBias)
@@ -21,12 +21,10 @@ namespace Algorithms::TwoD
 
     std::deque<PointXY> RRTStar2D::PlanPath(PointXY start, PointXY goal)
     {
+        // setup:
+
         // get our sample domain
-        float xMin;
-        float xMax;
-        float yMin;
-        float yMax;
-        _Grid->getGridDomain(xMin, xMax, yMin, yMax); // sets them by reference
+        Grid->getGridDomain(xMin, xMax, yMin, yMax); // sets them by reference
 
         // make our random devices
         std::mt19937 randGen1 {std::random_device{}()};
@@ -37,6 +35,8 @@ namespace Algorithms::TwoD
         std::uniform_real_distribution<float> xDistribution(xMin, xMax);
         std::uniform_real_distribution<float> yDistribution(yMin, yMax);
         std::uniform_real_distribution<float> goalBiasDistribution(0, 1);
+
+        // set them as gloabal
 
         // initialize the tree
         Tree.clear();
@@ -49,7 +49,7 @@ namespace Algorithms::TwoD
             while (successfulSample == false)
             {
                 PointXY sample = sampleNewNode();
-                // find nearest node
+                // find nearest node TODO make function
                 float lowestManhattanDistance = INFINITY;
                 int closestTreeIndex = 0;
                 for(int i = 0; i < numNodes; i++)
@@ -76,7 +76,7 @@ namespace Algorithms::TwoD
         while(sucessfulSample != true)
         {
             // sample a node
-
+            PointXY sample(,);
             // check if its in a safe region
         }
         

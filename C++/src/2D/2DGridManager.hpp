@@ -14,7 +14,7 @@
 #include <chrono>
 
 // custom types
-#include "GridTypes2D.hpp"
+#include "Util/CustomTypes/GridTypes2D.hpp"
 
 namespace Algorithms::TwoD {
 

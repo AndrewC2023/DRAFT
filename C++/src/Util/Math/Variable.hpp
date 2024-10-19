@@ -6,13 +6,17 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 
+#include <string>
+
 namespace Math
 {
     class Variable
     {
         public:
-        Variable();
+        Variable(std::string Name){name = Name;};
         ~Variable() = default;
+        
+        std::string name;
     };
 }
 
