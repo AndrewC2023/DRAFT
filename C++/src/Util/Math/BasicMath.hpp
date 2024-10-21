@@ -3,6 +3,9 @@
  * Date: 10-15-2024
  */
 
+#ifndef BASICMATH_H
+#define BASICMATH_H
+
 // Custom types
 #include "Util/CustomTypes/VectorAndPointTypes.hpp"
 
@@ -29,5 +32,6 @@ namespace Math
         std::uniform_real_distribution<float> Var(0, 1);
         return Var(gen);
     };
-
 }
+
+#endif // BASICMATH_H

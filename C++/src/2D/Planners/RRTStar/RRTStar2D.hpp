@@ -54,6 +54,16 @@ namespace Algorithms::TwoD
             float yMin;
             float yMax;
 
+            // make our random devices
+            std::mt19937 randGen1 {std::random_device{}()};
+            std::mt19937 randGen2 {std::random_device{}()};
+            std::mt19937 randGen3 {std::random_device{}()};
+
+            // Create floating point distributions for the x and y axes
+            std::uniform_real_distribution<float> _xDistribution;
+            std::uniform_real_distribution<float> _yDistribution;
+            std::uniform_real_distribution<float> _goalBiasDistribution;
+
             // smart pointers to the grid and path validator
             std::shared_ptr<GridManager> Grid;
             std::shared_ptr<IPathValidator2D> Validator;

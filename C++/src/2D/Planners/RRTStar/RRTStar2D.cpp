@@ -17,6 +17,8 @@ namespace Algorithms::TwoD
                          _endBias(Config.planners.RRTStar.endBias)
     {
         Tree.clear();
+        
+
     };
 
     std::deque<PointXY> RRTStar2D::PlanPath(PointXY start, PointXY goal)
@@ -26,15 +28,7 @@ namespace Algorithms::TwoD
         // get our sample domain
         Grid->getGridDomain(xMin, xMax, yMin, yMax); // sets them by reference
 
-        // make our random devices
-        std::mt19937 randGen1 {std::random_device{}()};
-        std::mt19937 randGen2 {std::random_device{}()};
-        std::mt19937 randGen3 {std::random_device{}()};
-
-        // Create floating point distributions for the x and y axes
-        std::uniform_real_distribution<float> xDistribution(xMin, xMax);
-        std::uniform_real_distribution<float> yDistribution(yMin, yMax);
-        std::uniform_real_distribution<float> goalBiasDistribution(0, 1);
+        
 
         // set them as gloabal
 
@@ -79,7 +73,6 @@ namespace Algorithms::TwoD
             PointXY sample(,);
             // check if its in a safe region
         }
-        
     };
 
     void steer(PointXY& sampledPoint, PointXY nearestNode, bool& rejectNode)
