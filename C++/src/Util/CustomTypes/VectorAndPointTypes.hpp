@@ -34,7 +34,7 @@ namespace Util::Custom_Types::Vectors
         vector2(const T& x, const T& y) noexcept :  x(x), y(y) {};
         vector2(vector2& other) noexcept : x(other.x), y(other.y) {};
         vector2(const vector2& other) noexcept : x(other.x), y(other.y) {};
-        vector2(const vector2&& other) noexcept : x(other.x), y(other.y) {}; // why????
+        vector2(const vector2&& other) noexcept : x(other.x), y(other.y) {};
         ~vector2() = default;
 
         vector2& operator=(const vector2& other) noexcept

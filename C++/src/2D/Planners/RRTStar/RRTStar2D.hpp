@@ -46,20 +46,19 @@ namespace Algorithms::TwoD
             float pathCost;
 
             int numNodes; // Current count of how many nodes we have
-            PointXY start; // Start point
-            PointXY goal; // goal point     
             bool foundEnd;
+            PointXY _goal;
             float xMin;
             float xMax;
             float yMin;
             float yMax;
 
-            // make our random devices
-            std::mt19937 randGen1 {std::random_device{}()};
-            std::mt19937 randGen2 {std::random_device{}()};
-            std::mt19937 randGen3 {std::random_device{}()};
+            // Random Generators
+            std::mt19937 randGenX;
+            std::mt19937 randGenY;
+            std::mt19937 randGenBias;
 
-            // Create floating point distributions for the x and y axes
+            // Floating point distributions for the axes and goal bias
             std::uniform_real_distribution<float> _xDistribution;
             std::uniform_real_distribution<float> _yDistribution;
             std::uniform_real_distribution<float> _goalBiasDistribution;
@@ -75,7 +74,7 @@ namespace Algorithms::TwoD
 
             PointXY sampleNewNode();
 
-            void steer(PointXY&, PointXY, bool&);
+            void steer(PointXY& sampledPoint, PointXY nearestNode, bool& successful);
             
             void Rewire();
 
@@ -84,7 +83,7 @@ namespace Algorithms::TwoD
             void setDomain();
 
             int FindNearestNode(PointXY);
-            
+
     };
 
 }

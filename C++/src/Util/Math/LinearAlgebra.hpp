@@ -3,10 +3,10 @@
  * Date: 10-15-2024
  */
 
-#ifndef COORDINATESYSTEMS_H
-#define COORDINATESYSTEMS_H
+#ifndef LINEARALGEBRA_H
+#define LINEARALGEBRA_H
 
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #include <cmath>
 namespace Math
 {
@@ -33,4 +33,4 @@ namespace Math
 
 }
 
-#endif //COORDINATESYSTEMS_H
+#endif //LINEARALGEBRA_H

@@ -65,10 +65,10 @@ namespace Algorithms::TwoD {
          */
         void addKnownObstacle(PointXY point);
         /** Add Known Obstacles method
-         *  @param Obstacle the x and y position that we want to set as occupied
+         *  @param obstacle the x and y position that we want to set as occupied
          *  will find the cell that contains this point and set it as occupied
          */
-        void addKnownObstacle(); // TODO: obstacle type
+        void addKnownObstacle(Obstacle obstacle); // TODO: obstacle type
 
         void pushUpdatesToGrid();
 

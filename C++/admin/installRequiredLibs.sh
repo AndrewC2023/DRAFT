@@ -6,8 +6,12 @@ declare -i THREADS=${1:-4}
 echo "Updating package lists ..."
 sudo apt-get update
 
+# eigen Library
 echo "Installing Eigen3 ..."
 sudo apt-get install -y libeigen3-dev
+
+# PCL (Point Cloud Library)
+apt install libpcl-dev -y
 
 sudo apt-get install -y curl
 

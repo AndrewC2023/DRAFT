@@ -153,6 +153,11 @@ namespace Algorithms::TwoD {
         }
     }
 
+    void GridManager::addKnownObstacle(Obstacle obstacle)   {
+
+        
+    }
+
     void GridManager::pushUpdatesToGrid()   {
         auto goalTime = std::chrono::steady_clock::now() + std::chrono::milliseconds(_cellUpdateThreadPeriod_ms);
 
