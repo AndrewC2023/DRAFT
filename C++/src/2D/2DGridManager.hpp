@@ -70,6 +70,12 @@ namespace Algorithms::TwoD {
          */
         void addKnownObstacle(Obstacle obstacle); // TODO: obstacle type
 
+        /** get the nearest point 
+         *  @param checkPoint the point that we want to see what the nearest obstacle is to
+         *  @return the intersection point of the stright line projected from the check point to the center of tyhe nearest obstacle
+         */
+        PointXY getNearestObstacle(PointXY checkPoint);
+
         void pushUpdatesToGrid();
 
         /** Helper to get the grid domain values
