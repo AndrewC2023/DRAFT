@@ -14,20 +14,34 @@ namespace Algorithms::TwoD
 
     }
 
-    RayTracingValidator::validatePath(std::deque<PointXY> path)
+    bool RayTracingValidator::validatePath(std::deque<PointXY> path)
+    {
+        if(path.size() < 2)
+            return false;
+        else if(path.size() == 2)
+            return validatePathSegment(path[0], path[1]);
+        else
+        {
+            for(std::size_t i = 1; i < path.size(); i++)
+            {
+                // Validate the segment between points
+                if(!validatePathSegment(path[i-1], path[i]))
+                    return false;
+            }
+
+        return true;
+        }
+    }
+
+    bool RayTracingValidator::validatePathSegment(PointXY startPoint, PointXY endPoint)
     {
 
     }
 
-    RayTracingValidator::validatePathSegment(PointXY startPoint, PointXY endPoint)
-    {
-
-    }
-
-    RayTracingValidator::setVehicle(std::vector<VehicleFeature> vehicle)
+    void RayTracingValidator::setVehicle(std::vector<VehicleFeature> vehicle)
     {
         _vehicle = vehicle;
     }
 
-    RayTracingValidator::getMinimumSafeDistance(){ return _minimumSafeDistance; }
+    float RayTracingValidator::getMinimumSafeDistance(){ return _minimumSafeDistance; }
 }
