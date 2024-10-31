@@ -28,10 +28,10 @@ namespace Math
 
     /// returns a float value between 0 and 1
     float rand(){
-        std::mt19937 gen {std::random_device{}()};
-        std::uniform_real_distribution<float> Var(0, 1);
-        return Var(gen);
-    };
+        static std::mt19937 randomGenerator {std::random_device{}()};
+        static std::uniform_real_distribution<float> Var(0, 1);
+        return Var(randomGenerator);
+    }
 }
 
 #endif // BASICMATH_H

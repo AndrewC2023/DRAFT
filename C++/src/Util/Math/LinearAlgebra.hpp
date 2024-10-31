@@ -13,11 +13,11 @@ namespace Math
     // DCM matrix 2D
     Eigen::Matrix2f DCM2D(float theta)
     {
-        Eigen::Matrix2f DCM(3,3);
-        DCM(1,1) = std::cos(theta) 
-        DCM(1,2) = std::sin(theta) 
-        DCM(2,1) = (-1)*std::sin(theta) 
-        DCM(2,2) = std::cos(theta) 
+        Eigen::Matrix2f DCM(2,2);
+        DCM(1,1) = std::cos(theta);
+        DCM(1,2) = std::sin(theta);
+        DCM(2,1) = (-1)*std::sin(theta);
+        DCM(2,2) = std::cos(theta);
         
         return DCM;
     }
