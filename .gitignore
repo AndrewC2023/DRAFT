@@ -22,3 +22,11 @@ __pycache__
 
 # ignore installed libraries
 reqLib
+
+# Latex auto generated files
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
