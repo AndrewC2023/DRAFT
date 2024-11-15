@@ -13,6 +13,8 @@ The required dependencies for the C++ algorithm library are:
 * Eigen 3
 * Yaml-cpp
 * Matplot++
+* boost
+* pcl
 
 These dependencies must be installed before building the system, you may use the installRequiredLibs script in C++/admin to do this for you. From home directory:
 
