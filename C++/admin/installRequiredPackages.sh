@@ -11,8 +11,12 @@ echo "Installing Eigen3 ..."
 sudo apt-get install -y libeigen3-dev
 
 # PCL (Point Cloud Library)
-apt install libpcl-dev -y
+sudo apt install libpcl-dev -y
 
+# boost
+sudo apt-get install libboost-all-dev 
+
+# curl
 sudo apt-get install -y curl
 
 # yaml-cpp
@@ -27,4 +31,3 @@ THREADS=$THREADS ./installFromSource.sh "${MATPLOTPP_URL}" "-DCMAKE_INSTALL_PREF
 echo ""
 echo "Installation of required packages complete!"
 echo "Run setup.sh to build the project"
-echo "Happy hacking!"

@@ -6,6 +6,8 @@
 #ifndef VISUALIZER2D_H
 #define VISUALIZER2D_H
 
+#include <matplot.h>
+
 namespace Algorithms::TwoD::Visualization
 {
     class Visualizer2D

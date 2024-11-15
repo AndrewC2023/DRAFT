@@ -25,6 +25,9 @@ namespace Algorithms::TwoD
         OBSTACLE
     };
 
+    // TODO: Use boost polygohns instead the idea of this sturcture is for 
+    // satic predefined obstacles (at least for now) so it does not need to be perfectly optimized
+
     struct Obstacle{
         Obstacle( PointXY center, float length, float width, float orientation)
         {
@@ -53,14 +56,15 @@ namespace Algorithms::TwoD
         const State state = State::OBSTACLE;
     };
 
+    // Given how we use this class do we need to make its member values private? would it be faster if we didnt need getter functions? the values do get accessed a lot
     class Cell {
         public:
             Cell(Algorithms::TwoD::PointXY p_center, float cellSize)
             {
-                _center = p_center;
-                _cellSize = cellSize;
+                center = p_center;
+                cellSize = cellSize;
                 
-                _corners = {
+                corners = {
                     Algorithms::TwoD::PointXY(p_center.x - (cellSize/2.0f),p_center.y - (cellSize/2.0f)),
                     Algorithms::TwoD::PointXY(p_center.x - (cellSize/2.0f),p_center.y + (cellSize/2.0f)),
                     Algorithms::TwoD::PointXY(p_center.x + (cellSize/2.0f),p_center.y + (cellSize/2.0f)),
@@ -68,62 +72,62 @@ namespace Algorithms::TwoD
                 };
 
                 // default if not specified
-                _state = State::CLEAR;
-                _odds = 0; /// only ranges from [0,1]
+                state = State::CLEAR;
+                odds = 0; /// only ranges from [0,1]
             }
 
             Cell(Algorithms::TwoD::PointXY p_center, float cellSize, State state, float odds)
             {
-                _center = p_center;
-                _cellSize = cellSize;
+                center = p_center;
+                cellSize = cellSize;
 
-                _corners = {
+                corners = {
                     Algorithms::TwoD::PointXY(p_center.x - (cellSize/2.0f),p_center.y - (cellSize/2.0f)),
                     Algorithms::TwoD::PointXY(p_center.x - (cellSize/2.0f),p_center.y + (cellSize/2.0f)),
                     Algorithms::TwoD::PointXY(p_center.x + (cellSize/2.0f),p_center.y + (cellSize/2.0f)),
                     Algorithms::TwoD::PointXY(p_center.x + (cellSize/2.0f),p_center.y - (cellSize/2.0f)),
                 };
 
-                _state = state;
-                _odds = odds;
+                state = state;
+                odds = odds;
             }
 
             Algorithms::TwoD::PointXY getCenter()    
             {
-                return _center;
+                return center;
             }
 
             std::vector<Algorithms::TwoD::PointXY> getCorners()   
             {
-                return _corners;
+                return corners;
             }
 
             State getState()    
             {
-                return _state;
+                return state;
             }
             void setState(State p_state) 
             {
-                _state = p_state;
+                state = p_state;
             }
 
             void incrementOdds(int increment) 
             {
-                _odds += increment;
+                odds += increment;
             }
 
             float getOdds() 
             {
-                return (1 - (1/(1-(std::pow(2, _odds)))));
+                return (1 - (1/(1-(std::pow(2, odds)))));
             }
 
 
         private:
-            Algorithms::TwoD::PointXY _center;
-            std::vector<Algorithms::TwoD::PointXY> _corners;
-            State _state;
-            float _odds;
-            float _cellSize;
+            Algorithms::TwoD::PointXY center;
+            std::vector<Algorithms::TwoD::PointXY> corners;
+            State state;
+            float odds;
+            float cellSize;
 
     };
 }

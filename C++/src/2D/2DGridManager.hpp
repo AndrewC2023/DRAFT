@@ -12,6 +12,7 @@
 #include <atomic>
 #include <thread>
 #include <chrono>
+#include <cmath>
 
 // custom types
 #include "Util/CustomTypes/GridTypes2D.hpp"
@@ -68,13 +69,19 @@ namespace Algorithms::TwoD {
          *  @param obstacle the x and y position that we want to set as occupied
          *  will find the cell that contains this point and set it as occupied
          */
-        void addKnownObstacle(Obstacle obstacle); // TODO: obstacle type
+        void addKnownObstacle(Obstacle obstacle); // TODO: change to boost polygon and intersect!
 
-        /** get the nearest point 
+        /** get the nearest obstacle center
          *  @param checkPoint the point that we want to see what the nearest obstacle is to
-         *  @return the intersection point of the stright line projected from the check point to the center of tyhe nearest obstacle
+         *  @return the center of the nearest obstacle
          */
-        PointXY getNearestObstacle(PointXY checkPoint);
+        PointXY getNearestObstacleCenter(PointXY checkPoint);
+
+        /** get the nearest obstacle center
+         *  @param checkPoint the point that we want to see what the nearest obstacle is to
+         *  @return the intersection point of the stright line projected from the check point to the center of the nearest obstacle
+         */
+        float getDistanceToNearestObstacle(PointXY checkPoin); // may want to allow for the return of the intersection point?
 
         void pushUpdatesToGrid();
 
@@ -95,7 +102,7 @@ namespace Algorithms::TwoD {
         const int _cellUpdateThreadPeriod_ms = 5;
         std::thread _cellUpdateThread;
 
-        // grid domain descriptors
+        /// grid domain descriptors
         float _cellSize;
         float _xSize;
         float _ySize;

@@ -94,7 +94,7 @@ namespace Algorithms::TwoD {
         return _grid[calcIndex];
     }
 
-    // TODO: implement caching. depends on what hardware this runs on bc if we dont care abt space we could just hold a massive lookup table tbh
+    // TODO: implement caching. depends on what hardware this runs on bc if we dont care abt space we could just hold a massive lookup table tbh (doesnt seem wise for a library that could be on many different systems -Drew)
     std::vector<Cell> GridManager::getNeighbors(float x, float y, int depth)   
     {
         std::vector<Cell> neighbors;
@@ -194,6 +194,27 @@ namespace Algorithms::TwoD {
         }
 
     }
+
+    PointXY GridManager::getNearestObstacleCenter(PointXY PointOfReference)
+    {
+        float lowestDistance = INFINITY;
+        int closestCellIndex = -1;
+        int currentIndex = 0;
+        for(const auto& cell : _grid)
+        {
+            // Run the checks
+            if(cell.state == State::OBSTACLE)
+            {
+                float distance = PointXY(cell.getCenter() - PointOfReference).norm();
+                if(distance < lowestDistance)
+                {
+                    closestCellIndex = currentIndex;
+                }
+            }
+            currentIndex++;
+        }
+    };
+
 
     void GridManager::getGridDomain(float& xMin, float& xMax, float& yMin, float& yMax)
     {
