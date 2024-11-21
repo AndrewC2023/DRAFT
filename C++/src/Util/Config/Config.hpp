@@ -10,7 +10,7 @@
 #include "yaml.h"
 
 // CustomTypes
-#include <CustomTypes/GridTypes2D.hpp>
+#include <Util/CustomTypes/GridTypes2D.hpp>
 
 // STL
 #include <iostream>

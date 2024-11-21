@@ -200,10 +200,10 @@ namespace Algorithms::TwoD {
         float lowestDistance = INFINITY;
         int closestCellIndex = -1;
         int currentIndex = 0;
-        for(const auto& cell : _grid)
+        for(auto& cell : _grid)
         {
             // Run the checks
-            if(cell.state == State::OBSTACLE)
+            if(cell.getState() == State::OBSTACLE)
             {
                 float distance = PointXY(cell.getCenter() - PointOfReference).norm();
                 if(distance < lowestDistance)
