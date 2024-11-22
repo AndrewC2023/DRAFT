@@ -31,4 +31,4 @@ endif()
 
 include ( FindPackageHandleStandardArgs )
 # Set YAMLCPP_FOUND to TRUE if all listed variables are TRUE
-find_package_handle_standard_args ( YAMLCPP DEFAULT_MSG YAMLCPP_LIBRARY YAMLCPP_INCLUDE_DIR )
+find_package_handle_standard_args ( yaml-cpp  DEFAULT_MSG YAMLCPP_LIBRARY YAMLCPP_INCLUDE_DIR )
