@@ -20,7 +20,7 @@
 #include "Util/CustomTypes/VectorAndPointTypes.hpp"
 #include "PlanningNodes2D.hpp"
 
-//STL
+// STL
 #include <vector>
 #include <memory>
 #include <cmath>

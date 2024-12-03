@@ -23,9 +23,9 @@ namespace Algorithms::TwoD
     {
         public:
 
-        virtual std::deque<PointXY> PlanPath(PointXY start, PointXY goal);
+            virtual std::deque<PointXY> PlanPath(PointXY start, PointXY goal);
 
-        virtual float getPathCost(); // Helper to return the cost of the found path
+            virtual float getPathCost(); // Helper to return the cost of the found path
     };
 
 }

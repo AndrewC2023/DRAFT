@@ -2,6 +2,14 @@
 // Created by Andrew C on 04/19/24
 //
 
+
+/*
+   TODO: boost library should just be used to generalize most obstacles
+   this however may not be best for dynamic obstacles or anything tha must check intersections
+   more than just on initialization or on adding an obstacle, for validation and propagation of 
+   dynamic obstacles it may be necessary to write a much faster custom method rather than relying
+   on the robust built in methods of boost due to the potential overhead
+*/
 #include "2DGridManager.hpp"
 
 namespace Algorithms::TwoD {
@@ -213,6 +221,8 @@ namespace Algorithms::TwoD {
             }
             currentIndex++;
         }
+
+
     };
 
 
