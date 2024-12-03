@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "VectorAndPointTypes.hpp"
-#include "Geometry.hpp"
+#include "Util/Math/Geometry.hpp"
 
 namespace Algorithms::TwoD
 {

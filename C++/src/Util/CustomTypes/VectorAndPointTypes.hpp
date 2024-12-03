@@ -3,15 +3,15 @@
  * Date: 07-21-2024
  */
 
-#ifndef VECTORANDPOINTS_H
-#define VECTORANDPOINTS_H
+#ifndef VECTORANDPOINTTYPES_H
+#define VECTORANDPOINTTYPES_H
 
 // STL
 #include <iostream>
 #include <cmath>
 #include <string>
 
-namespace Util::Custom_Types::Vectors
+namespace Util::CustomTypes::Vectors
 {
     /** Implementation of some basic structures to use for planning. objects like Eigen::Vector3f can be used,
      *  but the implementation of those are not very efficient. These are simple structures with 2 or 3 templated data fields
@@ -231,10 +231,10 @@ namespace Util::Custom_Types::Vectors
 /// Macros for use in navigation
 namespace Algorithms::TwoD
 {
-    typedef Util::Custom_Types::Vectors::vector2<int> IndexXY;                 // Index type, with X and Y indices
-    typedef Util::Custom_Types::Vectors::vector2<float> PointXY;               // Point type with floating point X and Y coordinates
-    typedef Util::Custom_Types::Vectors::vector2<float> PolarCoordinateRT;     // Polar coordinate with length r and theta t
-    typedef Util::Custom_Types::Vectors::vector3<float> StateXYT;              // 2D state of XY and Theta for heading dont use norm!
+    typedef Util::CustomTypes::Vectors::vector2<int> IndexXY;                 // Index type, with X and Y indices
+    typedef Util::CustomTypes::Vectors::vector2<float> PointXY;               // Point type with floating point X and Y coordinates
+    typedef Util::CustomTypes::Vectors::vector2<float> PolarCoordinateRT;     // Polar coordinate with length r and theta t
+    typedef Util::CustomTypes::Vectors::vector3<float> StateXYT;              // 2D state of XY and Theta for heading dont use norm!
 
     typedef struct UncertainPointXY
     {
@@ -247,14 +247,14 @@ namespace Algorithms::TwoD
 
 namespace Algorithms::ThreeD
 {
-    typedef Util::Custom_Types::Vectors::vector3<int> IndexXYZ;                // Index type for 3D grid manager
-    typedef Util::Custom_Types::Vectors::vector3<float> PointXYZ;              // XYZ Point
-    typedef Util::Custom_Types::Vectors::angle3<float> AnglesRollPitchYaw;     // Roll Pitch Yaw angles
-    typedef Util::Custom_Types::Vectors::angle3<float> CylindricalRhoPhiZ;     // Cylindrical Coordinates
-    typedef Util::Custom_Types::Vectors::vector3<float> SphericalRThetaPhi;    // Shperical Coordinates 
+    typedef Util::CustomTypes::Vectors::vector3<int> IndexXYZ;                // Index type for 3D grid manager
+    typedef Util::CustomTypes::Vectors::vector3<float> PointXYZ;              // XYZ Point
+    typedef Util::CustomTypes::Vectors::angle3<float> AnglesRollPitchYaw;     // Roll Pitch Yaw angles
+    typedef Util::CustomTypes::Vectors::angle3<float> CylindricalRhoPhiZ;     // Cylindrical Coordinates
+    typedef Util::CustomTypes::Vectors::vector3<float> SphericalRThetaPhi;    // Shperical Coordinates 
 }
 
-namespace Util::Custom_Types::Vectors
+namespace Util::CustomTypes::Vectors
 {
 
     /** 3D state vector
@@ -339,8 +339,8 @@ namespace Util::Custom_Types::Vectors
 
 namespace Algorithms::ThreeD
 {
-    typedef Util::Custom_Types::Vectors::statevector6DOF<float> State6DOFf;
-    typedef Util::Custom_Types::Vectors::statevector6DOF<double> State6DOFd;
+    typedef Util::CustomTypes::Vectors::statevector6DOF<float> State6DOFf;
+    typedef Util::CustomTypes::Vectors::statevector6DOF<double> State6DOFd;
 }
 
-#endif // VECTORANDPOINTS_H
+#endif // VECTORANDPOINTTYPES_H

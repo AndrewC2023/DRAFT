@@ -9,6 +9,9 @@
 // Custom Types
 #include "Util/CustomTypes/VectorAndPointTypes.hpp"
 
+// dependancies
+#include "BasicMath.hpp"
+
 // boost
 #include <boost/geometry/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
@@ -25,8 +28,6 @@ using namespace Algorithms::ThreeD;
 
 namespace Math::Geometry
 {
-
-
 
     /**  Function that returns true if the polygons formed by the points in a and b intersect one another
      *   i.e. a is a set of 4 points that form a square, and b is a set of 3 points that form a triangle
@@ -137,91 +138,6 @@ namespace Math::Geometry
         return intersect;
     }
 
-    /** Helper function to rotate a set of points that form a rectangle around a center point. This has many uses, especially in
-     *  navigation. The original use of this function is to generate the points that form the robot's perimeter, using the robot's
-     *  pose (x/y/theta) and the robot dimensions.
-     * 
-     *  @param x the center x position, in meters
-     *  @param y the center y position, in meters
-     *  @param theta the yaw in radians
-     *  @param width_m the width of the object, the y axis with a yaw of 0
-     *  @param length_m the length of the object, the x axis with a yaw of 0
-     *  
-     *  @return a list of point objects that form the outline of the object
-     */
-    [[maybe_unused, nodiscard]] static std::vector<PointXY> generateRectangularOutline(const PointXY center,
-                                                                             const float length,
-                                                                             const float width,
-                                                                             const float orientation_Rads)
-    {
-            // make unit vectors:
-            Util::Custom_Types::Vectors::Vector2f e1(std::cos(orientation_Rads), std::sin(orientation_Rads));
-            Util::Custom_Types::Vectors::Vector2f e2(std::cos(orientation_Rads + M_PI/2), std::sin(orientation_Rads + M_PI/2));
-
-            float hL = length/2;
-            float hW = width/2;
-
-            std::vector<PointXY> corners;
-            corners.push_back(center + e1*hL - e2*hW);
-            corners.push_back(center + e1*hL + e2*hW);
-            corners.push_back(center - e1*hL + e2*hW);
-            corners.push_back(center - e1*hL - e2*hW);
-            return corners;
-    }
-
-    /** Helper to generate a downsampled version of a circle, using the circle's center position and radius
-     *  The original use of this function was for rendering obstacles, as it must be rendered as triangles
-     */
-    [[maybe_unused, nodiscard]] static std::vector<PointXY> generateCircularOutline(const float x,
-                                                                                    const float y,
-                                                                                    const float radius,
-                                                                                    const std::size_t numberOfPoints)
-    {
-        std::vector<PointXY> obstacleShape;
-        const double radiansPerPoint = platform_code::common::math::toRadians(static_cast<double>(360) / static_cast<double>(numberOfPoints));
-
-        // Each obstacle is a circle-ish, generate a set of points that make up the outline
-        for(std::size_t i = 0; i < numberOfPoints; i++)
-        {
-            const double angle = static_cast<double>(i) * radiansPerPoint;
-            const PointXY point = { static_cast<float>(x + radius * std::cos(angle)), static_cast<float>(y + radius * std::sin(angle)) };
-            obstacleShape.push_back(point);
-        }
-
-        return obstacleShape;
-    }
-
-    /** Helper to get the distance from a point to a line, as a vector. Make sure to take the absolute value when using if you don't
-     *  care about which side the point is on
-     */
-    [[maybe_unused, nodiscard]] static inline float distanceFromPointToLine(const PointXY& lineStart, const PointXY& lineEnd, const PointXY& point)
-    {
-       auto lineDelta = lineEnd - lineStart;
-       auto pointDelta = point - lineStart;
-
-       // Magnitude of cross product of point distance and line length is the area of a parallelogram
-       float area = std::abs(pointDelta.x * lineDelta.y - pointDelta.y * lineDelta.x);
-
-       // Distance to line is the height of the parallelogram, so area / base = height = distance to point
-       return static_cast<float>(area / lineDelta.norm());
-    }
-
-    /** Returns true if the provided point is inside the provided polygon outline,
-     *  using a ray-casting algorithm. This flips the value of inPolygon back and
-     *  forth every time a wall is crossed, which means the number will be odd (true)
-     *  if the point lies inside the polygon
-     */
-    [[gnu::hot, maybe_unused, nodiscard]] static inline bool isPointInsidePolygon(const PointXY& point, const std::vector<PointXY>& polygon)
-    {
-        bool inPolygon = false;
-        for(std::size_t i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++)
-        {
-            if(((polygon[i].y > point.y) != (polygon[j].y > point.y)) && (point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x))
-                inPolygon = !inPolygon;
-        }
-        return inPolygon;
-    }
-
     /** Determines if two finite lines intersect eachother 
      *  returns true of two lines intersect within the ranges they are provided in
      * @param line1 the first line fed as two points
@@ -303,11 +219,94 @@ namespace Math::Geometry
             return false;
         }
     }
-}
 
+    /** Helper function to rotate a set of points that form a rectangle around a center point. This has many uses, especially in
+     *  navigation. The original use of this function is to generate the points that form the robot's perimeter, using the robot's
+     *  pose (x/y/theta) and the robot dimensions.
+     * 
+     *  @param x the center x position, in meters
+     *  @param y the center y position, in meters
+     *  @param theta the yaw in radians
+     *  @param width_m the width of the object, the y axis with a yaw of 0
+     *  @param length_m the length of the object, the x axis with a yaw of 0
+     *  
+     *  @return a list of point objects that form the outline of the object
+     */
+    [[maybe_unused, nodiscard]] static std::vector<PointXY> generateRectangularOutline(const PointXY center,
+                                                                             const float length,
+                                                                             const float width,
+                                                                             const float orientation_Rads)
+    {
+            // make unit vectors:
+            Util::CustomTypes::Vectors::Vector2f e1(std::cos(orientation_Rads), std::sin(orientation_Rads));
+            Util::CustomTypes::Vectors::Vector2f e2(std::cos(orientation_Rads + M_PI/2), std::sin(orientation_Rads + M_PI/2));
 
+            float hL = length/2;
+            float hW = width/2;
 
+            std::vector<PointXY> corners;
+            corners.push_back(center + e1*hL - e2*hW);
+            corners.push_back(center + e1*hL + e2*hW);
+            corners.push_back(center - e1*hL + e2*hW);
+            corners.push_back(center - e1*hL - e2*hW);
+            return corners;
+    }
 
+    /** Helper to generate a downsampled version of a circle, using the circle's center position and radius
+     *  The original use of this function was for rendering obstacles, as it must be rendered as triangles
+     */
+    [[maybe_unused, nodiscard]] static std::vector<PointXY> generateCircularOutline(const float x,
+                                                                                    const float y,
+                                                                                    const float radius,
+                                                                                    const std::size_t numberOfPoints)
+    {
+        std::vector<PointXY> obstacleShape;
+        double radiansPerPoint = static_cast<double>(2*M_PI) / static_cast<double>(numberOfPoints);
+
+        // Each obstacle is a circle-ish, generate a set of points that make up the outline
+        for(std::size_t i = 0; i < numberOfPoints; i++)
+        {
+            const double angle = static_cast<double>(i) * radiansPerPoint;
+            const PointXY point = { static_cast<float>(x + radius * std::cos(angle)), static_cast<float>(y + radius * std::sin(angle)) };
+            obstacleShape.push_back(point);
+        }
+
+        return obstacleShape;
+    }
+
+    /** Helper to get the distance from a point to a line, as a vector. Make sure to take the absolute value when using if you don't
+     *  care about which side the point is on
+     * 
+     *  works based of the perpendicular vector component using cross product
+     */
+    [[maybe_unused, nodiscard]] static inline float distanceFromPointToLine(const PointXY& lineStart, const PointXY& lineEnd, const PointXY& point)
+    {
+       auto lineDelta = lineEnd - lineStart;
+       auto pointDelta = point - lineStart;
+
+       // Magnitude of cross product of point distance and line length is the area of a parallelogram
+       float area = std::abs(pointDelta.x * lineDelta.y - pointDelta.y * lineDelta.x);
+
+       // Distance to line is the height of the parallelogram, so area / base = height = distance to point
+       return static_cast<float>(area / lineDelta.norm());
+    }
+
+    /** Returns true if the provided point is inside the provided polygon outline,
+     *  using a ray-casting algorithm. This flips the value of inPolygon back and
+     *  forth every time a wall is crossed, which means the number will be odd (true)
+     *  if the point lies inside the polygon
+     */
+    [[gnu::hot, maybe_unused, nodiscard]] static inline bool isPointInsidePolygon(const PointXY& point, const std::vector<PointXY>& polygon)
+    {
+        bool inPolygon = false;
+        for(std::size_t i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++)
+        {
+            if(((polygon[i].y > point.y) != (polygon[j].y > point.y)) && (point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x))
+                inPolygon = !inPolygon;
+        }
+        return inPolygon;
+    }
+    
 }
 
 #endif // GEOMETRY_H
