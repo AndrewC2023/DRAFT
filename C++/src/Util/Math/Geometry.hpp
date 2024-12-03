@@ -1,5 +1,5 @@
 /*
- *Author: Andrew Campbell
+ * Author: Andrew Campbell
  * Date: 10-16-2024
  */
 
@@ -20,8 +20,10 @@
 #include <algorithm>
 #include <utility>
 
+using namespace Algorithms::TwoD;
+using namespace Algorithms::ThreeD;
 
-namespace Math
+namespace Math::Geometry
 {
 
 
@@ -31,7 +33,9 @@ namespace Math
      *
      * @param a vector of points x/y that form a polygon
      * @param b vector of points x/y that form a polygon
-     *
+     * 
+     * @note polygons a & b should be defined in the rotational order in which the points define the polygon notably the order in which the line of the line integral of the polygon would encounter the points/corners
+     * 
      * @return true if the polygons intersect
      */
     [[gnu::hot, maybe_unused, nodiscard]] static bool polygonsIntersect(const std::vector<PointXY>& a, const std::vector<PointXY>& b)
@@ -145,21 +149,24 @@ namespace Math
      *  
      *  @return a list of point objects that form the outline of the object
      */
-    [[maybe_unused, nodiscard]] static std::vector<PointXY> generateRectangularOutline(const float x,
-                                                                                       const float y,
-                                                                                       const float theta,
-                                                                                       const float width_m,
-                                                                                       const float length_m)
+    [[maybe_unused, nodiscard]] static std::vector<PointXY> generateRectangularOutline(const PointXY center,
+                                                                             const float length,
+                                                                             const float width,
+                                                                             const float orientation_Rads)
     {
-        const float r = std::sqrt(std::pow(length_m / 2.0, 2.0) + std::pow(width_m / 2.0, 2.0));
-        const float t = std::atan(width_m / length_m);
+            // make unit vectors:
+            Util::Custom_Types::Vectors::Vector2f e1(std::cos(orientation_Rads), std::sin(orientation_Rads));
+            Util::Custom_Types::Vectors::Vector2f e2(std::cos(orientation_Rads + M_PI/2), std::sin(orientation_Rads + M_PI/2));
 
-        const PointXY a = { x + r * std::cos(t + theta), y + r * std::sin(t + theta) };
-        const PointXY b = { x - r * std::cos(t - theta), y + r * std::sin(t - theta) };
-        const PointXY c = { x - r * std::cos(t + theta), y - r * std::sin(t + theta) };
-        const PointXY d = { x + r * std::cos(t - theta), y - r * std::sin(t - theta) };
+            float hL = length/2;
+            float hW = width/2;
 
-        return { a, b, c, d };
+            std::vector<PointXY> corners;
+            corners.push_back(center + e1*hL - e2*hW);
+            corners.push_back(center + e1*hL + e2*hW);
+            corners.push_back(center - e1*hL + e2*hW);
+            corners.push_back(center - e1*hL - e2*hW);
+            return corners;
     }
 
     /** Helper to generate a downsampled version of a circle, using the circle's center position and radius

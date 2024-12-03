@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "VectorAndPointTypes.hpp"
+#include "Geometry.hpp"
 
 namespace Algorithms::TwoD
 {
@@ -25,36 +26,55 @@ namespace Algorithms::TwoD
         OBSTACLE
     };
 
-    // TODO: Use boost polygohns instead the idea of this sturcture is for 
+    // TODO: Use boost polygons instead the idea of this sturcture is for 
     // satic predefined obstacles (at least for now) so it does not need to be perfectly optimized
 
-    struct Obstacle{
-        Obstacle( PointXY center, float length, float width, float orientation)
-        {
-            // make unit vectors:
-            Util::Custom_Types::Vectors::Vector2f e1(std::cos(orientation), std::sin(orientation));
-            Util::Custom_Types::Vectors::Vector2f e2(std::cos(orientation + M_PI/2), std::sin(orientation + M_PI/2));
-
-            float hL = length/2;
-            float hW = width/2;
-
-            points[1] = center + e1*hL - e2*hW;
-            points[2] = center + e1*hL + e2*hW;
-            points[3] = center - e1*hL + e2*hW;
-            points[4] = center - e1*hL - e2*hW;
-        };
-        Obstacle(PointXY OtherPoints[4])
-        {
-            for(int i = 0; i < 4; i++)
+    /**
+     * Static obstacle class
+     * the most basic obstacle type effectively characterised as its 
+     */
+    class StaticObstacle
+    {
+        public:
+            StaticObstacle(std::vector<PointXY> Corners) : corners(Corners){}; 
+            StaticObstacle(PointXY center, float length, float width, float orientation)
             {
-                points[i] = OtherPoints[i];
-            }
-        };
+                corners = Math::Geometry::generateRectangularOutline(center, length, width, orientation);
+            };
 
-        /// @brief Obstacle.points is the four points one can use to define a rectangle in a counterclockwise order
-        PointXY points[4];
-        const State state = State::OBSTACLE;
+            ~StaticObstacle() = default;
+            std::vector<PointXY> getCorners(){return corners;}
+        private:
+            std::vector<PointXY> corners;
     };
+
+    struct UncertainPointXY
+    class StaticUncertainObstacle
+    {
+        // set up such that effectively all paramaters are potentially random, if some arent supposed to be random then construct those parameters' variance as 0 
+        public:
+
+        private:
+            std::vector<
+
+        // need boundary conditions  
+    };
+
+    class DynamicObstacle
+    {
+        public:
+    };
+
+    class DynamicUncertainObstacle
+    {
+        public:
+
+
+    };
+
+
+
+
 
     // Given how we use this class do we need to make its member values private? would it be faster if we didnt need getter functions? the values do get accessed a lot
     class Cell {

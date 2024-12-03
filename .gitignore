@@ -16,7 +16,7 @@ _deps
 
 # ignore built code
 C++/build/
-
+C++/build/.cmake/
 # ignore cached python
 __pycache__
 

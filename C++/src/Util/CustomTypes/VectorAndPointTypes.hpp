@@ -235,6 +235,14 @@ namespace Algorithms::TwoD
     typedef Util::Custom_Types::Vectors::vector2<float> PointXY;               // Point type with floating point X and Y coordinates
     typedef Util::Custom_Types::Vectors::vector2<float> PolarCoordinateRT;     // Polar coordinate with length r and theta t
     typedef Util::Custom_Types::Vectors::vector3<float> StateXYT;              // 2D state of XY and Theta for heading dont use norm!
+
+    typedef struct UncertainPointXY
+    {
+        PointXY meanCenter;
+        bool independent;
+        
+    }
+
 }
 
 namespace Algorithms::ThreeD
