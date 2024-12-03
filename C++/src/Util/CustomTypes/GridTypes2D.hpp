@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <utility>
 
 #include "VectorAndPointTypes.hpp"
 #include "Util/Math/Geometry.hpp"
@@ -55,7 +56,10 @@ namespace Algorithms::TwoD
         public:
 
         private:
-            std::vector<
+            std::vector<PointXY> corners; // treated as a mean effectively
+            std::vector<std::pair<float, float>> CornerVariance;
+            PointXY centroid;
+
 
         // need boundary conditions  
     };
@@ -63,6 +67,13 @@ namespace Algorithms::TwoD
     class DynamicObstacle
     {
         public:
+            // This class needs dimensions and initial conditions
+            propagateInTime(float finalTime, float dt);
+        private:
+            std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
+            float t_0;
+            PointXY CM_initialPosition;
+            // Dynamics
     };
 
     class DynamicUncertainObstacle
