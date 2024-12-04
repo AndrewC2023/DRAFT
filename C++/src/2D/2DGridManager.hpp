@@ -93,7 +93,11 @@ namespace Algorithms::TwoD {
         private:
         // The grid as a list of Grid Cells
         std::vector<Cell> _grid;
-        
+
+        // The grid will also cointain a list of known obstacles, This allows for the opportunity to potential speed up path validation
+        std::vector<IObstacle>
+
+
         // The updates to be made to the grid
         std::deque<UpdateRequest> _updates;
         std::mutex _cellUpdateMutex;

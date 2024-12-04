@@ -30,60 +30,79 @@ namespace Algorithms::TwoD
     // TODO: Use boost polygons instead the idea of this sturcture is for 
     // satic predefined obstacles (at least for now) so it does not need to be perfectly optimized
 
-    /**
-     * Static obstacle class
-     * the most basic obstacle type effectively characterised as its 
-     */
-    class StaticObstacle
-    {
-        public:
-            StaticObstacle(std::vector<PointXY> Corners) : corners(Corners){}; 
-            StaticObstacle(PointXY center, float length, float width, float orientation)
-            {
-                corners = Math::Geometry::generateRectangularOutline(center, length, width, orientation);
-            };
 
-            ~StaticObstacle() = default;
-            std::vector<PointXY> getCorners(){return corners;}
-        private:
-            std::vector<PointXY> corners;
-    };
+    // Region Obstacle Classes
 
-    struct UncertainPointXY
-    class StaticUncertainObstacle
-    {
-        // set up such that effectively all paramaters are potentially random, if some arent supposed to be random then construct those parameters' variance as 0 
-        public:
+        // Base obstacle class wrapper
+        class I2DObstacle
+        {
+            public:
+                virtual ~I2DObstacle() = default; // Virtual destructor for polymorphism
+        };
 
-        private:
-            std::vector<PointXY> corners; // treated as a mean effectively
-            std::vector<std::pair<float, float>> CornerVariance;
-            PointXY centroid;
+        /**
+         * Static obstacle class
+         * the most basic obstacle type effectively characterised as its 
+         * @param corners this gives the cornor locations of the polygon describing the obstace
+         */
+        class StaticObstacle : I2DObstacle
+        {
+            public:
+                StaticObstacle(std::vector<PointXY> Corners) : corners(Corners){}; 
+                StaticObstacle(PointXY center, float length, float width, float orientation)
+                {
+                    corners = Math::Geometry::generateRectangularOutline(center, length, width, orientation);
+                };
+
+                ~StaticObstacle() = default;
+
+            private:
+                std::vector<PointXY> corners;
+        };
+
+        class StaticUncertainObstacle : I2DObstacle
+        {
+            // set up such that effectively all paramaters are potentially random, if some arent supposed to be random then construct those parameters' variance as 0 
+            public:
+                StaticUncertainObstacle(){};
+            private:
+                std::vector<PointXY> corners; // treated as a mean effectively
+                std::vector<std::pair<float, float>> CornerVariance; // TODO: this needs to eventually support any PDF and not just normal
+                PointXY centroid;
+
+                
+        };
+
+        class DynamicObstacle : I2DObstacle
+        {
+            public:
+                // This class needs dimensions and initial conditions
+                std::vector<PointXY> propagateInTime(float finalTime, float dt);
+            private:
+                std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
+                float t_0;
+                PointXY CM_initialPosition;
+                // Dynamics
+                // TODO: wtf do i do here
+                
+                IDynamics dynamics;
+                
+                // Boundary Conditions
+                float initialTime;
+                float initialCMPosition;
+            // need boundary conditions  
+        };
+
+        class DynamicUncertainObstacle : I2DObstacle
+        {
+            public:
 
 
-        // need boundary conditions  
-    };
 
-    class DynamicObstacle
-    {
-        public:
-            // This class needs dimensions and initial conditions
-            propagateInTime(float finalTime, float dt);
-        private:
-            std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
-            float t_0;
-            PointXY CM_initialPosition;
-            // Dynamics
-    };
-
-    class DynamicUncertainObstacle
-    {
-        public:
+        };
 
 
-    };
-
-
+    // End Region
 
 
 
