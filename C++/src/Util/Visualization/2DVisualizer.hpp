@@ -15,8 +15,6 @@
 #include <matplot.h>
 #include <memory>
 #include <deque>
-#include <
-
 
 namespace Visualization
 {

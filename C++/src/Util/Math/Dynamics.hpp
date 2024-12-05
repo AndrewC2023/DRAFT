@@ -30,7 +30,6 @@ namespace Math::Dynamics
 
         private:
         
-        bool controllableCanonicalForm
     };
 }
 

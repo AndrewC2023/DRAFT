@@ -27,7 +27,7 @@ namespace Math
     };
 
     /// returns a float value between 0 and 1
-    float rand(){
+    inline float rand(){
         static std::mt19937 randomGenerator {std::random_device{}()};
         static std::uniform_real_distribution<float> Var(0, 1);
         return Var(randomGenerator);

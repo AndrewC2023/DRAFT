@@ -30,7 +30,7 @@ namespace Algorithms::TwoD
         _goal = goal;
         // setup:
         // get our sample domain
-        Grid->getGridDomain(xMin, xMax, yMin, yMax); // sets them by reference
+        _Grid->getGridDomain(xMin, xMax, yMin, yMax); // sets them by reference
         _xDistribution = std::uniform_real_distribution<float>(xMin,xMax);
         _yDistribution = std::uniform_real_distribution<float>(yMin,yMax);
 

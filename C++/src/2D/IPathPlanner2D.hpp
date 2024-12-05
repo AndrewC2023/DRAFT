@@ -13,7 +13,7 @@
 
 namespace Algorithms::TwoD
 {
-    typedef struct Penalties{
+    struct Penalties{
         const float ObstaclePentalty;
         const float InvalidPenalty;
         const float UnknownPenalty;

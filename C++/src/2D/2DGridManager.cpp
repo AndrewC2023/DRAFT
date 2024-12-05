@@ -235,6 +235,7 @@ namespace Algorithms::TwoD {
             currentIndex++;
         }
 
+        return _grid.at(closestCellIndex).getCenter();
 
     };
 

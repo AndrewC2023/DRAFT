@@ -7,18 +7,18 @@
 #define RRTSTAR2D_H
 
 // base class
-#include "IPathPlanner2D.hpp"
+#include "../../IPathPlanner2D.hpp"
 
 // Dependent Classes
-#include "2DGridManager.hpp"
-#include "IPathValidator2D.hpp"
+#include "../../2DGridManager.hpp"
+#include "../../IPathValidator2D.hpp"
 
 // Config
 #include "Util/Config/Config.hpp"
 
 // Custom Types
 #include "Util/CustomTypes/VectorAndPointTypes.hpp"
-#include "PlanningNodes2D.hpp"
+#include "Util/CustomTypes/PlanningNodes2D.hpp"
 
 // STL
 #include <vector>
