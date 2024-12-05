@@ -4,7 +4,7 @@ A collection of MATLAB, Python, & C++ Planning/navigation algorithms and their t
 
 ## Development Environment Setup
 
-It is recommended to clone and develop the repository in ubuntu (20.04 or later)
+It is recommended to clone and develop the repository in ubuntu 24.04
 
 ### C++ Setup
 
@@ -23,14 +23,10 @@ cd C++/admin
 sudo ./installRequiredLibs.sh
 ```
 
-you may need to give the shell script permissions before it is run:
-
-```console
-chmod +x installRequiredLibs.sh
-```
-
 Once dependecies are installed you can run setup.sh to make your build directories and configure them. this may also require you to allow privileges.
 
 ```console
 sudo ./setup.sh
 ```
+
+Will pivot to Dev container soon
