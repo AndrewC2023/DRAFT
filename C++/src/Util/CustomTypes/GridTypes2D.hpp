@@ -38,6 +38,8 @@ namespace Algorithms::TwoD
         {
             public:
                 virtual ~I2DObstacle() = default; // Virtual destructor for polymorphism
+
+                virtual const std::vector<PointXY>& getCorners();
         };
 
         /**
@@ -56,6 +58,8 @@ namespace Algorithms::TwoD
 
                 ~StaticObstacle() = default;
 
+                const std::vector<PointXY>& getCorners() override {return corners;}
+
             private:
                 std::vector<PointXY> corners;
         };
@@ -65,6 +69,8 @@ namespace Algorithms::TwoD
             // set up such that effectively all paramaters are potentially random, if some arent supposed to be random then construct those parameters' variance as 0 
             public:
                 StaticUncertainObstacle(){};
+
+                const std::vector<PointXY>& getCorners() override {return corners;}
             private:
                 std::vector<PointXY> corners; // treated as a mean effectively
                 std::vector<std::pair<float, float>> CornerVariance; // TODO: this needs to eventually support any PDF and not just normal
@@ -78,6 +84,8 @@ namespace Algorithms::TwoD
             public:
                 // This class needs dimensions and initial conditions
                 std::vector<PointXY> propagateInTime(float finalTime, float dt);
+
+                const std::vector<PointXY>& getCorners() override {return corners;}
             private:
                 std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
                 float t_0;
@@ -98,6 +106,8 @@ namespace Algorithms::TwoD
             public:
                 // This class needs dimensions and initial conditions
                 std::vector<PointXY> propagateInTime(float finalTime, float dt);
+
+                const std::vector<PointXY>& getCorners() override {return corners;}
             private:
                 std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
                 float t_0;
