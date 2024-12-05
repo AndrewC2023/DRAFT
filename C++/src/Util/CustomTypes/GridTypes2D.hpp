@@ -33,6 +33,8 @@ namespace Algorithms::TwoD
 
     // Region Obstacle Classes
 
+    // Uncertain obstacles currently only support independed uncertain variables
+
         // Base obstacle class wrapper
         class I2DObstacle
         {
@@ -169,7 +171,7 @@ namespace Algorithms::TwoD
                 return center;
             }
 
-            std::vector<Algorithms::TwoD::PointXY> getCorners()   
+            const std::vector<Algorithms::TwoD::PointXY> getCorners()   
             {
                 return corners;
             }

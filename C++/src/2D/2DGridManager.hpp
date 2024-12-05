@@ -17,6 +17,9 @@
 #include <chrono>
 #include <cmath>
 
+// Math Library
+#include "Util/Math/Geometry.hpp"
+
 // custom types
 #include "Util/CustomTypes/GridTypes2D.hpp"
 
@@ -55,24 +58,24 @@ namespace Algorithms::TwoD {
         std::vector<Cell> getNeighbors(Cell cell, int depth);
         // gets neighbors of cells given a point in space -> point will be normalized to the cell that contains it
         std::vector<Cell> getNeighbors(float x, float y, int depth);
-        // gets neighbors of cells given a PointXYZ representation of a point in space -> will be normailized to containing cell
+        // gets neighbors of cells given a PointXY representation of a point in space -> will be normailized to containing cell
         std::vector<Cell> getNeighbors(PointXY point);
 
         /** Add Known Obstacles method
          *  @param x,y the x and y position that we want to set as occupied
          *  will find the cell that contains this point and set it as occupied
          */
-        void addKnownObstacle(float x, float y);
+        void addKnownObstacle(const float x, const float y);
         /** Add Known Obstacles method
          *  @param point the point that we want to set as occupied
          *  will find the cell that contains this point and set it as occupied
          */
-        void addKnownObstacle(PointXY point);
+        void addKnownObstacle(const PointXY& point);
         /** Add Known Obstacles method
          *  @param obstacle the x and y position that we want to set as occupied
          *  will find the cell that contains this point and set it as occupied
          */
-        void addKnownObstacle(I2DObstacle obstacle); // TODO: change to boost polygon and intersect!
+        void addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle); // TODO: change to boost polygon and intersect!
 
         /** get the nearest obstacle center
          *  @param checkPoint the point that we want to see what the nearest obstacle is to
@@ -98,7 +101,7 @@ namespace Algorithms::TwoD {
         std::vector<Cell> _grid;
 
         // The grid will also cointain a list of known obstacles, This allows for the opportunity to potential speed up path validation
-        std::vector<I2DObstacle> _obstacleList;
+        std::vector<std::unique_ptr<I2DObstacle>> _obstacleList;
 
 
         // The updates to be made to the grid

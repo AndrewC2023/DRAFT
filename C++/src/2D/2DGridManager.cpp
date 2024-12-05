@@ -143,7 +143,7 @@ namespace Algorithms::TwoD {
         }
     }
 
-    void GridManager::addKnownObstacle(PointXY point)   {
+    void GridManager::addKnownObstacle(const PointXY& point)   {
         int _numCellsX = static_cast<int>(_xSize / _cellSize);
         int _numCellsY = static_cast<int>(_ySize / _cellSize);
 
@@ -161,9 +161,22 @@ namespace Algorithms::TwoD {
         }
     }
 
-    void GridManager::addKnownObstacle(Obstacle obstacle)   {
+    void GridManager::addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle)
+    {
+        // for now this is only handling certain static obstacles
+        // TODO: add cases for each child of I2Dobstacle (uncertainones will require monte carlo sim or something PCE??)
+        const std::vector<PointXY>& obstaclePolygon = obstacle->getCorners();
 
-        
+        // TODO: optimize
+        for(auto& cell : _grid)
+        {
+            const auto CellPolygon  = cell.getCorners();
+            if(Math::Geometry::polygonsIntersect(CellPolygon,obstaclePolygon))
+            {
+                cell.setState(State::OBSTACLE);
+            }
+        }
+        _obstacleList.push_back(std::move(obstacle));
     }
 
     void GridManager::pushUpdatesToGrid()   {
