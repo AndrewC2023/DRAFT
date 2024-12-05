@@ -32,7 +32,7 @@ namespace Algorithms::TwoD {
      *     Add obstalce retangle and body type 
      * and add obstacle methods for that type
      */
-    class GridManager   {
+    class GridManager2D   {
         public:
         /** GridManager 2D
          *  @param p_minX the minimum X value in true space
@@ -41,10 +41,10 @@ namespace Algorithms::TwoD {
          *  @param p_maxY the maximum Y value in true space
          *  @param p_cellsize the side length of a square cell in true space units (meters
          */
-        GridManager(float p_minX, float p_maxX,
+        GridManager2D(float p_minX, float p_maxX,
                     float p_minY, float p_maxY,
                     float p_cellSize);
-        ~GridManager();
+        ~GridManager2D();
 
         // returns vector representation of grid (same type as _grid)
         std::vector<Cell> getCells();

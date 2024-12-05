@@ -9,10 +9,12 @@
 // Custom Classes
 #include "2D/2DGridManager.hpp"
 
-
+// Custom Types
+#include "Util/CustomTypes/VectorAndPointTypes.hpp"
+#include "Util/CustomTypes/PlanningNodes2D.hpp"
 
 // STL
-#include <matplot.h>
+#include <matplot/matplot.h>
 #include <memory>
 #include <deque>
 
@@ -25,7 +27,8 @@ namespace Visualization
         ~Visualizer2D() = default;
 
         void plotGrid(std::shared_ptr<Algorithms::TwoD::GridManager2D>);
-        void plotPath(std::deque<>);
+        void plotPath(std::deque<Algorithms::TwoD::PointXY>);
+        void plotTree(std::vector<RRTStarNode>);
     };
 }
 

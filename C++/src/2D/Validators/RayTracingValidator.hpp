@@ -24,7 +24,7 @@ namespace Algorithms::TwoD
     {
         public:
             RayTracingValidator(Configuration::Config&,
-                                std::shared_ptr<GridManager>);
+                                std::shared_ptr<GridManager2D>);
                                 
             ~RayTracingValidator() = default;
 
@@ -40,7 +40,7 @@ namespace Algorithms::TwoD
             std::vector<VehicleFeature> _vehicle;
 
             // grid
-            std::shared_ptr<GridManager> _grid;
+            std::shared_ptr<GridManager2D> _grid;
 
             float _minimumSafeDistance; 
 

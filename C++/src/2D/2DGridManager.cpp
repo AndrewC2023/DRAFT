@@ -14,7 +14,7 @@
 
 namespace Algorithms::TwoD {
     // TODO: implement pre calculation of number of cells -> mild performance saving
-    GridManager::GridManager(float p_minX, float p_maxX,
+    GridManager2D::GridManager2D(float p_minX, float p_maxX,
                              float p_minY, float p_maxY,
                              float p_cellSize):
                             _cellUpdateThreadRunning(true),
@@ -32,13 +32,13 @@ namespace Algorithms::TwoD {
         _cellUpdateThread = std::thread([this](){ pushUpdatesToGrid(); });
     }
 
-    GridManager::~GridManager(){
+    GridManager2D::~GridManager2D(){
         _cellUpdateThreadRunning = false;
         if(_cellUpdateThread.joinable())
             _cellUpdateThread.join();
     }
 
-    std::vector<Cell> GridManager::getCells(){
+    std::vector<Cell> GridManager2D::getCells(){
         if (initialized){
             return _grid;
         }
@@ -50,7 +50,7 @@ namespace Algorithms::TwoD {
 
     // TODO: implement multithreaded approach to make grid update
     // e.g updater thread that we push updates to so the thread that holds the grid doesnt risk getting throttled under large data load
-    void GridManager::createEmptyGrid() {
+    void GridManager2D::createEmptyGrid() {
         int numX = static_cast<int>(_xSize / _cellSize);
         int numY = static_cast<int>(_ySize / _cellSize);
 
@@ -67,7 +67,7 @@ namespace Algorithms::TwoD {
     }
 
     // returns the cell that contains point at x, y, z
-    Cell GridManager::getCell(float x, float y) {
+    Cell GridManager2D::getCell(float x, float y) {
 
         int cellIndexX = static_cast<int>(std::floor((x - _xMin) / _cellSize));
         int cellIndexY = static_cast<int>(std::floor((y - _yMin) / _cellSize));
@@ -85,7 +85,7 @@ namespace Algorithms::TwoD {
     }
 
     // returns the cell that contains PointXYZ point
-    Cell GridManager::getCell(PointXY point) 
+    Cell GridManager2D::getCell(PointXY point) 
     {
         int cellIndexX = static_cast<int>(std::floor((point.x - _xMin) / _cellSize));
         int cellIndexY = static_cast<int>(std::floor((point.y - _yMin) / _cellSize));
@@ -103,7 +103,7 @@ namespace Algorithms::TwoD {
     }
 
     // TODO: implement caching. depends on what hardware this runs on bc if we dont care abt space we could just hold a massive lookup table tbh (doesnt seem wise for a library that could be on many different systems -Drew)
-    std::vector<Cell> GridManager::getNeighbors(float x, float y, int depth)   
+    std::vector<Cell> GridManager2D::getNeighbors(float x, float y, int depth)   
     {
         std::vector<Cell> neighbors;
 
@@ -126,7 +126,7 @@ namespace Algorithms::TwoD {
         return neighbors;
     }
 
-    void GridManager::addKnownObstacle(float x, float y)  
+    void GridManager2D::addKnownObstacle(float x, float y)  
     {
 
         int cellIndexX = static_cast<int>(std::floor((x - _xMin) / _cellSize));
@@ -143,7 +143,7 @@ namespace Algorithms::TwoD {
         }
     }
 
-    void GridManager::addKnownObstacle(const PointXY& point)   {
+    void GridManager2D::addKnownObstacle(const PointXY& point)   {
         int _numCellsX = static_cast<int>(_xSize / _cellSize);
         int _numCellsY = static_cast<int>(_ySize / _cellSize);
 
@@ -161,7 +161,7 @@ namespace Algorithms::TwoD {
         }
     }
 
-    void GridManager::addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle)
+    void GridManager2D::addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle)
     {
         // for now this is only handling certain static obstacles
         // TODO: add cases for each child of I2Dobstacle (uncertainones will require monte carlo sim or something PCE??)
@@ -179,7 +179,7 @@ namespace Algorithms::TwoD {
         _obstacleList.push_back(std::move(obstacle));
     }
 
-    void GridManager::pushUpdatesToGrid()   {
+    void GridManager2D::pushUpdatesToGrid()   {
         auto goalTime = std::chrono::steady_clock::now() + std::chrono::milliseconds(_cellUpdateThreadPeriod_ms);
 
         while (_cellUpdateThreadRunning)    {
@@ -216,7 +216,7 @@ namespace Algorithms::TwoD {
 
     }
 
-    PointXY GridManager::getNearestObstacleCenter(PointXY PointOfReference)
+    PointXY GridManager2D::getNearestObstacleCenter(PointXY PointOfReference)
     {
         float lowestDistance = INFINITY;
         int closestCellIndex = -1;
@@ -240,7 +240,7 @@ namespace Algorithms::TwoD {
     };
 
 
-    void GridManager::getGridDomain(float& xMin, float& xMax, float& yMin, float& yMax)
+    void GridManager2D::getGridDomain(float& xMin, float& xMax, float& yMin, float& yMax)
     {
         xMin = _xMin;
         xMax = _xMax;

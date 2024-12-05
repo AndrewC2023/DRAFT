@@ -8,7 +8,7 @@
 namespace Algorithms::TwoD
 {
     RayTracingValidator::RayTracingValidator(Configuration::Config& Config,
-                                             std::shared_ptr<GridManager> Grid):
+                                             std::shared_ptr<GridManager2D> Grid):
                                              _grid(std::move(Grid))
     {
 

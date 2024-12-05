@@ -8,6 +8,9 @@
 
 #include "Eigen/Dense"
 
+// Custom Types
+#include "Util/CustomTypes/VectorAndPointTypes.hpp"
+
 namespace Math::Dynamics
 {
     class IDynamics

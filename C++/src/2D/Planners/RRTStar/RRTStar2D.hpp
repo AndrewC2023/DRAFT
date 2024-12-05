@@ -32,7 +32,7 @@ namespace Algorithms::TwoD
     {
         public:
             RRTStar2D(Configuration::Config&, 
-                      std::shared_ptr<GridManager>,
+                      std::shared_ptr<GridManager2D>,
                       std::shared_ptr<IPathValidator2D>);
 
             ~RRTStar2D() = default;
@@ -64,7 +64,7 @@ namespace Algorithms::TwoD
             std::uniform_real_distribution<float> _goalBiasDistribution;
 
             // smart pointers to the grid and path validator
-            std::shared_ptr<GridManager> _Grid; // may not need this
+            std::shared_ptr<GridManager2D> _Grid; // may not need this
             std::shared_ptr<IPathValidator2D> _Validator;
 
             // Config
