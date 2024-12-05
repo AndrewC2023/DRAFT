@@ -73,7 +73,7 @@ namespace Algorithms::TwoD
                 
         };
 
-        class DynamicObstacle : I2DObstacle
+        class DynamicObstacle : I2DObstacle // TODO: Finish this class
         {
             public:
                 // This class needs dimensions and initial conditions
@@ -93,12 +93,24 @@ namespace Algorithms::TwoD
             // need boundary conditions  
         };
 
-        class DynamicUncertainObstacle : I2DObstacle
+        class DynamicUncertainObstacle : I2DObstacle // TODO: make more than the inputs possibly uncertain
         {
             public:
-
-
-
+                // This class needs dimensions and initial conditions
+                std::vector<PointXY> propagateInTime(float finalTime, float dt);
+            private:
+                std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
+                float t_0;
+                PointXY CM_initialPosition;
+                // Dynamics
+                // TODO: wtf do i do here
+                
+                // IDynamics dynamics;
+                
+                // Boundary Conditions
+                float initialTime;
+                float initialCMPosition;
+            // need boundary conditions  
         };
 
 

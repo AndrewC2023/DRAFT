@@ -1,10 +1,10 @@
 /*
- * Author: Andrew Campbell
- * Date: 04-19-2024
+ *Author: Andrew Campbell
+ * Date: 12-05-2024
  */
 
-#ifndef TWODGRIDMANAGER_H
-#define TWODGRIDMANAGER_H
+#ifndef TWODHYBRIDGRIDMANAGER_H
+#define TWODHYBRIDGRIDMANAGER_H
 
 // std
 #include <iostream>
@@ -20,16 +20,9 @@
 // custom types
 #include "Util/CustomTypes/GridTypes2D.hpp"
 
-namespace Algorithms::TwoD {
-
-    /* TODOs:
-     *     Allow this grid to be resized after it 
-     * has been constructed without losing the current 
-     * obstacle set that remains in the domain
-     *     Add obstalce retangle and body type 
-     * and add obstacle methods for that type
-     */
-    class GridManager   {
+namespace Algorithms::TwoD
+{
+    class HybridGridManager   {
         public:
         /** GridManager 2D
          *  @param p_minX the minimum X value in true space
@@ -38,10 +31,10 @@ namespace Algorithms::TwoD {
          *  @param p_maxY the maximum Y value in true space
          *  @param p_cellsize the side length of a square cell in true space units (meters
          */
-        GridManager(float p_minX, float p_maxX,
+        HybridGridManager(float p_minX, float p_maxX,
                     float p_minY, float p_maxY,
                     float p_cellSize);
-        ~GridManager();
+        ~HybridGridManager();
 
         // returns vector representation of grid (same type as _grid)
         std::vector<Cell> getCells();
@@ -128,7 +121,6 @@ namespace Algorithms::TwoD {
         void createEmptyGrid();
 
     };
-} 
+}
 
-
-#endif // TWODGRIDMANAGER_H
+#endif // TWODHYBRIDGRIDMANAGER_H

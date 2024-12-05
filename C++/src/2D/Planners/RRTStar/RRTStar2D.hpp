@@ -54,9 +54,9 @@ namespace Algorithms::TwoD
             float yMax;
 
             // Random Generators
-            std::mt19937 randGenX;
-            std::mt19937 randGenY;
-            std::mt19937 randGenBias;
+            std::mt19937 _randGenX;
+            std::mt19937 _randGenY;
+            std::mt19937 _randGenGoalBias;
 
             // Floating point distributions for the axes and goal bias
             std::uniform_real_distribution<float> _xDistribution;
@@ -64,8 +64,8 @@ namespace Algorithms::TwoD
             std::uniform_real_distribution<float> _goalBiasDistribution;
 
             // smart pointers to the grid and path validator
-            std::shared_ptr<GridManager> Grid;
-            std::shared_ptr<IPathValidator2D> Validator;
+            std::shared_ptr<GridManager> _Grid; // may not need this
+            std::shared_ptr<IPathValidator2D> _Validator;
 
             // Config
             const int _maxIterations;

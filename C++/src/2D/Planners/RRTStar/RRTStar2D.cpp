@@ -10,14 +10,14 @@ namespace Algorithms::TwoD
     RRTStar2D::RRTStar2D(Configuration::Config& Config,
                          std::shared_ptr<GridManager> grid,
                          std::shared_ptr<IPathValidator2D> validator):
-                         Grid(std::move(grid)),
-                         Validator(std::move(validator)),
+                         _Grid(std::move(grid)),
+                         _Validator(std::move(validator)),
                          _maxIterations(Config.planners.RRTStar.maxIterations),
                          _maxEdgeLength(Config.planners.RRTStar.maxEdgeLength),
                          _endBias(Config.planners.RRTStar.endBias),
-                         randGenX({std::random_device{}()}),
-                         randGenY({std::random_device{}()}),
-                         randGenBias({std::random_device{}()})
+                         _randGenX({std::random_device{}()}),
+                         _randGenY({std::random_device{}()}),
+                         _randGenGoalBias({std::random_device{}()})
     {
         Tree.clear(); // make sure the  tree is empty
         _goalBiasDistribution = std::uniform_real_distribution<float>(0,1);
@@ -25,6 +25,7 @@ namespace Algorithms::TwoD
 
     std::deque<PointXY> RRTStar2D::PlanPath(PointXY start, PointXY goal)
     {
+
         // TODO: error handling for bogus start and/or goal points
         _goal = goal;
         // setup:
@@ -69,17 +70,17 @@ namespace Algorithms::TwoD
     PointXY RRTStar2D::sampleNewNode()
     {
         // goal bias
-        if(_goalBiasDistribution(randGenBias) < _endBias)
+        if(_goalBiasDistribution(_randGenGoalBias) < _endBias)
         {
             // sucessful sample the goal
-            return _goal;
+            return _goal; // the assumption is that the gaol is clear maybe we need a prestep to validate this
         }
         // else
         bool sucessfulSample = false;
         while(sucessfulSample != true)
         {
             // sample a node
-            PointXY sample(_xDistribution(randGenX),_yDistribution(randGenY));
+            PointXY sample(_xDistribution(_randGenX),_yDistribution(_randGenY));
             // check if its in a safe region
 
         }
