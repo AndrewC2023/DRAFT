@@ -85,7 +85,7 @@ namespace Algorithms::TwoD
                 // Dynamics
                 // TODO: wtf do i do here
                 
-                IDynamics dynamics;
+                // IDynamics dynamics;
                 
                 // Boundary Conditions
                 float initialTime;
