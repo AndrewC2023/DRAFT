@@ -27,8 +27,9 @@ namespace Algorithms::TwoD
                             _yMin(p_minY),
                             _yMax(p_maxY)
     {
-        int _numCellsX = static_cast<int>(_xSize / _cellSize);
-        int _numCellsY = static_cast<int>(_ySize / _cellSize);
+        _numCellsX = static_cast<int>(_xSize / _cellSize);
+        _numCellsY = static_cast<int>(_ySize / _cellSize);
+
         createEmptyGrid();
         _cellUpdateThread = std::thread([this](){ pushUpdatesToGrid(); });
     }
@@ -52,18 +53,17 @@ namespace Algorithms::TwoD
     // TODO: implement multithreaded approach to make grid update
     // e.g updater thread that we push updates to so the thread that holds the grid doesnt risk getting throttled under large data load
     void GridManager2D::createEmptyGrid() {
-        int numX = static_cast<int>(_xSize / _cellSize); // todo this rounds Down always
-        int numY = static_cast<int>(_ySize / _cellSize);
+        _grid.clear();
 
-        for (int i = 0; i < numX; i++)  {
-            for (int j = 0; j < numY; j++)  {
-                
+        for (int i = 0; i < _numCellsX; i++)  {
+            for (int j = 0; j < _numCellsY; j++)  {
                 float centerX = (i + 0.5) * _cellSize + _xMin;
                 float centerY = (j + 0.5) * _cellSize + _yMin;
 
                 _grid.emplace_back(Cell(PointXY(centerX, centerY), IndexXY(i,j), _cellSize));
             }
         }
+        std::cout << "numCells total: " << _grid.size() << "\n";
         initialized = true;
     }
 
@@ -179,6 +179,8 @@ namespace Algorithms::TwoD
             }
         }
         _obstacleList.push_back(std::move(obstacle));
+
+
     }
 
     void GridManager2D::pushUpdatesToGrid()   {

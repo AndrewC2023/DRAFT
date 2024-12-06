@@ -28,6 +28,9 @@ echo "Installing Matplot++ ..."
 declare -r MATPLOTPP_URL="https://github.com/alandefreitas/matplotplusplus/archive/refs/tags/v1.2.1.tar.gz"
 THREADS=$THREADS ./installFromSource.sh "${MATPLOTPP_URL}" "-DCMAKE_INSTALL_PREFIX=/usr/local -DMATPLOTPP_BUILD_EXAMPLES=OFF -DMATPLOTPP_BUILD_SHARED_LIBS=ON -DMATPLOTPP_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON"
 
+# gnuplot
+sudo apt install gnuplot
+
 echo ""
 echo "Installation of required packages complete!"
 echo "Run setup.sh to build the project"

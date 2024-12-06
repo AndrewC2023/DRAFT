@@ -41,7 +41,7 @@ namespace Algorithms::TwoD
             public:
                 virtual ~I2DObstacle() = default; // Virtual destructor for polymorphism
 
-                virtual const std::vector<PointXY>& getCorners();
+                virtual const std::vector<PointXY>& getCorners() = 0;
         };
 
         /**
@@ -49,7 +49,7 @@ namespace Algorithms::TwoD
          * the most basic obstacle type effectively characterised as its 
          * @param corners this gives the cornor locations of the polygon describing the obstace
          */
-        class StaticObstacle : I2DObstacle
+        class StaticObstacle : public I2DObstacle
         {
             public:
                 StaticObstacle(std::vector<PointXY> Corners) : corners(Corners){}; 
@@ -66,7 +66,7 @@ namespace Algorithms::TwoD
                 std::vector<PointXY> corners;
         };
 
-        class StaticUncertainObstacle : I2DObstacle
+        class StaticUncertainObstacle : public I2DObstacle
         {
             // set up such that effectively all paramaters are potentially random, if some arent supposed to be random then construct those parameters' variance as 0 
             public:
@@ -81,7 +81,7 @@ namespace Algorithms::TwoD
                 
         };
 
-        class DynamicObstacle : I2DObstacle // TODO: Finish this class
+        class DynamicObstacle : public I2DObstacle // TODO: Finish this class
         {
             public:
                 // This class needs dimensions and initial conditions
@@ -103,7 +103,7 @@ namespace Algorithms::TwoD
             // need boundary conditions  
         };
 
-        class DynamicUncertainObstacle : I2DObstacle // TODO: make more than the inputs possibly uncertain
+        class DynamicUncertainObstacle : public I2DObstacle // TODO: make more than the inputs possibly uncertain
         {
             public:
                 // This class needs dimensions and initial conditions

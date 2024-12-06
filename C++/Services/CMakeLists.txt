@@ -1,1 +1,2 @@
 add_subdirectory(3DGridManagerTest)
+add_subdirectory(2DStaticObstacleGridTest)

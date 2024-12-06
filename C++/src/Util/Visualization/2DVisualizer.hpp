@@ -19,6 +19,7 @@
 #include <deque>
 #include <vector>
 #include <utility>
+#include <iostream>
 
 namespace Visualization
 {

@@ -22,15 +22,17 @@ namespace Visualization
         int numYrows = static_cast<int>((yMax - yMin) / cellSize);
 
         std::vector<std::vector<int>> occupancyGrid;
+        occupancyGrid.resize(numYrows, std::vector<int>(numXcolumns, 0));
 
+        std::cout << "number for grid cells: " << _grid->getCells().size() << "\n";
         for(auto& cell : _grid->getCells())
         {
             auto index = cell.getIndex();
             if(cell.getState() == State::OBSTACLE)
             {
-                occupancyGrid[index.y][index.x] = 1;
+                occupancyGrid.at(index.y).at(index.x) = 1;
             } else {
-                occupancyGrid[index.y][index.x] = 0;
+                occupancyGrid.at(index.y).at(index.x) = 0;
             }
         }
 
