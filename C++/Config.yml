@@ -120,3 +120,7 @@ Planners:
     distanceCostFactor: 10.0
     heuristicCostFactor: 1.0
     isInvalidPenalty: 1000.0
+
+# TODO: add it to the list
+Tests:
+

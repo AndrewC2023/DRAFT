@@ -97,7 +97,7 @@ namespace Visualization
 
     void Visualizer2D::show()
     {
-
+            // todo Image sc has the Z axis pointing into the screen not out of it, fix this at some point pls or else all plots are mirrored immages of reality
         matplot::show();
     }
 

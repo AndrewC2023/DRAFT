@@ -34,7 +34,7 @@ namespace Algorithms::TwoD
     // Region Obstacle Classes
 
     // Uncertain obstacles currently only support independed uncertain variables
-
+        // TODO: add an obstacle factory
         // Base obstacle class wrapper
         class I2DObstacle
         {
