@@ -295,6 +295,8 @@ namespace Math::Geometry
      *  using a ray-casting algorithm. This flips the value of inPolygon back and
      *  forth every time a wall is crossed, which means the number will be odd (true)
      *  if the point lies inside the polygon
+     * 
+     *  @note this function is incredibly useful and well written, no need to rewrite
      */
     [[gnu::hot, maybe_unused, nodiscard]] static inline bool isPointInsidePolygon(const PointXY& point, const std::vector<PointXY>& polygon)
     {

@@ -168,22 +168,22 @@ namespace Algorithms::TwoD
                 odds = odds;
             }
 
-            Algorithms::TwoD::PointXY getCenter()    
+            Algorithms::TwoD::PointXY getCenter() const
             {
                 return center;
             }
 
-            const std::vector<Algorithms::TwoD::PointXY> getCorners()   
+            const std::vector<Algorithms::TwoD::PointXY> getCorners() const   
             {
                 return corners;
             }
 
-            Algorithms::TwoD::IndexXY getIndex()
+            Algorithms::TwoD::IndexXY getIndex() const
             {
                 return index;
             }
 
-            State getState()    
+            State getState() const
             {
                 return state;
             }
@@ -198,7 +198,7 @@ namespace Algorithms::TwoD
                 odds += increment;
             }
 
-            float getOdds() 
+            const float getOdds() const 
             {
                 return (1 - (1/(1-(std::pow(2, odds)))));
             }

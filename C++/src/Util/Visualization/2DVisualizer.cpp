@@ -7,13 +7,32 @@
 
 namespace Visualization
 {
-    Visualizer2D::Visualizer2D(std::shared_ptr<Algorithms::TwoD::GridManager2D> grid) : _grid(std::move(grid))
+
+    Visualizer2D::Visualizer2D(std::shared_ptr<Algorithms::TwoD::GridManager2D>& grid) : _grid(grid)
     {
-        auto _figure = matplot::figure();
+        _figure = matplot::figure();
         matplot::figure(_figure);
     }
 
-    void Visualizer2D::plotGrid()
+    void Visualizer2D::plotPolygon(const std::vector<Algorithms::TwoD::PointXY>& polygon)
+    {
+        std::vector<float> X;
+        std::vector<float> Y;
+
+        for(const auto& point : polygon)
+        {
+            X.push_back(point.x);
+            Y.push_back(point.y);
+        } 
+        // close the polygon
+        X.push_back(polygon.at(0).x);
+        Y.push_back(polygon.at(0).y);
+
+        matplot::plot(X,Y);
+
+    }
+
+    void Visualizer2D::plotGrid(float time)
     {
         _grid->getGridDomain(xMin, xMax, yMin, yMax); // sets them by reference
         float cellSize = _grid->getCellSize();
@@ -24,8 +43,8 @@ namespace Visualization
         std::vector<std::vector<int>> occupancyGrid;
         occupancyGrid.resize(numYrows, std::vector<int>(numXcolumns, 0));
 
-        std::cout << "number for grid cells: " << _grid->getCells().size() << "\n";
-        for(auto& cell : _grid->getCells())
+        std::cout << "number for grid cells: " << _grid->getCells(time).size() << "\n";
+        for(const auto& cell : _grid->getCells(time))
         {
             auto index = cell.getIndex();
             if(cell.getState() == State::OBSTACLE)
@@ -36,18 +55,20 @@ namespace Visualization
             }
         }
 
+        // matplot::ylim({100,0});
+
         matplot::imagesc(occupancyGrid);
         matplot::colormap(matplot::palette::greys());
 
     }
 
-    void Visualizer2D::plotPath(std::deque<Algorithms::TwoD::PointXY>& path)
+    void Visualizer2D::plotPath(const std::deque<Algorithms::TwoD::PointXY>& path)
     {
 
         std::vector<float> X;
         std::vector<float> Y;
 
-        for(auto& point : path)
+        for(const auto& point : path)
         {
             X.push_back(convert2IndexSpace(point).x);
             Y.push_back(convert2IndexSpace(point).y);
@@ -57,7 +78,7 @@ namespace Visualization
 
     }
 
-    void Visualizer2D::plotTree(std::vector<Algorithms::TwoD::RRTStarNode>& tree)
+    void Visualizer2D::plotTree(const std::vector<Algorithms::TwoD::RRTStarNode>& tree)
     {
 
         for(int i = 0; i < tree.size() - 1; i++)
@@ -95,9 +116,14 @@ namespace Visualization
         return Algorithms::TwoD::PointXY(static_cast<float>(index.x) * cellSize - 0.5 * cellSize, static_cast<float>(index.y) * cellSize - 0.5 * cellSize);
     }
 
-    void Visualizer2D::show()
+    void Visualizer2D::show(std::string title)
     {
+        matplot::figure(_figure);
             // todo Image sc has the Z axis pointing into the screen not out of it, fix this at some point pls or else all plots are mirrored immages of reality
+        _figure->title(title);
+        _figure->size(8000, 8000);
+
+        
         matplot::show();
     }
 

@@ -7,7 +7,7 @@
 
 namespace Algorithms::TwoD
 {
-    RRTStar2D::RRTStar2D(Configuration::Config& Config,
+    RRTStar2D::RRTStar2D(const Configuration::Config& Config,
                          std::shared_ptr<GridManager2D> grid,
                          std::shared_ptr<IPathValidator2D> validator):
                          _Grid(std::move(grid)),

@@ -20,8 +20,9 @@ namespace Algorithms::ThreeD {
             _cellUpdateThread.join();
     }
 
-    std::vector<Cell> GridManager::getCells()   {
+    std::vector<Cell> GridManager::getCells([[maybe_unused]] float time)   {
         if (initialized)    {
+            // time not used in a static grid
             return _grid;
         }
         else    {

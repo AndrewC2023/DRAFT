@@ -40,8 +40,9 @@ namespace Algorithms::TwoD
             _cellUpdateThread.join();
     }
 
-    std::vector<Cell> GridManager2D::getCells(){
+    std::vector<Cell> GridManager2D::getCells([[maybe_unused]] float time){
         if (initialized){
+            // time not used in a static grid
             return _grid;
         }
         else{
@@ -225,7 +226,7 @@ namespace Algorithms::TwoD
         float lowestDistance = INFINITY;
         int closestCellIndex = -1;
         int currentIndex = 0;
-        for(auto& cell : _grid)
+        for(const auto& cell : _grid)
         {
             // Run the checks
             if(cell.getState() == State::OBSTACLE)

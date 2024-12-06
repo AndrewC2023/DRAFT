@@ -19,7 +19,7 @@ namespace Algorithms::ThreeD {
         ~GridManager();
 
         // returns vector representation of grid
-        std::vector<Cell> getCells();
+        std::vector<Cell> getCells(float time);
 
         // returns cell at x, y, z
         Cell getCell(float x, float y, float z);

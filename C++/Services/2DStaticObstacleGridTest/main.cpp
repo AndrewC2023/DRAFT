@@ -23,8 +23,10 @@ int main()
 
     auto* visualizer = new Visualization::Visualizer2D(grid);
 
-    visualizer->plotGrid();
-    visualizer->show();
+    float time = 0;
+    
+    visualizer->plotGrid(time);
+    visualizer->show("Grid population test");
 
     std::cout << "Press Enter to end the test" << std::endl;
     std::cin.get();

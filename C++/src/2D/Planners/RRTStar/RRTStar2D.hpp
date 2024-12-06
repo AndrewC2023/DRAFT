@@ -31,7 +31,7 @@ namespace Algorithms::TwoD
     class RRTStar2D : IPathPlanner2D
     {
         public:
-            RRTStar2D(Configuration::Config&, 
+            RRTStar2D(const Configuration::Config&, 
                       std::shared_ptr<GridManager2D>,
                       std::shared_ptr<IPathValidator2D>);
 

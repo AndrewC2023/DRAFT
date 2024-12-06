@@ -8,5 +8,5 @@ target_link_libraries(
     2DStaticObstacleTest
 
     TwoD
-    backendVisualization
+    BackendVisualization
 )

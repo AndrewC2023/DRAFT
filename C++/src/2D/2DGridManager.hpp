@@ -47,7 +47,7 @@ namespace Algorithms::TwoD {
         ~GridManager2D();
 
         // returns vector representation of grid (same type as _grid)
-        std::vector<Cell> getCells();
+        std::vector<Cell> getCells(float);
 
         // returns cell at x, y, z
         Cell getCell(float x, float y);

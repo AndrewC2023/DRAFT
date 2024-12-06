@@ -1,11 +1,11 @@
 add_library(
-    backendVisualization
+    BackendVisualization
 
     2DVisualizer.cpp
 )
 
 target_link_libraries(
-    backendVisualization
+    BackendVisualization
 
     TwoD
     Config
