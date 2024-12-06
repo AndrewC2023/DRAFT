@@ -9,6 +9,7 @@
 
 #include "RayTracingValidator.hpp"
 
+#define VALIDATOR_VISUALIZATION_DEBUG // make this a config check maybe?
 // Debug
 #ifdef VALIDATOR_VISUALIZATION_DEBUG
     #include "Util/Visualization/2DVisualizer.hpp"                
@@ -88,6 +89,7 @@ namespace Algorithms::TwoD
             
             #ifdef VALIDATOR_VISUALIZATION_DEBUG
                 auto debugVisaulizer = Visualization::Visualizer2D(_grid);
+                debugVisaulizer.plotGrid(time);
                 debugVisaulizer.plotPolygon(outline);
                 debugVisaulizer.show("Validator Bounding Box");
             #endif
@@ -189,6 +191,7 @@ namespace Algorithms::TwoD
             }
         }
         
+        return true;
     }
 
 

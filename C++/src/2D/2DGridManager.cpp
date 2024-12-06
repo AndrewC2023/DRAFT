@@ -64,7 +64,7 @@ namespace Algorithms::TwoD
                 _grid.emplace_back(Cell(PointXY(centerX, centerY), IndexXY(i,j), _cellSize));
             }
         }
-        std::cout << "numCells total: " << _grid.size() << "\n";
+
         initialized = true;
     }
 

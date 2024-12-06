@@ -21,14 +21,15 @@ namespace Visualization
 
         for(const auto& point : polygon)
         {
-            X.push_back(point.x);
-            Y.push_back(point.y);
+            X.push_back(convert2IndexSpace(point).x);
+            Y.push_back(convert2IndexSpace(point).y);
         } 
         // close the polygon
-        X.push_back(polygon.at(0).x);
-        Y.push_back(polygon.at(0).y);
+        X.push_back(convert2IndexSpace(polygon.at(0)).x);
+        Y.push_back(convert2IndexSpace(polygon.at(0)).y);
 
         matplot::plot(X,Y);
+        matplot::hold(true);
 
     }
 
@@ -59,6 +60,7 @@ namespace Visualization
 
         matplot::imagesc(occupancyGrid);
         matplot::colormap(matplot::palette::greys());
+        matplot::hold(true);
 
     }
 
@@ -75,7 +77,7 @@ namespace Visualization
         }
 
         matplot::plot(X,Y);
-
+        matplot::hold(true);
     }
 
     void Visualizer2D::plotTree(const std::vector<Algorithms::TwoD::RRTStarNode>& tree)
@@ -95,6 +97,7 @@ namespace Visualization
             Y.push_back(convert2IndexSpace(parentPosition).y);
 
             matplot::plot(X,Y)->color("r");
+            matplot::hold(true);
         }
     }
 
@@ -118,13 +121,13 @@ namespace Visualization
 
     void Visualizer2D::show(std::string title)
     {
-        matplot::figure(_figure);
             // todo Image sc has the Z axis pointing into the screen not out of it, fix this at some point pls or else all plots are mirrored immages of reality
         _figure->title(title);
         _figure->size(8000, 8000);
 
-        
+        std::cout << "Showing Figure: " << title << std::endl;
         matplot::show();
+        // std::cin.get();
     }
 
 }
