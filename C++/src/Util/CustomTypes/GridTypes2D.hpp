@@ -133,8 +133,9 @@ namespace Algorithms::TwoD
     // Given how we use this class do we need to make its member values private? would it be faster if we didnt need getter functions? the values do get accessed a lot
     class Cell {
         public:
-            Cell(Algorithms::TwoD::PointXY p_center, float cellSize)
+            Cell(Algorithms::TwoD::PointXY p_center, Algorithms::TwoD::IndexXY Index, float cellSize)
             {
+                index = Index;
                 center = p_center;
                 cellSize = cellSize;
                 
@@ -150,8 +151,9 @@ namespace Algorithms::TwoD
                 odds = 0; /// only ranges from [0,1]
             }
 
-            Cell(Algorithms::TwoD::PointXY p_center, float cellSize, State state, float odds)
+            Cell(Algorithms::TwoD::PointXY p_center, Algorithms::TwoD::IndexXY Index, float cellSize, State state, float odds)
             {
+                index = Index;
                 center = p_center;
                 cellSize = cellSize;
 
@@ -176,10 +178,16 @@ namespace Algorithms::TwoD
                 return corners;
             }
 
+            Algorithms::TwoD::IndexXY getIndex()
+            {
+                return index;
+            }
+
             State getState()    
             {
                 return state;
             }
+
             void setState(State p_state) 
             {
                 state = p_state;
@@ -199,9 +207,11 @@ namespace Algorithms::TwoD
         private:
             Algorithms::TwoD::PointXY center;
             std::vector<Algorithms::TwoD::PointXY> corners;
+            Algorithms::TwoD::IndexXY index;
             State state;
             float odds;
             float cellSize;
+
 
     };
 }

@@ -91,10 +91,10 @@ namespace Algorithms::TwoD
             {
                 // Check the 4 corners
                 // TODO: check if running the polygon intersect is faster than running this four times
-                if(isPointInsidePolygon(cellOutline[0], outline) ||
-                isPointInsidePolygon(cellOutline[1], outline) ||
-                isPointInsidePolygon(cellOutline[2], outline) ||
-                isPointInsidePolygon(cellOutline[3], outline))
+                if(Math::Geometry::isPointInsidePolygon(cellOutline[0], outline) ||
+                Math::Geometry::isPointInsidePolygon(cellOutline[1], outline) ||
+                Math::Geometry::isPointInsidePolygon(cellOutline[2], outline) ||
+                Math::Geometry::isPointInsidePolygon(cellOutline[3], outline))
                     return false;
             }
         }
@@ -112,24 +112,6 @@ namespace Algorithms::TwoD
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    bool RayTracingValidator::validatePathSegment(PointXY startPoint, PointXY endPoint)
-    {
-
-    }
 
     void RayTracingValidator::setVehicle(std::vector<VehicleFeature> vehicle)
     {

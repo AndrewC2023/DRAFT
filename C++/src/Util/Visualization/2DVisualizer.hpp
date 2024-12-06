@@ -17,18 +17,39 @@
 #include <matplot/matplot.h>
 #include <memory>
 #include <deque>
+#include <vector>
+#include <utility>
 
 namespace Visualization
 {
     class Visualizer2D
     {
         public:
-        Visualizer2D();
-        ~Visualizer2D() = default;
+            Visualizer2D(std::shared_ptr<Algorithms::TwoD::GridManager2D>);
+            ~Visualizer2D() = default;
 
-        void plotGrid(std::shared_ptr<Algorithms::TwoD::GridManager2D>);
-        void plotPath(std::deque<Algorithms::TwoD::PointXY>);
-        void plotTree(std::vector<RRTStarNode>);
+            void plotGrid();
+            void plotPath(std::deque<Algorithms::TwoD::PointXY>&);
+            void plotTree(std::vector<Algorithms::TwoD::RRTStarNode>&);
+
+            void show();
+
+        private:
+
+            const Algorithms::TwoD::PointXY convert2IndexSpace(const Algorithms::TwoD::PointXY point);
+
+            const Algorithms::TwoD::PointXY convert2PointSpace(const Algorithms::TwoD::PointXY IndexPoint);
+
+            const Algorithms::TwoD::PointXY convert2PointSpace(const Algorithms::TwoD::IndexXY index);
+
+            std::shared_ptr<Algorithms::TwoD::GridManager2D> _grid;
+        
+            matplot::figure_handle _figure;
+
+            float xMin;
+            float xMax;
+            float yMin;
+            float yMax;
     };
 }
 

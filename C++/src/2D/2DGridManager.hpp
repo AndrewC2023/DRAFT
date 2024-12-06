@@ -54,6 +54,12 @@ namespace Algorithms::TwoD {
         // returns cell at center point
         Cell getCell(PointXY point);
 
+        const float getCellSize();
+
+        // helpers for converting between point and index space
+        const IndexXY getIndexContainingPoint(const PointXY);
+        const PointXY getPointFromIndex(const IndexXY);
+
         // gets neighbors of cells given the specific cell and a depth
         std::vector<Cell> getNeighbors(Cell cell, int depth);
         // gets neighbors of cells given a point in space -> point will be normalized to the cell that contains it

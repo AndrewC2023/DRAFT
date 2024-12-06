@@ -10,7 +10,7 @@
 #include "Util/Config/Config.hpp"
 
 // Base class
-#include "IPathValidator2D.hpp"
+#include "../IPathValidator2D.hpp"
 
 // STL
 #include <cmath>

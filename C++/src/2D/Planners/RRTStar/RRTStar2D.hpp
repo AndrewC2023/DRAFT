@@ -46,6 +46,7 @@ namespace Algorithms::TwoD
             float pathCost;
 
             int numNodes; // Current count of how many nodes we have
+            // num edges will need to be known for graph planners
             bool foundEnd;
             PointXY _goal;
             float xMin;

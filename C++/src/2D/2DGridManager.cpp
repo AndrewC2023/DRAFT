@@ -12,7 +12,8 @@
 */
 #include "2DGridManager.hpp"
 
-namespace Algorithms::TwoD {
+namespace Algorithms::TwoD 
+{
     // TODO: implement pre calculation of number of cells -> mild performance saving
     GridManager2D::GridManager2D(float p_minX, float p_maxX,
                              float p_minY, float p_maxY,
@@ -51,7 +52,7 @@ namespace Algorithms::TwoD {
     // TODO: implement multithreaded approach to make grid update
     // e.g updater thread that we push updates to so the thread that holds the grid doesnt risk getting throttled under large data load
     void GridManager2D::createEmptyGrid() {
-        int numX = static_cast<int>(_xSize / _cellSize);
+        int numX = static_cast<int>(_xSize / _cellSize); // todo this rounds Down always
         int numY = static_cast<int>(_ySize / _cellSize);
 
         for (int i = 0; i < numX; i++)  {
@@ -60,7 +61,7 @@ namespace Algorithms::TwoD {
                 float centerX = (i + 0.5) * _cellSize + _xMin;
                 float centerY = (j + 0.5) * _cellSize + _yMin;
 
-                _grid.emplace_back(Cell(PointXY(centerX, centerY), _cellSize));
+                _grid.emplace_back(Cell(PointXY(centerX, centerY), IndexXY(i,j), _cellSize));
             }
         }
         initialized = true;
@@ -69,14 +70,14 @@ namespace Algorithms::TwoD {
     // returns the cell that contains point at x, y, z
     Cell GridManager2D::getCell(float x, float y) {
 
-        int cellIndexX = static_cast<int>(std::floor((x - _xMin) / _cellSize));
-        int cellIndexY = static_cast<int>(std::floor((y - _yMin) / _cellSize));
+        int cellIndexX = static_cast<int>(std::round((x - _xMin) / _cellSize));
+        int cellIndexY = static_cast<int>(std::round((y - _yMin) / _cellSize));
 
         if (cellIndexX < 0 || cellIndexX >= _numCellsX || cellIndexY < 0 || cellIndexY >= _numCellsY)    {
             // TODO: implement actuall error handling system -> could log and return -1, -1, -1 just null for now
             std::cout << "WARNING: attempted access of grid outside of defined domain\n";
             // return a meaningless cell that is listed as an obstacle
-            return Cell(PointXY(0.0f,0.0f), _cellSize, State::OBSTACLE,1.0f);
+            return Cell(PointXY(0.0f,0.0f), IndexXY(0,0), _cellSize, State::OBSTACLE,1.0f);
         }
 
         int calcIndex = cellIndexX + _numCellsX * (cellIndexY + _numCellsY);
@@ -87,14 +88,14 @@ namespace Algorithms::TwoD {
     // returns the cell that contains PointXYZ point
     Cell GridManager2D::getCell(PointXY point) 
     {
-        int cellIndexX = static_cast<int>(std::floor((point.x - _xMin) / _cellSize));
-        int cellIndexY = static_cast<int>(std::floor((point.y - _yMin) / _cellSize));
+        int cellIndexX = static_cast<int>(std::round((point.x - _xMin) / _cellSize));
+        int cellIndexY = static_cast<int>(std::round((point.y - _yMin) / _cellSize));
 
         if (cellIndexX < 0 || cellIndexX >= _numCellsX || cellIndexY < 0 || cellIndexY >= _numCellsY)    {
             // TODO: implement actuall error handling system -> could log and return -1, -1, -1 just null for now
             std::cout << "WARNING: attempted access of grid outside of defined domain\n";
             // return a meaningless cell that is listed as an obstacle
-            return Cell(PointXY(0.0f,0.0f), _cellSize, State::OBSTACLE,1.0f);
+            return Cell(PointXY(0.0f,0.0f), IndexXY(0,0), _cellSize, State::OBSTACLE,1.0f);
         }
 
         int calcIndex = cellIndexX + _numCellsX * (cellIndexY);
@@ -107,15 +108,16 @@ namespace Algorithms::TwoD {
     {
         std::vector<Cell> neighbors;
 
-        int cellIndexX = static_cast<int>(std::floor((x - _xMin) / _cellSize));
-        int cellIndexY = static_cast<int>(std::floor((y - _yMin) / _cellSize));
-        // TODO: there is a deterministic way to implement this given we know how the list is structured
-        // TODO: error handling?
+        int cellIndexX = static_cast<int>(std::round((x - _xMin) / _cellSize));
+        int cellIndexY = static_cast<int>(std::round((y - _yMin) / _cellSize));
+        // TODO: there is a deterministic way to implement this given we know how the list is structured 
+        // TODO: error handling? yes and yes --
         int minX = std::max(0, cellIndexX - depth);
         int maxX = std::min(_numCellsX - 1, cellIndexX + depth);
         int minY = std::max(0, cellIndexY - depth);
         int maxY = std::min(_numCellsY - 1, cellIndexY + depth);
 
+        // TODO: no handling for if we are looking at something at an edge or corner of the grid 
         for (int i = minX; i < maxX; i++)   {
             for (int j = minY; j < maxY; j++)   {
                 int neighborIndex = x + _numCellsX * (y);
@@ -129,8 +131,8 @@ namespace Algorithms::TwoD {
     void GridManager2D::addKnownObstacle(float x, float y)  
     {
 
-        int cellIndexX = static_cast<int>(std::floor((x - _xMin) / _cellSize));
-        int cellIndexY = static_cast<int>(std::floor((y - _yMin) / _cellSize));
+        int cellIndexX = static_cast<int>(std::round((x - _xMin) / _cellSize));
+        int cellIndexY = static_cast<int>(std::round((y - _yMin) / _cellSize));
 
         bool invalid = cellIndexX < 0 || cellIndexX >= _numCellsX || cellIndexY < 0 || cellIndexY >= _numCellsY;
 
@@ -147,8 +149,8 @@ namespace Algorithms::TwoD {
         int _numCellsX = static_cast<int>(_xSize / _cellSize);
         int _numCellsY = static_cast<int>(_ySize / _cellSize);
 
-        int cellIndexX = static_cast<int>(std::floor((point.x - _xMin) / _cellSize));
-        int cellIndexY = static_cast<int>(std::floor((point.y - _yMin) / _cellSize));
+        int cellIndexX = static_cast<int>(std::round((point.x - _xMin) / _cellSize));
+        int cellIndexY = static_cast<int>(std::round((point.y - _yMin) / _cellSize));
 
         bool invalid = cellIndexX < 0 || cellIndexX >= _numCellsX || cellIndexY < 0 || cellIndexY >= _numCellsY;
 
@@ -246,6 +248,20 @@ namespace Algorithms::TwoD {
         xMax = _xMax;
         yMin = _yMin;
         yMax = _yMax;
-    };
+    }
+
+    const float GridManager2D::getCellSize(){
+        return _cellSize;
+    }
+
+
+    const IndexXY GridManager2D::getIndexContainingPoint(const PointXY point)
+    {
+        return IndexXY(static_cast<int>(std::round((point.x + 0.5 * _cellSize) / _cellSize)), static_cast<int>(std::round((point.y + 0.5 * _cellSize) / _cellSize)));
+    }
+    const PointXY GridManager2D::getPointFromIndex(const IndexXY index)
+    {
+        return PointXY(index.x * _cellSize - 0.5 * _cellSize, index.y * _cellSize - 0.5 * _cellSize);
+    }
 
 }
