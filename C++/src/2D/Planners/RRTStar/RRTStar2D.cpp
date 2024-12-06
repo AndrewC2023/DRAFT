@@ -19,7 +19,7 @@ namespace Algorithms::TwoD
                          _randGenY({std::random_device{}()}),
                          _randGenGoalBias({std::random_device{}()})
     {
-        Tree.clear(); // make sure the  tree is empty
+        Tree.clear(); // make sure the tree is empty
         _goalBiasDistribution = std::uniform_real_distribution<float>(0,1);
     };
 

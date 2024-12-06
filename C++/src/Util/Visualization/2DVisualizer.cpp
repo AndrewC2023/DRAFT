@@ -14,6 +14,15 @@ namespace Visualization
         matplot::figure(_figure);
     }
 
+    /**
+     * @brief Plots a 2D polygon on a graph.
+     * 
+     * This function takes a vector of 2D points representing the vertices of a polygon,
+     * converts them to index space, and plots the polygon using the matplot library.
+     * The polygon is closed by connecting the last point to the first point.
+     * 
+     * @param polygon A vector of Points representing the vertices of the polygon.
+     */
     void Visualizer2D::plotPolygon(const std::vector<Algorithms::TwoD::PointXY>& polygon)
     {
         std::vector<float> X;
@@ -33,6 +42,18 @@ namespace Visualization
 
     }
 
+    /**
+     * @brief Plots a 2D grid visualization based on the occupancy state of cells at a given time.
+     * 
+     * This function retrieves the grid domain boundaries and cell size, calculates the number of columns and rows,
+     * and initializes an occupancy grid. It then populates the occupancy grid based on the state of each cell 
+     * (either obstacle or free space) at the specified time. Finally, it uses the Matplot++ library to visualize 
+     * the occupancy grid with a grayscale colormap.
+     * 
+     * @param time The time at which to retrieve the cell states for plotting.
+     * 
+     * @note this method uses the grey color scheme but this works well only if the grid is binary
+     */
     void Visualizer2D::plotGrid(float time)
     {
         _grid->getGridDomain(xMin, xMax, yMin, yMax); // sets them by reference
@@ -101,12 +122,24 @@ namespace Visualization
         }
     }
 
+    /**
+     * @brief Converts a point from world space to index space.
+     *
+     * @param point The point in world coordinates to be converted.
+     * @return The converted point in index coordinates.
+     */
     const Algorithms::TwoD::PointXY Visualizer2D::convert2IndexSpace(const Algorithms::TwoD::PointXY point)
     {
         float cellSize = _grid->getCellSize();
         return Algorithms::TwoD::PointXY((point.x + 0.5 * cellSize) / cellSize, (point.y + 0.5 * cellSize) / cellSize);
     }
 
+    /**
+     * @brief Converts a point from index space to point space.
+     * 
+     * @param IndexPoint The point in index space to be converted.
+     * @return The converted point in world coordinates.
+     */
     const Algorithms::TwoD::PointXY Visualizer2D::convert2PointSpace(const Algorithms::TwoD::PointXY IndexPoint)
     {
         float cellSize = _grid->getCellSize();
