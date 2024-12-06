@@ -24,14 +24,16 @@ namespace Algorithms::TwoD
     {
         public:
             RayTracingValidator(Configuration::Config&,
-                                std::shared_ptr<GridManager2D>);
+                                std::shared_ptr<GridManager2D>,
+                                std::vector<VehicleFeature>&);
                                 
             ~RayTracingValidator() = default;
 
-            bool validatePath(std::deque<PointXY>) override;
-            bool validatePathSegment(PointXY, PointXY) override;
-            void setVehicle(std::vector<VehicleFeature>) override;
-            float getMinimumSafeDistance() override;
+            bool validatePath(const std::deque<PointXY>& ) override;
+            bool validatePathSegment(const PointXY&, const PointXY&) override;
+            void setVehicle(std::vector<VehicleFeature>&) override;
+            const float getMinimumSafeDistance() override;
+            bool validatePose(const StateXYT&) override;
 
         private:
 

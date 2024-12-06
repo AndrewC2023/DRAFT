@@ -29,7 +29,7 @@ declare -r MATPLOTPP_URL="https://github.com/alandefreitas/matplotplusplus/archi
 THREADS=$THREADS ./installFromSource.sh "${MATPLOTPP_URL}" "-DCMAKE_INSTALL_PREFIX=/usr/local -DMATPLOTPP_BUILD_EXAMPLES=OFF -DMATPLOTPP_BUILD_SHARED_LIBS=ON -DMATPLOTPP_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON"
 
 # gnuplot
-sudo apt install gnuplot
+sudo apt install gnuplot-x11
 
 echo ""
 echo "Installation of required packages complete!"

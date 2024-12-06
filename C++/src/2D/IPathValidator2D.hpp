@@ -17,29 +17,21 @@ namespace Algorithms::TwoD
 {
     struct VehicleFeature
     {
-        PointXY positionFromCG;
-        float width;
-        float length;
+        PointXY featureCenterfromCG;
+        std::vector<PointXY> featurePolygon; /// the polygon given as positions relative to the feature defined reference point
     };
 
     class IPathValidator2D
     {
         public:
+            virtual ~IPathValidator2D() = default;
 
-            virtual bool validatePath(std::deque<PointXY>);
-            virtual bool validatePathSegment(PointXY, PointXY);
-            virtual float getMinimumSafeDistance();
-            virtual bool validatePoint(PointXY);
-            virtual bool validatePolynomial();
-            void setVehicle(std::vector<VehicleFeature>&);
+            virtual bool validatePath(const std::deque<PointXY>&) = 0;
+            virtual bool validatePathSegment(const PointXY&, const PointXY&) = 0;
+            virtual const float getMinimumSafeDistance() = 0;
+            virtual bool validatePose(const StateXYT&) = 0;
+            virtual void setVehicle(std::vector<VehicleFeature>&) = 0;
 
-        private:
-            std::vector<VehicleFeature> _vehicle;
     };
-
-    void IPathValidator2D::setVehicle(std::vector<VehicleFeature>& vehicle)
-    {
-        _vehicle = vehicle;
-    }
     
 }
