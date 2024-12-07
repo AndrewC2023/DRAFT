@@ -157,4 +157,4 @@ namespace Algorithms::Configuration
     Config parseConfig(std::istream& configFile);
 }
 
-#endif // CONFIG_HPP
+#endif // CONFIG_HPPConfig

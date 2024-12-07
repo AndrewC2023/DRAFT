@@ -21,7 +21,7 @@
 
 namespace Algorithms::TwoD
 {
-    class RayTracingValidator : IPathValidator2D
+    class RayTracingValidator : public IPathValidator2D
 
     {
         public:
@@ -31,8 +31,8 @@ namespace Algorithms::TwoD
                                 
             ~RayTracingValidator() = default;
 
-            bool validatePath(const std::deque<PointXY>&, float) override;
-            bool validatePathSegment(const PointXY&, const PointXY&, float) override;
+            bool validatePath(const std::deque<PointXY>&, float time) override;
+            bool validatePathSegment(const PointXY&, const PointXY&, float time) override;
             void setVehicle(std::vector<VehicleFeature>&) override;
             const float getMinimumSafeDistance() override;
             bool validatePose(const StateXYT&, float time ) override;

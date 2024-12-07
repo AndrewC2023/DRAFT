@@ -37,7 +37,7 @@ namespace Algorithms::TwoD
         _xDistribution = std::uniform_real_distribution<float>(xMin,xMax);
         _yDistribution = std::uniform_real_distribution<float>(yMin,yMax);
 
-        // Emty the tree if this is being called again
+        // Empty the tree if this is being called again
         Tree.clear();
         Tree.push_back(RRTStarNode({start, 0.0f, 0, 0}));
         
@@ -90,8 +90,8 @@ namespace Algorithms::TwoD
         }
 
         // find the path
-        std::deque<PointXY> path;
-        int currentIndex = goalIndex; 
+        std::deque<PointXY> path{};
+        int currentIndex = goalIndex; // TODO this is wehre the bug is
         while(currentIndex != 0)
         {
             path.push_front(Tree.at(currentIndex).position);
@@ -104,6 +104,16 @@ namespace Algorithms::TwoD
     } // PlanPath
 
 
+    /**
+     * @brief Samples a new node in the 2D space for the RRT* algorithm.
+     * 
+     * This function attempts to sample a new node with a goal bias. If the goal bias
+     * condition is met and the goal has not been found yet, it returns the goal node.
+     * Otherwise, it samples a node within the defined space until a valid (safe) node
+     * is found.
+     * 
+     * @return PointXY The sampled node, either the goal node or a valid random node.
+     */
     PointXY RRTStar2D::sampleNewNode()
     {
         // goal bias, however we need to check if we have already found the goal

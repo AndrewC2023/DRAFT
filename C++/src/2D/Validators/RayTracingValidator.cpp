@@ -9,7 +9,6 @@
 
 #include "RayTracingValidator.hpp"
 
-#define VALIDATOR_VISUALIZATION_DEBUG // make this a config check maybe?
 // Debug
 #ifdef VALIDATOR_VISUALIZATION_DEBUG
     #include "Util/Visualization/2DVisualizer.hpp"                

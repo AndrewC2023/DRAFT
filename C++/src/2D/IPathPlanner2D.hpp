@@ -22,10 +22,10 @@ namespace Algorithms::TwoD
     class IPathPlanner2D
     {
         public:
+            virtual ~IPathPlanner2D() = default;
+            virtual std::deque<PointXY> PlanPath(PointXY start, PointXY goal) = 0;
 
-            virtual std::deque<PointXY> PlanPath(PointXY start, PointXY goal);
-
-            virtual float getPathCost(); // Helper to return the cost of the found path
+            virtual float getPathCost() = 0; // Helper to return the cost of the found path
     };
 
 }

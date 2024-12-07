@@ -47,7 +47,7 @@ namespace Algorithms::TwoD
      * @param std::shared_ptr<GridManager2D> Shared pointer to the grid manager.
      * @param std::shared_ptr<IPathValidator2D> Shared pointer to the path validator.
      */
-    class RRTStar2D : IPathPlanner2D
+    class RRTStar2D : public IPathPlanner2D
     {
         public:
             RRTStar2D(const Configuration::Config&, 

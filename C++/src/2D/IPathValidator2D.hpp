@@ -3,6 +3,9 @@
  * Date: 08-24-2024
  */
 
+#ifndef IPATHVALIDATOR2D_H
+#define IPATHVALIDATOR2D_H
+
 // Custom Types
 #include "Util/CustomTypes/VectorAndPointTypes.hpp"
 
@@ -35,3 +38,5 @@ namespace Algorithms::TwoD
     };
     
 }
+
+#endif // IPATHVALIDATOR2D_H
