@@ -89,6 +89,11 @@ namespace Algorithms::TwoD
 
         }
 
+        if(!foundEnd) //TODO: real error handling
+        {
+            throw std::runtime_error("Failed to find a path");
+        }
+
         // find the path
         std::deque<PointXY> path{};
         int currentIndex = goalIndex; // TODO this is wehre the bug is
