@@ -267,3 +267,5 @@ namespace Algorithms::TwoD
     } // getPointFromIndex
 
 }
+
+
