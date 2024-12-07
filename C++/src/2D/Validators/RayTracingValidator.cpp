@@ -41,7 +41,7 @@ namespace Algorithms::TwoD
 
         return true;
         }
-    }
+    } // validatePath
 
     bool RayTracingValidator::validatePathSegment(const PointXY& head, const PointXY& tail, float time)
     {
@@ -77,7 +77,7 @@ namespace Algorithms::TwoD
                 throw(std::runtime_error("validator not given rectangle"));
             } 
 
-            const auto& outline = Math::Geometry::generateRectangularOutline(midPoint, pathLength + std::abs(feature.featurePolygon.at(0).x * 2), std::abs(feature.featurePolygon.at(0).y * 2),pathTheta);
+            const auto& outline = Math::Geometry::generateRectangularOutline(midPoint, pathLength + std::abs(feature.featurePolygon[0].x * 2), std::abs(feature.featurePolygon[0].y * 2),pathTheta);
             auto gridCells = _grid->getCells(time);
             // TODO: grid obstacles go here for optimization 
 
@@ -127,7 +127,7 @@ namespace Algorithms::TwoD
         }
 
         return true;
-    }
+    } // validatePathSegment
 
     bool RayTracingValidator::validatePose(const StateXYT& state, float time)
     {
@@ -142,7 +142,7 @@ namespace Algorithms::TwoD
                 throw(std::runtime_error("validator not given rectangle"));
             } 
 
-            const auto& outline = Math::Geometry::generateRectangularOutline(PointXY(state.x, state.y), std::abs(feature.featurePolygon.at(0).x * 2), std::abs(feature.featurePolygon.at(0).y * 2), state.z);
+            const auto& outline = Math::Geometry::generateRectangularOutline(PointXY(state.x, state.y), std::abs(feature.featurePolygon[0].x * 2), std::abs(feature.featurePolygon[0].y * 2), state.z);
             auto gridCells = _grid->getCells(time);
             // TODO: grid obstacles go here for optimization 
 
@@ -192,7 +192,7 @@ namespace Algorithms::TwoD
         }
         
         return true;
-    }
+    } // validatePose
 
 
     void RayTracingValidator::setVehicle(std::vector<VehicleFeature>& vehicle)
@@ -218,7 +218,7 @@ namespace Algorithms::TwoD
                     float distance = -2;
                     if(i == feature.featurePolygon.size() - 1)
                     {
-                        auto line = std::make_pair<PointXY, PointXY>(PointXY(feature.featurePolygon.at(i)),PointXY(feature.featurePolygon.at(0)));
+                        auto line = std::make_pair<PointXY, PointXY>(PointXY(feature.featurePolygon[i]),PointXY(feature.featurePolygon[0]));
                         if(Math::Geometry::doTwoFiniteLinesIntersect(ray,line))
                         {
                             PointXY intersect = Math::Geometry::linesIntersection(ray,line);
@@ -227,7 +227,7 @@ namespace Algorithms::TwoD
                     }
                     else
                     {
-                        auto line = std::make_pair<PointXY, PointXY>(PointXY(feature.featurePolygon.at(i)),PointXY(feature.featurePolygon.at(i + 1)));
+                        auto line = std::make_pair<PointXY, PointXY>(PointXY(feature.featurePolygon[i]), PointXY(feature.featurePolygon[i + 1]));
                         if(Math::Geometry::doTwoFiniteLinesIntersect(ray,line))
                         {
                             PointXY intersect = Math::Geometry::linesIntersection(ray,line);
@@ -251,7 +251,8 @@ namespace Algorithms::TwoD
 
         _minimumSafeDistance = minimumDistance;
         
-    }
+    } // setVehicle
 
-    const float RayTracingValidator::getMinimumSafeDistance(){ return _minimumSafeDistance; }
+    const float RayTracingValidator::getMinimumSafeDistance(){ return _minimumSafeDistance; } 
+    // TODO: this could be used as a preprocessing step to populate the grid in an artificial manner for the goal of initial point sampling in RRT* and RRT sharp
 }

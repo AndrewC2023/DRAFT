@@ -32,13 +32,13 @@ namespace Algorithms::TwoD
 
         createEmptyGrid();
         _cellUpdateThread = std::thread([this](){ pushUpdatesToGrid(); });
-    }
+    } // constructor
 
     GridManager2D::~GridManager2D(){
         _cellUpdateThreadRunning = false;
         if(_cellUpdateThread.joinable())
             _cellUpdateThread.join();
-    }
+    } // destructor
 
     std::vector<Cell> GridManager2D::getCells([[maybe_unused]] float time){
         if (initialized){
@@ -49,7 +49,7 @@ namespace Algorithms::TwoD
             // TODO: implement error handling here -> actual logging for now just return grid
             return _grid;
         }
-    }
+    } // getCells
 
     // TODO: implement multithreaded approach to make grid update
     // e.g updater thread that we push updates to so the thread that holds the grid doesnt risk getting throttled under large data load
@@ -66,7 +66,7 @@ namespace Algorithms::TwoD
         }
 
         initialized = true;
-    }
+    } // createEmptyGrid
 
     // returns the cell that contains point at x, y, z
     Cell GridManager2D::getCell(float x, float y) {
@@ -84,7 +84,7 @@ namespace Algorithms::TwoD
         int calcIndex = cellIndexX + _numCellsX * (cellIndexY + _numCellsY);
 
         return _grid[calcIndex];
-    }
+    } // getCell
 
     // returns the cell that contains PointXYZ point
     Cell GridManager2D::getCell(PointXY point) 
@@ -102,7 +102,7 @@ namespace Algorithms::TwoD
         int calcIndex = cellIndexX + _numCellsX * (cellIndexY);
 
         return _grid[calcIndex];
-    }
+    } // getCell
 
     // TODO: implement caching. depends on what hardware this runs on bc if we dont care abt space we could just hold a massive lookup table tbh (doesnt seem wise for a library that could be on many different systems -Drew)
     std::vector<Cell> GridManager2D::getNeighbors(float x, float y, int depth)   
@@ -127,7 +127,7 @@ namespace Algorithms::TwoD
         }
 
         return neighbors;
-    }
+    } // getNeighbors
 
     void GridManager2D::addKnownObstacle(float x, float y)  
     {
@@ -144,7 +144,7 @@ namespace Algorithms::TwoD
 
             _updates.push_back(UpdateRequest{calcIndex, 1});
         }
-    }
+    } // addKnownObstacle
 
     void GridManager2D::addKnownObstacle(const PointXY& point)   {
         int _numCellsX = static_cast<int>(_xSize / _cellSize);
@@ -162,7 +162,7 @@ namespace Algorithms::TwoD
 
             _updates.push_back(UpdateRequest{calcIndex, 1});
         }
-    }
+    } // addKnownObstacle
 
     void GridManager2D::addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle)
     {
@@ -181,8 +181,7 @@ namespace Algorithms::TwoD
         }
         _obstacleList.push_back(std::move(obstacle));
 
-
-    }
+    } // addKnownObstacle
 
     void GridManager2D::pushUpdatesToGrid()   {
         auto goalTime = std::chrono::steady_clock::now() + std::chrono::milliseconds(_cellUpdateThreadPeriod_ms);
@@ -219,7 +218,7 @@ namespace Algorithms::TwoD
 
         }
 
-    }
+    } // pushUpdatesToGrid
 
     PointXY GridManager2D::getNearestObstacleCenter(PointXY PointOfReference)
     {
@@ -242,7 +241,7 @@ namespace Algorithms::TwoD
 
         return _grid.at(closestCellIndex).getCenter();
 
-    };
+    } // getNearestObstacleCenter
 
 
     void GridManager2D::getGridDomain(float& xMin, float& xMax, float& yMin, float& yMax)
@@ -251,20 +250,20 @@ namespace Algorithms::TwoD
         xMax = _xMax;
         yMin = _yMin;
         yMax = _yMax;
-    }
+    } // getGridDomain
 
     const float GridManager2D::getCellSize(){
         return _cellSize;
-    }
-
+    } // getCellSize
 
     const IndexXY GridManager2D::getIndexContainingPoint(const PointXY point)
     {
         return IndexXY(static_cast<int>(std::round((point.x + 0.5 * _cellSize) / _cellSize)), static_cast<int>(std::round((point.y + 0.5 * _cellSize) / _cellSize)));
-    }
+    } // getIndexContainingPoint
+
     const PointXY GridManager2D::getPointFromIndex(const IndexXY index)
     {
         return PointXY(index.x * _cellSize - 0.5 * _cellSize, index.y * _cellSize - 0.5 * _cellSize);
-    }
+    } // getPointFromIndex
 
 }

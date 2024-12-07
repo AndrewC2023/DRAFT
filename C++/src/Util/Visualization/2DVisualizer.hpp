@@ -24,6 +24,19 @@
 
 namespace Visualization
 {
+    /**
+     * @class Visualizer2D
+     * @brief A class for visualizing 2D grids, paths, trees, and polygons.
+     * 
+     * This class provides functionalities to plot and visualize various 2D structures
+     * such as grids, paths, trees, and polygons using the matplot library. It also 
+     * includes methods to convert between different coordinate spaces.
+     * 
+     * @note This class requires a shared pointer to a GridManager2D object for initialization.
+     *
+     * This class provides methods to plot various 2D structures such as grids, paths, trees, and polygons.
+     * It also provides functionality to display the plotted figures.
+     */
     class Visualizer2D
     {
         public:
@@ -33,6 +46,7 @@ namespace Visualization
             void plotGrid(float);
             void plotPath(const std::deque<Algorithms::TwoD::PointXY>&);
             void plotTree(const std::vector<Algorithms::TwoD::RRTStarNode>&);
+            
             void plotPolygon(const std::vector<Algorithms::TwoD::PointXY>&);
 
             void show(std::string);

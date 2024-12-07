@@ -12,7 +12,7 @@ namespace Visualization
     {
         _figure = matplot::figure();
         matplot::figure(_figure);
-    }
+    } // constructor
 
     /**
      * @brief Plots a 2D polygon on a graph.
@@ -40,7 +40,7 @@ namespace Visualization
         matplot::plot(X,Y);
         matplot::hold(true);
 
-    }
+    } // plotPolygon
 
     /**
      * @brief Plots a 2D grid visualization based on the occupancy state of cells at a given time.
@@ -83,7 +83,7 @@ namespace Visualization
         matplot::colormap(matplot::palette::greys());
         matplot::hold(true);
 
-    }
+    } // plotGrid
 
     void Visualizer2D::plotPath(const std::deque<Algorithms::TwoD::PointXY>& path)
     {
@@ -99,7 +99,7 @@ namespace Visualization
 
         matplot::plot(X,Y);
         matplot::hold(true);
-    }
+    } // plotPath
 
     void Visualizer2D::plotTree(const std::vector<Algorithms::TwoD::RRTStarNode>& tree)
     {
@@ -120,7 +120,7 @@ namespace Visualization
             matplot::plot(X,Y)->color("r");
             matplot::hold(true);
         }
-    }
+    } // plotTree
 
     /**
      * @brief Converts a point from world space to index space.
@@ -132,7 +132,7 @@ namespace Visualization
     {
         float cellSize = _grid->getCellSize();
         return Algorithms::TwoD::PointXY((point.x + 0.5 * cellSize) / cellSize, (point.y + 0.5 * cellSize) / cellSize);
-    }
+    } // convert2IndexSpace
 
     /**
      * @brief Converts a point from index space to point space.
@@ -144,13 +144,19 @@ namespace Visualization
     {
         float cellSize = _grid->getCellSize();
         return Algorithms::TwoD::PointXY(IndexPoint.x * cellSize - 0.5 * cellSize, IndexPoint.y * cellSize - 0.5 * cellSize);
-    }
+    } // convert2PointSpace
 
+    /**
+     * @brief Converts a grid index to a point in 2D space.
+     *
+     * @param index The grid index to be converted, represented as an IndexXY object.
+     * @return A PointXY object representing the corresponding point in 2D space.
+     */
     const Algorithms::TwoD::PointXY Visualizer2D::convert2PointSpace(const Algorithms::TwoD::IndexXY index)
     {
         float cellSize = _grid->getCellSize();
         return Algorithms::TwoD::PointXY(static_cast<float>(index.x) * cellSize - 0.5 * cellSize, static_cast<float>(index.y) * cellSize - 0.5 * cellSize);
-    }
+    } // convert2PointSpace
 
     void Visualizer2D::show(std::string title)
     {
@@ -161,6 +167,6 @@ namespace Visualization
         std::cout << "Showing Figure: " << title << std::endl;
         matplot::show();
         // std::cin.get();
-    }
+    } // show
 
 }

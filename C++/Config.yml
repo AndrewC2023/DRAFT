@@ -110,6 +110,8 @@ Planners:
     maxEdgeLength: 0.1
     maxIterations: 10000
     endBias: 0.5
+    steerStep: 0.05
+    invalidPenalty: 1000.0
   EP_RRTStar:
     maxSamplingRange: 0.1
   LQR_RRTStar:

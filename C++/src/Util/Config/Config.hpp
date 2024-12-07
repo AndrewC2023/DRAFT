@@ -103,6 +103,8 @@ namespace Algorithms::Configuration
             float maxEdgeLength;
             int maxIterations;
             float endBias;
+            float steerStep;
+            float invalidPenalty;
         } RRTStarConfig;
 
         typedef struct ep_rrtstar{
