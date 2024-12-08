@@ -43,8 +43,11 @@ namespace Algorithms::TwoD
         
         numNodes = 1;
         int goalIndex = -1;
+        foundEnd = false;
 
-        for(int iteration; iteration < _maxIterations; iteration++)
+        // std::cout << "Starting RRT* Path Planning" << std::endl;
+
+        for(int iteration = 0; iteration < _maxIterations; iteration++)
         {
             // loop goals
             int closestTreeIndex = 0;
@@ -72,13 +75,17 @@ namespace Algorithms::TwoD
                 // steer function handles the while loop condition
             }
 
+            // debug
+            // std::cout << "Sampled Point: " << sample << std::endl;
+
             // sucessful sample
-            float cost = costFunction(sample, Tree.at(closestTreeIndex).position);
+            float cost = costFunction(sample, Tree.at(closestTreeIndex).position) + Tree.at(closestTreeIndex).cost;
             // add the node to the tree
             Tree.push_back(RRTStarNode({sample, cost, numNodes, closestTreeIndex}));
 
-            if(sample == goal && !foundEnd)
+            if(!foundEnd && sample == goal)
             {
+                std::cout << "Found the goal!" << std::endl << "Iteration: " << iteration << std::endl << "refining path" << std::endl;
                 foundEnd = true;
                 goalIndex = numNodes;
             }
@@ -86,6 +93,8 @@ namespace Algorithms::TwoD
             numNodes++;
 
             rewire();
+
+            std::cout << "Iteration: " << iteration << std::endl;
 
         }
 
@@ -101,6 +110,7 @@ namespace Algorithms::TwoD
         {
             path.push_front(Tree.at(currentIndex).position);
             currentIndex = Tree.at(currentIndex).parentIndex;
+            std::cout << "path " << path.front() << std::endl; 
         }
 
         path.push_front(Tree.at(currentIndex).position); // add the start node
@@ -124,8 +134,10 @@ namespace Algorithms::TwoD
         // goal bias, however we need to check if we have already found the goal
         if(_goalBiasDistribution(_randGenGoalBias) < _endBias && !foundEnd)
         {
+            // std::cout << "Goal sampled" << std::endl;
             // sucessful sample the goal
             return _goal; // the assumption is that the gaol is clear maybe we need a prestep to validate this
+
         }
         // else
         bool sucessfulSample = false;
@@ -146,22 +158,27 @@ namespace Algorithms::TwoD
     {
 
         successful = false;
-        float increment = 0.05f;
-
+        
         // Calculate the unit vector
-        PointXY vector = sampledPoint - sampledPoint;
+        PointXY vector = sampledPoint - nearestNode;
         PointXY unit_vector = vector / vector.norm();
-        PointXY stepVector = unit_vector * increment;
+        PointXY stepVector = PointXY(unit_vector.x * _steerStepSize, unit_vector.y * _steerStepSize);
 
-        float xStep = increment * unit_vector.x;
-        float yStep = increment * unit_vector.y;
+        // std::cout << "xStep " << stepVector.x * _steerStepSize << std::endl;
+        // std::cout << "yStep " << stepVector.y * _steerStepSize << std::endl;     
+        // std::cout << "steerStepSize " << _steerStepSize << std::endl;
 
-        // Check if the point is within the increment distance if so we are done
-        if (vector.norm() < increment)
+        // std::cout << "in steer function" << std::endl;
+        // std::cout << "vector to steer along: " << vector << std::endl;
+        // std::cout << "unit vector: " << unit_vector << std::endl;
+        // std::cout << "step vector: " << stepVector << std::endl << std::endl;    
+        // std::cout << "yada pee pee" << nearestNode + (unit_vector * _maxEdgeLength) << std::endl;
+
+        // fast ways to exit to avoid more calls to the validator
+        if (vector.norm() < _steerStepSize)
         {
             if(_Validator->validatePathSegment(nearestNode, sampledPoint, 0.0f))
             {
-                sampledPoint = sampledPoint;
                 successful = true;
                 return;
             }
@@ -171,16 +188,28 @@ namespace Algorithms::TwoD
                 return;
             }
         }
-
+        
+        
+        if((sampledPoint - nearestNode).norm() < _maxEdgeLength)
+        {
+            if(_Validator->validatePathSegment(nearestNode, sampledPoint, 0.0f))
+            {
+                successful = true;
+                return;
+            }
+            
+        }
+        
+        
         // Loop setup
         PointXY lastPoint = nearestNode;
         PointXY tempPoint = lastPoint + stepVector;
 
-        float travelled = increment;
+        float travelled = _steerStepSize;
         bool first = true;
         while (!successful)
         {
-            travelled += increment;
+            travelled += _steerStepSize;
 
             if (first)
             {
@@ -207,11 +236,12 @@ namespace Algorithms::TwoD
                 successful = true;
                 return;
             }
-            else if (std::sqrt(std::pow(tempPoint.x - sampledPoint.x, 2) + std::pow(tempPoint.y - sampledPoint.y, 2)) < increment * 1.1f)
+            else if (std::sqrt(std::pow(tempPoint.x - sampledPoint.x, 2) + std::pow(tempPoint.y - sampledPoint.y, 2)) < _steerStepSize * 1.1f)
             {
                 // Reached point, exit
                 sampledPoint = sampledPoint;
                 successful = true;
+                return;
             }
             else
             {
@@ -236,7 +266,7 @@ namespace Algorithms::TwoD
             }
 
             // check if the new node is a better parent
-            float newCost = costFunction(Tree[numNodes - 1].position, Tree[i].position);
+            float newCost = costFunction(Tree[numNodes - 1].position, Tree[i].position) + Tree[numNodes - 1].cost;
             if (newCost < Tree[i].cost)
             {
                 // validate the path

@@ -30,16 +30,16 @@ int main()
     
     std::shared_ptr<RRTStar2D> planner = std::make_shared<RRTStar2D>(config, grid, validator);
 
-    grid->addKnownObstacle(std::make_unique<Algorithms::TwoD::StaticObstacle>(Algorithms::TwoD::PointXY(5.0,5.0), 2, 0.67, -M_PI/4));
+    grid->addKnownObstacle(std::make_unique<Algorithms::TwoD::StaticObstacle>(Algorithms::TwoD::PointXY(5.0,5.0), 1, 0.67, -M_PI/4));
 
-    std::deque<PointXY> path = planner->PlanPath(PointXY(1.0,1.0), PointXY(8.0,8.0));
+    std::deque<PointXY> path = planner->PlanPath(PointXY(2.0,2.0), PointXY(8.0,8.0));
     std::vector<RRTStarNode> tree = planner->getTree();
     
     auto* visualizer = new Visualization::Visualizer2D(grid);
 
     visualizer->plotGrid(0.0);
-    //visualizer->plotPath(path);
-    visualizer->plotTree(tree);
+    visualizer->plotPath(path);
+    // visualizer->plotTree(tree);
     visualizer->show("RRT* Path Planning");
    
     return 0;

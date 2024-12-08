@@ -100,7 +100,7 @@ void operator>>(const YAML::Node& node, Grid3D& grid)
     node["TestSpace"] >> grid.testSpace;
 }
 
-void operator>>(const YAML::Node& node, GridConfig grid)
+void operator>>(const YAML::Node& node, GridConfig& grid)
 {
     calledLine = __LINE__;
     node["TwoD"] >> grid.twoD;
@@ -126,27 +126,27 @@ void operator>>(const YAML::Node& node, EP_RRTStarConfig& EP_RRTStar)
     EP_RRTStar.maxSamplingRange = node["maxSamplingRange"].as<float>();
 }
 
-void operator>>(const YAML::Node& node, LQR_RRTStarConfig LQR_RRTStar)
+void operator>>(const YAML::Node& node, LQR_RRTStarConfig& LQR_RRTStar)
 {
     calledLine = __LINE__;
 }
 
-void operator>>(const YAML::Node& node, CL_RRTStarConfig CL_RRTStar)
+void operator>>(const YAML::Node& node, CL_RRTStarConfig& CL_RRTStar)
 {
     calledLine = __LINE__;
 }
 
-void operator>>(const YAML::Node& node, RRTSharpConfig RRTSharp)
+void operator>>(const YAML::Node& node, RRTSharpConfig& RRTSharp)
 {
     calledLine = __LINE__;
 }
 
-void operator>>(const YAML::Node& node, RH_ELQRConfig RH_ELQR)
+void operator>>(const YAML::Node& node, RH_ELQRConfig& RH_ELQR)
 {
     calledLine = __LINE__;
 }
 
-void operator>>(const YAML::Node& node, AstarConfig Astar)
+void operator>>(const YAML::Node& node, AstarConfig& Astar)
 {
     calledLine = __LINE__;
     Astar.distanceCostFactor = node["distanceCostFactor"].as<float>();
@@ -154,7 +154,7 @@ void operator>>(const YAML::Node& node, AstarConfig Astar)
     Astar.isInvalidPenalty = node["isInvalidPenalty"].as<float>();
 }
 
-void operator>>(const YAML::Node& node, PlannersConfig planners)
+void operator>>(const YAML::Node& node, PlannersConfig& planners)
 {
     calledLine = __LINE__;
     node["RRTStar"] >> planners.RRTStar;
@@ -166,12 +166,20 @@ void operator>>(const YAML::Node& node, PlannersConfig planners)
     node["AStar"] >> planners.Astar;
 }
 
-void operator>>(const YAML::Node& node, Config config)
+void operator>>(const YAML::Node& node, ValidatorsConfig& validators)
+{
+    calledLine = __LINE__;
+    validators.debug = node["debug"].as<bool>();
+}
+
+void operator>>(const YAML::Node& node, Config& config)
 {
     calledLine = __LINE__;
 
     node["Grid"] >> config.grid;
     node["Planners"] >> config.planners;
+    node["Validators"] >> config.validators;
+    
 }
 
 Config Algorithms::Configuration::loadConfig(const std::string &configPath) {

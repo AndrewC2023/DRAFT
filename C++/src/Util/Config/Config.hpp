@@ -142,6 +142,10 @@ namespace Algorithms::Configuration
             RH_ELQRConfig RH_ELQR;
             AstarConfig Astar;
         } PlannersConfig;
+
+        typedef struct validators{
+            bool debug;
+        } ValidatorsConfig;
     // End Region
 
 
@@ -149,6 +153,7 @@ namespace Algorithms::Configuration
     typedef struct config{
         GridConfig grid;
         PlannersConfig planners;
+        ValidatorsConfig validators;
     } Config;
 
     // The two helpers to load and parse the config

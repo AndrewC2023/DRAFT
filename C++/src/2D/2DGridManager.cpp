@@ -76,8 +76,13 @@ namespace Algorithms::TwoD
 
         if (cellIndexX < 0 || cellIndexX >= _numCellsX || cellIndexY < 0 || cellIndexY >= _numCellsY)    {
             // TODO: implement actuall error handling system -> could log and return -1, -1, -1 just null for now
-            std::cout << "WARNING: attempted access of grid outside of defined domain\n";
+            // std::cout << "WARNING: attempted access of grid outside of defined domain\n";
             // return a meaningless cell that is listed as an obstacle
+            /* TODO: decide of the best way of handling this error
+             * construct a cell at that point and label it as an obstacle
+             * return meaning;ess occupied cell
+             * come up with a create an out of bounds state, construct a Cell of that state and return it, make the class calling this handle it
+             */
             return Cell(PointXY(0.0f,0.0f), IndexXY(0,0), _cellSize, State::OBSTACLE,1.0f);
         }
 
@@ -94,8 +99,13 @@ namespace Algorithms::TwoD
 
         if (cellIndexX < 0 || cellIndexX >= _numCellsX || cellIndexY < 0 || cellIndexY >= _numCellsY)    {
             // TODO: implement actuall error handling system -> could log and return -1, -1, -1 just null for now
-            std::cout << "WARNING: attempted access of grid outside of defined domain\n";
+            // std::cout << "WARNING: attempted access of grid outside of defined domain\n";
             // return a meaningless cell that is listed as an obstacle
+            /* TODO: decide of the best way of handling this error
+             * construct a cell at that point and label it as an obstacle
+             * return meaning;ess occupied cell
+             * come up with a create an out of bounds state, construct a Cell of that state and return it, make the class calling this handle it
+             */
             return Cell(PointXY(0.0f,0.0f), IndexXY(0,0), _cellSize, State::OBSTACLE,1.0f);
         }
 

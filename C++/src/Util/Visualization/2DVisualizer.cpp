@@ -5,6 +5,10 @@
 
 #include "2DVisualizer.hpp"
 
+
+// TODO: Add a method to plot a single point
+// TODO: allow grind to get plotted on real space axes
+//      - likely willl need a lot of post processing to graph the grid in real space
 namespace Visualization
 {
 
@@ -65,7 +69,6 @@ namespace Visualization
         std::vector<std::vector<int>> occupancyGrid;
         occupancyGrid.resize(numYrows, std::vector<int>(numXcolumns, 0));
 
-        std::cout << "number for grid cells: " << _grid->getCells(time).size() << "\n";
         for(const auto& cell : _grid->getCells(time))
         {
             auto index = cell.getIndex();
@@ -161,8 +164,18 @@ namespace Visualization
     void Visualizer2D::show(std::string title)
     {
             // todo Image sc has the Z axis pointing into the screen not out of it, fix this at some point pls or else all plots are mirrored immages of reality
-        _figure->title(title);
-        _figure->size(8000, 8000);
+        matplot::gcf()->title(title);
+        // Negative value moves title down
+
+        matplot::gcf()->position(2000,1000,2000,2000);
+        
+        matplot::gca()->x_axis().label_font_size(20);    // X axis font size
+        matplot::gca()->y_axis().label_font_size(20);    // Y axis font size
+        // matplot::gca()->x_axis(); // X tick labels
+        // matplot::gca()->y_axis(); // Y tick label
+        matplot::gca()->x_axis().label("X");
+        matplot::gca()->y_axis().label("Y");
+        matplot::gca()->y_axis().reverse(false);
 
         std::cout << "Showing Figure: " << title << std::endl;
         matplot::show();

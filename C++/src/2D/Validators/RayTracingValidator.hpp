@@ -17,6 +17,8 @@
 #include <memory>
 #include <deque>
 
+#include "Util/Visualization/2DVisualizer.hpp"
+
 // TODO: there is so much to work on with this algorithm to make it more robust
 
 namespace Algorithms::TwoD
@@ -29,7 +31,7 @@ namespace Algorithms::TwoD
                                 std::shared_ptr<GridManager2D>,
                                 std::vector<VehicleFeature>&);
                                 
-            ~RayTracingValidator() = default;
+            ~RayTracingValidator();
 
             bool validatePath(const std::deque<PointXY>&, float time) override;
             bool validatePathSegment(const PointXY&, const PointXY&, float time) override;
@@ -42,6 +44,11 @@ namespace Algorithms::TwoD
             // variables
             std::deque<PointXY> _path;
             std::vector<VehicleFeature> _vehicle;
+
+            // debug
+            bool _debug;
+            Visualization::Visualizer2D* debugVisaulizer;
+            bool _gridGraphed;
 
             // grid
             std::shared_ptr<GridManager2D> _grid;

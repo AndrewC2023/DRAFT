@@ -107,10 +107,10 @@ Grid:
 
 Planners:
   RRTStar:
-    maxEdgeLength: 0.1
-    maxIterations: 10000
+    maxEdgeLength: 0.5
+    maxIterations: 3000
     endBias: 0.5
-    steerStep: 0.05
+    steerStep: 0.1
     invalidPenalty: 1000.0
   EP_RRTStar:
     maxSamplingRange: 0.1
@@ -122,6 +122,9 @@ Planners:
     distanceCostFactor: 10.0
     heuristicCostFactor: 1.0
     isInvalidPenalty: 1000.0
+    
+Validators:
+  debug: false # this also helps with planner debugging
 
 # TODO: add it to the list
 Tests:

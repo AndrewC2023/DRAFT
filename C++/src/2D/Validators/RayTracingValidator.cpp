@@ -9,18 +9,32 @@
 
 #include "RayTracingValidator.hpp"
 
-// Debug
-#ifdef VALIDATOR_VISUALIZATION_DEBUG
-    #include "Util/Visualization/2DVisualizer.hpp"                
-#endif
+
+
 namespace Algorithms::TwoD
 {
     RayTracingValidator::RayTracingValidator(const Configuration::Config& Config,
                                              std::shared_ptr<GridManager2D> Grid,
                                              std::vector<VehicleFeature>& vehicle):
-                                             _grid(std::move(Grid))
+                                             _grid(std::move(Grid)),
+                                             _debug(Config.validators.debug)
     {
         setVehicle(vehicle);
+        if(_debug)
+        { 
+            debugVisaulizer = new Visualization::Visualizer2D(_grid);   
+        }
+        else
+        {
+            debugVisaulizer = nullptr;
+        }
+        _gridGraphed = false;
+
+    }
+
+    RayTracingValidator::~RayTracingValidator()
+    {
+        delete debugVisaulizer;   
     }
 
     bool RayTracingValidator::validatePath(const std::deque<PointXY>& path, float time)
@@ -86,12 +100,15 @@ namespace Algorithms::TwoD
             const float yMax = std::max(std::max(outline[0].y, outline[1].y), std::max(outline[2].y, outline[3].y));
             const float yMin = std::min(std::min(outline[0].y, outline[1].y), std::min(outline[2].y, outline[3].y));
             
-            #ifdef VALIDATOR_VISUALIZATION_DEBUG
-                auto debugVisaulizer = Visualization::Visualizer2D(_grid);
-                debugVisaulizer.plotGrid(time);
-                debugVisaulizer.plotPolygon(outline);
-                debugVisaulizer.show("Validator Bounding Box");
-            #endif
+            if(_debug)
+            { 
+                if (!_gridGraphed) {
+                    debugVisaulizer->plotGrid(time);
+                    _gridGraphed = true;
+                }
+                debugVisaulizer->plotPolygon(outline);
+                debugVisaulizer->show("Validator Bounding Box");
+            }
 
             // Can't do much if there is no grid
             if(gridCells.empty()){
@@ -151,11 +168,6 @@ namespace Algorithms::TwoD
             const float yMax = std::max(std::max(outline[0].y, outline[1].y), std::max(outline[2].y, outline[3].y));
             const float yMin = std::min(std::min(outline[0].y, outline[1].y), std::min(outline[2].y, outline[3].y));
             
-            #ifdef VALIDATOR_VISUALIZATION_DEBUG
-                auto debugVisaulizer = Visualization::Visualizer2D(_grid);
-                debugVisaulizer.plotPolygon(outline);
-                debugVisaulizer.show("Validator Bounding Box");
-            #endif
 
             // Can't do much if there is no grid
             if(gridCells.empty()){
