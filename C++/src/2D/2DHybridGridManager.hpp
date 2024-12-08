@@ -22,7 +22,7 @@
 
 namespace Algorithms::TwoD
 {
-    class HybridGridManager   {
+    class HybridGridManager2D   {
         public:
         /** GridManager 2D
          *  @param p_minX the minimum X value in true space
@@ -31,10 +31,10 @@ namespace Algorithms::TwoD
          *  @param p_maxY the maximum Y value in true space
          *  @param p_cellsize the side length of a square cell in true space units (meters
          */
-        HybridGridManager(float p_minX, float p_maxX,
+        HybridGridManager2D(float p_minX, float p_maxX,
                     float p_minY, float p_maxY,
                     float p_cellSize);
-        ~HybridGridManager();
+        ~HybridGridManager2D();
 
         // returns vector representation of grid (same type as _grid)
         std::vector<Cell> getCells(float);
