@@ -84,28 +84,52 @@ namespace Algorithms::TwoD
         class DynamicObstacle : public I2DObstacle // TODO: Finish this class
         {
             public:
-                // This class needs dimensions and initial conditions
-                std::vector<PointXY> propagateInTime(float finalTime, float dt);
+            DynamicObstacle(PointXY initialPosition, float initialOrientation, float forwardVelocity)
+                : CM_initialPosition(initialPosition), orientation(initialOrientation), v(forwardVelocity), t_0(0.0f) {}
+            const std::vector<PointXY>& getCorners() override { return corners; }
 
-                const std::vector<PointXY>& getCorners() override {return corners;}
+            std::vector<PointXY> propagateInTime(float finalTime, float dt)
+            {
+                std::vector<PointXY> trajectory;
+                float t = t_0;
+                PointXY position = CM_initialPosition;
+                float theta = orientation;
+
+                while (t < finalTime)
+                {
+                // Update position based on differential drive model
+                position.x += v * std::cos(theta) * dt;
+                position.y += v * std::sin(theta) * dt;
+                theta += turnRate * dt;
+
+                trajectory.push_back(position);
+                t += dt;
+                }
+
+                return trajectory;
+            }
+
+            const std::vector<PointXY>& getCorners() override { return corners; }
+
+            void setTurnRate(float rate) { turnRate = rate; }
+
             private:
-                std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
-                float t_0;
-                PointXY CM_initialPosition;
-                // Dynamics
-                // TODO: wtf do i do here
-                
-                // IDynamics dynamics;
-                
-                // Boundary Conditions
-                float initialTime;
-                float initialCMPosition;
-            // need boundary conditions  
+            std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
+            float t_0;
+            PointXY CM_initialPosition;
+            float orientation;
+            float v; // constant forward velocity
+            float turnRate; // turn rate as input
         };
 
         class DynamicUncertainObstacle : public I2DObstacle // TODO: make more than the inputs possibly uncertain
         {
             public:
+                std::vector<std::vector<std::vector<PointXY>>> GeneratePossibleFutures(float finalTime, float dt, int numSamples)
+                {
+                    
+                }
+
                 // This class needs dimensions and initial conditions
                 std::vector<PointXY> propagateInTime(float finalTime, float dt);
 
