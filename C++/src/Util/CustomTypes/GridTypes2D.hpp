@@ -122,16 +122,55 @@ namespace Algorithms::TwoD
             float turnRate; // turn rate as input
         };
 
+
+        // TODO: so many, a multi week to moth project to get these to the level of functionality they need to be
+        // need any typre of dynamics, any amout of uncertainty, and all methods withing to manage
         class DynamicUncertainObstacle : public I2DObstacle // TODO: make more than the inputs possibly uncertain
         {
             public:
-                std::vector<std::vector<std::vector<PointXY>>> GeneratePossibleFutures(float finalTime, float dt, int numSamples)
+                /**
+                 * @brief 
+                 * 
+                 * @param finalTime the final time to generate the possible futures to, initial time will be a member of the class
+                 * @param dt time step
+                 * @param numSamples the total number of samples of futures to generate 
+                 * 
+                 * @note the grid that calls this method must keep track of the time, time,step, anf initial time, 
+                 * for now it needs to keep all of these things synchronized utiol the grid id more advanced
+                 * 
+                 * @return std::vector<std::vector<StateXYT>> this is the vector of the possible futures 
+                 * where the posible future is represented as a vectore of the same size as total time/dt so that the
+                 * second vector represents all time steps of a single sample in the set of samples
+                 */
+                std::vector<std::vector<StateXYT>> GeneratePossibleFutures(float finalTime, float dt, int numSamples)
                 {
-                    
+                    for(int i = 0; i < numSamples; i++)
+                    {
+
+                    }
                 }
 
                 // This class needs dimensions and initial conditions
-                std::vector<PointXY> propagateInTime(float finalTime, float dt);
+                std::vector<PointXY> propagateInTime(float finalTime, float dt)
+                {
+                    std::vector<PointXY> trajectory;
+                    float t = t_0;
+                    PointXY position = CM_initialPosition;
+                    float theta = orientation;
+
+                    while (t < finalTime)
+                    {
+                    // Update position based on differential drive model
+                    position.x += v * std::cos(theta) * dt;
+                    position.y += v * std::sin(theta) * dt;
+                    theta += turnRate * dt;
+
+                    trajectory.push_back(position);
+                    t += dt;
+                    }
+
+                    return trajectory;
+                }
 
                 const std::vector<PointXY>& getCorners() override {return corners;}
             private:
