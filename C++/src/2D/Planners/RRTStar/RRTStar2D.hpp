@@ -97,7 +97,7 @@ namespace Algorithms::TwoD
 
             PointXY sampleNewNode();
 
-            void steer(PointXY& sampledPoint, PointXY nearestNode, bool& successful);
+            void steer(PointXY& sampledPoint, PointXY nearestNode, bool& successful, float& odds);
             
             void rewire();
 
