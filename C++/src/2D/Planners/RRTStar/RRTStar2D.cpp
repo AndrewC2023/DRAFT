@@ -154,7 +154,9 @@ namespace Algorithms::TwoD
 
     } // sampleNewNode
 
-    void RRTStar2D::steer(PointXY& sampledPoint, PointXY nearestNode, bool& successful)
+
+    
+    void RRTStar2D::steer(PointXY& sampledPoint, PointXY nearestNode, bool& successful, float& odds)
     {
 
         successful = false;
@@ -165,7 +167,7 @@ namespace Algorithms::TwoD
         PointXY stepVector = PointXY(unit_vector.x * _steerStepSize, unit_vector.y * _steerStepSize);
 
         // std::cout << "xStep " << stepVector.x * _steerStepSize << std::endl;
-        // std::cout << "yStep " << stepVector.y * _steerStepSize << std::endl;     
+        // std::cout << "yStep " << stepVector.y * _steerStepSize << std::endl;
         // std::cout << "steerStepSize " << _steerStepSize << std::endl;
 
         // std::cout << "in steer function" << std::endl;
@@ -177,7 +179,8 @@ namespace Algorithms::TwoD
         // fast ways to exit to avoid more calls to the validator
         if (vector.norm() < _steerStepSize)
         {
-            if(_Validator->validatePathSegment(nearestNode, sampledPoint, 0.0f))
+            
+            if(_Validator->validatePathSegment(nearestNode, sampledPoint, 0.0f, odds))
             {
                 successful = true;
                 return;
@@ -192,12 +195,16 @@ namespace Algorithms::TwoD
         
         if((sampledPoint - nearestNode).norm() < _maxEdgeLength)
         {
-            if(_Validator->validatePathSegment(nearestNode, sampledPoint, 0.0f))
+            if(_Validator->validatePathSegment(nearestNode, sampledPoint, 0.0f, odds))
             {
                 successful = true;
                 return;
             }
-            
+            else
+            {
+                successful = false; // we failed to validate the path
+                return;
+            }
         }
         
         
@@ -207,6 +214,9 @@ namespace Algorithms::TwoD
 
         float travelled = _steerStepSize;
         bool first = true;
+        float probability = 0.0f;
+        odds = 0;
+        
         while (!successful)
         {
             travelled += _steerStepSize;
@@ -214,7 +224,7 @@ namespace Algorithms::TwoD
             if (first)
             {
                 first = false;
-                if(!_Validator->validatePathSegment(nearestNode, tempPoint, 0.0f))
+                if(!_Validator->validatePathSegment(nearestNode, tempPoint, 0.0f, odds))
                 {
                     successful = false;
                     return;
@@ -222,7 +232,7 @@ namespace Algorithms::TwoD
                 // else we hav ethe ability to steer until an obstacle is hit
             }
 
-            if (!_Validator->validatePathSegment(lastPoint, tempPoint, 0.0f))
+            if (!_Validator->validatePathSegment(lastPoint, tempPoint, 0.0f, probability))
             {
                 // Hit obstacle, exit
                 sampledPoint = lastPoint;
@@ -234,6 +244,14 @@ namespace Algorithms::TwoD
                 // Max length Reached
                 sampledPoint = tempPoint;
                 successful = true;
+
+                if(probability > odds)
+                {
+                    // we have hit a higher probability cell but we arent completely invalid
+                    // we can still move but we need to be careful
+                    odds = probability;
+                }
+
                 return;
             }
             else if (std::sqrt(std::pow(tempPoint.x - sampledPoint.x, 2) + std::pow(tempPoint.y - sampledPoint.y, 2)) < _steerStepSize * 1.1f)
@@ -248,6 +266,14 @@ namespace Algorithms::TwoD
                 lastPoint = tempPoint;
                 tempPoint = tempPoint + stepVector;
                 
+            }
+            
+            if(probability > odds)
+            {
+                // we have hit a higher probability cell but we arent completely invalid
+                // we can still move but we need to be careful
+                odds = probability;
+               
             }
 
         }

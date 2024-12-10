@@ -47,7 +47,7 @@ namespace Algorithms::TwoD
         }
         else{
             // TODO: implement error handling here -> actual logging for now just return grid
-            return _grid;
+            throw std::runtime_error("Grid not initialized");
         }
     } // getCells
 

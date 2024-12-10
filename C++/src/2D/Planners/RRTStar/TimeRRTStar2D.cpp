@@ -148,7 +148,7 @@ namespace Algorithms::TwoD
             sample.x = _xDistribution(_randGenX);
             sample.y = _yDistribution(_randGenY);
             // check if its in a safe region
-            sucessfulSample = (_Grid->getCell(sample).getState() == State::CLEAR);
+            sucessfulSample = (_Grid->getCell(sample,time).getState() == State::CLEAR);
         }
         return sample;
 

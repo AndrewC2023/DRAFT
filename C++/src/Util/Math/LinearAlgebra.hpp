@@ -8,6 +8,10 @@
 
 #include <eigen3/Eigen/Dense>
 #include <cmath>
+
+// custom types
+#include "Util/CustomTypes/GridTypes2D.hpp"
+
 namespace Math
 {
     // DCM matrix 2D
@@ -20,6 +24,14 @@ namespace Math
         DCM(2,2) = std::cos(theta);
         
         return DCM;
+    }
+
+    Algorithms::TwoD::PointXY rotate2DPoint(PointXY point, float theta)
+    {
+        Eigen::Matrix2f DCM = DCM2D(theta);
+        Eigen::Vector2f pointVec(point.x, point.y);
+        Eigen::Vector2f rotatedVec = DCM * pointVec;
+        return Algorithms::TwoD::PointXY(rotatedVec(0), rotatedVec(1));
     }
 
     // DCM matrix 3D

@@ -1,10 +1,10 @@
 /*
  * Author: Andrew Campbell
- * Date: 10-09-2024
+ * Date: 12-01-2024
  */
 
-#ifndef RAYTRACINGVALIDATOR_H
-#define RAYTRACINGVALIDATOR_H
+#ifndef RAYTRACINGVALIDATORUNCERTAIN_H
+#define RAYTRACINGVALIDATORUNCERTAIN_H
 
 // Config
 #include "Util/Config/Config.hpp"
@@ -23,15 +23,15 @@
 
 namespace Algorithms::TwoD
 {
-    class RayTracingValidator : public IPathValidator2D
+    class RayTracingValidatorUncertain : public IPathValidator2D
 
     {
         public:
-            RayTracingValidator(const Configuration::Config&,
+            RayTracingValidatorUncertain(const Configuration::Config&,
                                 std::shared_ptr<GridManager2D>,
                                 std::vector<VehicleFeature>&);
                                 
-            ~RayTracingValidator();
+            ~RayTracingValidatorUncertain();
 
             bool validatePath(const std::deque<PointXY>&, float time, float& probability) override;
             bool validatePathSegment(const PointXY&, const PointXY&, float time, float& probability) override;
@@ -60,4 +60,4 @@ namespace Algorithms::TwoD
 }
 
 
-#endif // RAYTRACINGVALIDATOR_H
+#endif // RAYTRACINGVALIDATORUNCERTAIN_H

@@ -1,10 +1,11 @@
 /*
- *Author: Andrew Campbell
- * Date: 12-05-2024
+ * Author: Andrew Campbell
+ * Date: 12-01-2024
  */
 
-#ifndef TWODHYBRIDGRIDMANAGER_H
-#define TWODHYBRIDGRIDMANAGER_H
+
+#ifndef TWODGRIDMANAGER_H
+#define TWODGRIDMANAGER_H
 
 // std
 #include <iostream>
@@ -17,11 +18,22 @@
 #include <chrono>
 #include <cmath>
 
+// Math Library
+#include "Util/Math/Geometry.hpp"
+#include "Util/Math/LinearAlgebra.hpp"
+
 // custom types
 #include "Util/CustomTypes/GridTypes2D.hpp"
 
-namespace Algorithms::TwoD
-{
+namespace Algorithms::TwoD {
+
+    /* TODOs:
+     *     Allow this grid to be resized after it 
+     * has been constructed without losing the current 
+     * obstacle set that remains in the domain
+     *     Add obstalce retangle and body type 
+     * and add obstacle methods for that type
+     */
     class HybridGridManager2D   {
         public:
         /** GridManager 2D
@@ -40,32 +52,38 @@ namespace Algorithms::TwoD
         std::vector<Cell> getCells(float);
 
         // returns cell at x, y, z
-        Cell getCell(float x, float y);
+        Cell getCell(float x, float y, float time);
         // returns cell at center point
-        Cell getCell(PointXY point);
+        Cell getCell(PointXY point, float time);
+
+        const float getCellSize();
+
+        // helpers for converting between point and index space
+        const IndexXY getIndexContainingPoint(const PointXY);
+        const PointXY getPointFromIndex(const IndexXY);
 
         // gets neighbors of cells given the specific cell and a depth
         std::vector<Cell> getNeighbors(Cell cell, int depth);
         // gets neighbors of cells given a point in space -> point will be normalized to the cell that contains it
         std::vector<Cell> getNeighbors(float x, float y, int depth);
-        // gets neighbors of cells given a PointXYZ representation of a point in space -> will be normailized to containing cell
+        // gets neighbors of cells given a PointXY representation of a point in space -> will be normailized to containing cell
         std::vector<Cell> getNeighbors(PointXY point);
 
         /** Add Known Obstacles method
          *  @param x,y the x and y position that we want to set as occupied
          *  will find the cell that contains this point and set it as occupied
          */
-        void addKnownObstacle(float x, float y);
+        void addKnownObstacle(const float x, const float y);
         /** Add Known Obstacles method
          *  @param point the point that we want to set as occupied
          *  will find the cell that contains this point and set it as occupied
          */
-        void addKnownObstacle(PointXY point);
+        void addKnownObstacle(const PointXY& point);
         /** Add Known Obstacles method
          *  @param obstacle the x and y position that we want to set as occupied
          *  will find the cell that contains this point and set it as occupied
          */
-        void addKnownObstacle(I2DObstacle obstacle); // TODO: change to boost polygon and intersect!
+        void addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle); // TODO: change to boost polygon and intersect!
 
         /** get the nearest obstacle center
          *  @param checkPoint the point that we want to see what the nearest obstacle is to
@@ -88,10 +106,14 @@ namespace Algorithms::TwoD
 
         private:
         // The grid as a list of Grid Cells
-        std::vector<Cell> _grid;
+        std::vector<Cell> _grid_0;
+        std::vector<std::vector<Cell>> _gridFutures;
+        float t_0 = 0;
+        float dt = 0.1;
+        const float defaultFinalTime = 30.0f;
 
         // The grid will also cointain a list of known obstacles, This allows for the opportunity to potential speed up path validation
-        std::vector<I2DObstacle> _obstacleList;
+        std::vector<std::unique_ptr<I2DObstacle>> _obstacleList;
 
 
         // The updates to be made to the grid
@@ -121,6 +143,7 @@ namespace Algorithms::TwoD
         void createEmptyGrid();
 
     };
-}
+} 
 
-#endif // TWODHYBRIDGRIDMANAGER_H
+
+#endif // TWODGRIDMANAGER_H

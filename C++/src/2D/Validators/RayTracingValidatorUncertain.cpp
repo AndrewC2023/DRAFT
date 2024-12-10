@@ -1,16 +1,15 @@
 /*
  * Author: Andrew Campbell
- * Date: 10-14-2024
+ * Date: 12-01-2024
  */
-
 
 // TODO: Look into convex hull algorithms
 
-#include "RayTracingValidator.hpp"
+#include "RayTracingValidatorUncertain.hpp"
 
 namespace Algorithms::TwoD
 {
-    RayTracingValidator::RayTracingValidator(const Configuration::Config& Config,
+    RayTracingValidatorUncertain::RayTracingValidatorUncertain(const Configuration::Config& Config,
                                              std::shared_ptr<GridManager2D> Grid,
                                              std::vector<VehicleFeature>& vehicle):
                                              _grid(std::move(Grid)),
@@ -29,12 +28,12 @@ namespace Algorithms::TwoD
 
     }
 
-    RayTracingValidator::~RayTracingValidator()
+    RayTracingValidatorUncertain::~RayTracingValidatorUncertain()
     {
         delete debugVisaulizer;   
     }
 
-    bool RayTracingValidator::validatePath(const std::deque<PointXY>& path, float time, float& probability)
+    bool RayTracingValidatorUncertain::validatePath(const std::deque<PointXY>& path, float time, float& probability)
     {
         if(path.size() < 2)
             return false;
@@ -53,7 +52,7 @@ namespace Algorithms::TwoD
         }
     } // validatePath
 
-    bool RayTracingValidator::validatePathSegment(const PointXY& head, const PointXY& tail, float time, float& probability)
+    bool RayTracingValidatorUncertain::validatePathSegment(const PointXY& head, const PointXY& tail, float time, float& probability)
     {
         // Calculate deltas and angle
         const auto xDelta = tail.x - head.x;
@@ -112,7 +111,6 @@ namespace Algorithms::TwoD
                 throw std::runtime_error("validator asked to validate on an empty grid");
                 return false;
             }
-            float currentOdds = 0.0f;
             for(const auto& cell : gridCells)
             {
                 // Safety check for safety
@@ -135,22 +133,15 @@ namespace Algorithms::TwoD
                        Math::Geometry::isPointInsidePolygon(cellOutline[2], outline) ||
                        Math::Geometry::isPointInsidePolygon(cellOutline[3], outline)   )
                            return false;
-                } else if(cellState == State::UNCERTAIN)
-                {
-                    if(cell.getOdds() > currentOdds)
-                    {
-                        currentOdds = cell.getOdds();
-                    }
                 }
             }
-            probability = currentOdds;
 
         }
 
         return true;
     } // validatePathSegment
 
-    bool RayTracingValidator::validatePose(const StateXYT& state, float time)
+    bool RayTracingValidatorUncertain::validatePose(const StateXYT& state, float time)
     {
 
         for(auto& feature : _vehicle)
@@ -211,7 +202,7 @@ namespace Algorithms::TwoD
     } // validatePose
 
 
-    void RayTracingValidator::setVehicle(std::vector<VehicleFeature>& vehicle)
+    void RayTracingValidatorUncertain::setVehicle(std::vector<VehicleFeature>& vehicle)
     {
         _vehicle = vehicle;
 
@@ -269,6 +260,6 @@ namespace Algorithms::TwoD
         
     } // setVehicle
 
-    const float RayTracingValidator::getMinimumSafeDistance(){ return _minimumSafeDistance; } 
+    const float RayTracingValidatorUncertain::getMinimumSafeDistance(){ return _minimumSafeDistance; } 
     // TODO: this could be used as a preprocessing step to populate the grid in an artificial manner for the goal of initial point sampling in RRT* and RRT sharp
 }

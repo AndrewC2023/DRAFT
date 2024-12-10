@@ -10,6 +10,7 @@
 #include <cmath>
 #include <vector>
 #include <utility>
+#include <random>
 
 #include "VectorAndPointTypes.hpp"
 #include "Util/Math/Geometry.hpp"
@@ -81,44 +82,57 @@ namespace Algorithms::TwoD
                 
         };
 
-        class DynamicObstacle : public I2DObstacle // TODO: Finish this class
+        class DynamicObstacle : public I2DObstacle // TODO: Finish this class and fix it, so so so much to fix here
         {
             public:
-            DynamicObstacle(PointXY initialPosition, float initialOrientation, float forwardVelocity)
-                : CM_initialPosition(initialPosition), orientation(initialOrientation), v(forwardVelocity), t_0(0.0f) {}
+            DynamicObstacle(StateXYT BoundaryConditionState, 
+                            float boundaryConditionInitialTime,
+                            float forwardVelocity,
+                            float turnRate)
+                            : Pose_0(BoundaryConditionState),
+                              t_0(boundaryConditionInitialTime),
+                              velocity(forwardVelocity),
+                              turnRate(turnRate)
+            {}
             const std::vector<PointXY>& getCorners() override { return corners; }
 
-            std::vector<PointXY> propagateInTime(float finalTime, float dt)
-            {
-                std::vector<PointXY> trajectory;
-                float t = t_0;
-                PointXY position = CM_initialPosition;
-                float theta = orientation;
-
-                while (t < finalTime)
+            std::vector<StateXYT> propagateInTime(float finalTime, float dt, int subResolution)
                 {
-                // Update position based on differential drive model
-                position.x += v * std::cos(theta) * dt;
-                position.y += v * std::sin(theta) * dt;
-                theta += turnRate * dt;
+                    std::vector<StateXYT> trajectory;
+                    float t = t_0;
+                    StateXYT position = Pose_0;
+                    trajectory.push_back(Pose_0);
 
-                trajectory.push_back(position);
-                t += dt;
+                    int subcount = 1;
+
+                    while (t < finalTime)
+                    {
+                        
+                        // Update position based on differential drive model
+                        position.x += velocity * std::cos(position.z) * dt/subResolution;
+                        position.y += velocity * std::sin(position.z) * dt/subResolution;
+                        position.z += turnRate * dt/subResolution;
+                        
+                        if(subcount == subResolution)
+                        {
+                            trajectory.push_back(position);
+                            t += dt;
+                            subcount = 1;
+                        }else{
+                            subcount++;
+                        }
+                    }
+
+                    return trajectory;
                 }
-
-                return trajectory;
-            }
-
-            const std::vector<PointXY>& getCorners() override { return corners; }
 
             void setTurnRate(float rate) { turnRate = rate; }
 
             private:
             std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
             float t_0;
-            PointXY CM_initialPosition;
-            float orientation;
-            float v; // constant forward velocity
+            StateXYT Pose_0;
+            float velocity; // constant forward velocity
             float turnRate; // turn rate as input
         };
 
@@ -142,49 +156,80 @@ namespace Algorithms::TwoD
                  * where the posible future is represented as a vectore of the same size as total time/dt so that the
                  * second vector represents all time steps of a single sample in the set of samples
                  */
-                std::vector<std::vector<StateXYT>> GeneratePossibleFutures(float finalTime, float dt, int numSamples)
+                
+                DynamicUncertainObstacle(std::vector<PointXY> Corners, 
+                                         StateXYT boundaryConditionState, 
+                                         float boundaryConditionInitialTime,
+                                         float boundaryConditionVelocity, 
+                                         float boundaryConditionTurnRateMean,
+                                         float boundaryConditionTurnRateVariance)
+                                         : corners(Corners), 
+                                           initialCMstate(boundaryConditionState), 
+                                           initialTime(boundaryConditionInitialTime), 
+                                           velocity(boundaryConditionVelocity), 
+                                           turnRateMean(boundaryConditionTurnRateMean),
+                                           turnRateVariance(boundaryConditionTurnRateVariance),
+                                           randomGenerator({std::random_device{}()})
                 {
+                    normDist = std::normal_distribution(boundaryConditionTurnRateMean , boundaryConditionTurnRateVariance);
+                }
+
+                std::vector<std::vector<StateXYT>> GeneratePossibleFutures(float finalTime, float dt, int subResolution, int numSamples)
+                {
+                    std::vector<std::vector<StateXYT>> possibleFutures;
                     for(int i = 0; i < numSamples; i++)
                     {
-
+                        possibleFutures.push_back(propagateInTime(finalTime, dt, subResolution));
                     }
+                    return possibleFutures;
                 }
 
                 // This class needs dimensions and initial conditions
-                std::vector<PointXY> propagateInTime(float finalTime, float dt)
+                std::vector<StateXYT> propagateInTime(float finalTime, float dt, int subResolution)
                 {
-                    std::vector<PointXY> trajectory;
-                    float t = t_0;
-                    PointXY position = CM_initialPosition;
-                    float theta = orientation;
+                    std::vector<StateXYT> trajectory;
+                    float t = initialTime;
+                    StateXYT position = initialCMstate;
+                    trajectory.push_back(initialCMstate);
+
+                    int subcount = 1;
+                    float turnRate = normDist(randomGenerator);
 
                     while (t < finalTime)
                     {
-                    // Update position based on differential drive model
-                    position.x += v * std::cos(theta) * dt;
-                    position.y += v * std::sin(theta) * dt;
-                    theta += turnRate * dt;
-
-                    trajectory.push_back(position);
-                    t += dt;
+                        
+                        // Update position based on differential drive model
+                        position.x += velocity * std::cos(position.z) * dt/subResolution;
+                        position.y += velocity * std::sin(position.z) * dt/subResolution;
+                        position.z += turnRate * dt/subResolution;
+                        
+                        if(subcount == subResolution)
+                        {
+                            trajectory.push_back(position);
+                            t += dt;
+                            turnRate = normDist(randomGenerator);
+                            subcount = 1;
+                        }else{
+                            subcount++;
+                        }
                     }
 
                     return trajectory;
                 }
 
                 const std::vector<PointXY>& getCorners() override {return corners;}
+
             private:
                 std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
-                float t_0;
-                PointXY CM_initialPosition;
-                // Dynamics
-                // TODO: wtf do i do here
-                
-                // IDynamics dynamics;
-                
-                // Boundary Conditions
                 float initialTime;
-                float initialCMPosition;
+                StateXYT initialCMstate;    
+                float velocity; // constant forward velocity
+                float turnRateMean; // turn rate as input
+                float turnRateVariance; // turn rate as input
+
+                // random generators:
+                std::mt19937 randomGenerator;
+                std::normal_distribution<float> normDist;
             // need boundary conditions  
         };
 
@@ -259,11 +304,19 @@ namespace Algorithms::TwoD
             void incrementOdds(int increment) 
             {
                 odds += increment;
+                if (odds > 1.0f)
+                {
+                    odds = 1.0f;
+                }else if(odds < 0.0f)
+                {
+                    odds = 0.0f;
+                }
             }
 
             const float getOdds() const 
             {
-                return (1 - (1/(1-(std::pow(2, odds)))));
+                // TODO: figure this out more
+                return odds;
             }
 
 

@@ -29,8 +29,8 @@ namespace Algorithms::TwoD
         public:
             virtual ~IPathValidator2D() = default;
 
-            virtual bool validatePath(const std::deque<PointXY>&, float time) = 0;
-            virtual bool validatePathSegment(const PointXY&, const PointXY&, float time) = 0;
+            virtual bool validatePath(const std::deque<PointXY>&, float time, float& probability) = 0;
+            virtual bool validatePathSegment(const PointXY&, const PointXY&, float time, float& probability) = 0;
             virtual const float getMinimumSafeDistance() = 0;
             virtual bool validatePose(const StateXYT&, float time) = 0;
             virtual void setVehicle(std::vector<VehicleFeature>&) = 0;

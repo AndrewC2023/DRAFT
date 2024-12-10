@@ -1,7 +1,7 @@
-//
-// Created by Andrew C on 04/19/24
-//
-
+/*
+ * Author: Andrew Campbell
+ * Date: 12-01-2024
+ */
 
 /*
    TODO: boost library should just be used to generalize most obstacles
@@ -40,36 +40,54 @@ namespace Algorithms::TwoD
             _cellUpdateThread.join();
     } // destructor
 
-    std::vector<Cell> HybridGridManager2D::getCells([[maybe_unused]] float time){
+    std::vector<Cell> HybridGridManager2D::getCells([[maybe_unused]] float time)
+    {
+        // solve for which grid we want to return
+        int gridIndex = static_cast<int>(std::round(time / dt));
+
         if (initialized){
             // time not used in a static grid
-            return _grid;
+            return _gridFutures.at(gridIndex);
         }
         else{
-            // TODO: implement error handling here -> actual logging for now just return grid
-            return _grid;
+            throw std::runtime_error("Grid not initialized");
         }
     } // getCells
 
     // TODO: implement multithreaded approach to make grid update
     // e.g updater thread that we push updates to so the thread that holds the grid doesnt risk getting throttled under large data load
     void HybridGridManager2D::createEmptyGrid() {
-        _grid.clear();
+        _grid_0.clear();
+        _gridFutures.clear();
 
         for (int i = 0; i < _numCellsX; i++)  {
             for (int j = 0; j < _numCellsY; j++)  {
                 float centerX = (i + 0.5) * _cellSize + _xMin;
                 float centerY = (j + 0.5) * _cellSize + _yMin;
 
-                _grid.emplace_back(Cell(PointXY(centerX, centerY), IndexXY(i,j), _cellSize));
+                _grid_0.emplace_back(Cell(PointXY(centerX, centerY), IndexXY(i,j), _cellSize));
             }
+        }
+
+        // i 0 is time zero and the finalindex is at the final time
+        for(int i = 0; i <=  defaultFinalTime / dt; i++)
+        {
+            _gridFutures.push_back(_grid_0);
         }
 
         initialized = true;
     } // createEmptyGrid
 
     // returns the cell that contains point at x, y, z
-    Cell HybridGridManager2D::getCell(float x, float y) {
+    Cell HybridGridManager2D::getCell(float x, float y, float time) {
+
+        if(time > defaultFinalTime)
+        {
+            throw std::runtime_error("Time is outside of the defined time domain");
+        }
+
+
+        int timeIndex = static_cast<int>(std::round(time / dt));
 
         int cellIndexX = static_cast<int>(std::round((x - _xMin) / _cellSize));
         int cellIndexY = static_cast<int>(std::round((y - _yMin) / _cellSize));
@@ -88,12 +106,18 @@ namespace Algorithms::TwoD
 
         int calcIndex = cellIndexX + _numCellsX * (cellIndexY + _numCellsY);
 
-        return _grid[calcIndex];
+        return _gridFutures.at(timeIndex)[calcIndex];
     } // getCell
 
     // returns the cell that contains PointXYZ point
-    Cell HybridGridManager2D::getCell(PointXY point) 
+    Cell HybridGridManager2D::getCell(PointXY point, float time) 
     {
+        int timeIndex = static_cast<int>(std::round(time / dt));
+        if(time > defaultFinalTime)
+        {
+            throw std::runtime_error("Time is outside of the defined time domain");
+        }
+
         int cellIndexX = static_cast<int>(std::round((point.x - _xMin) / _cellSize));
         int cellIndexY = static_cast<int>(std::round((point.y - _yMin) / _cellSize));
 
@@ -111,7 +135,7 @@ namespace Algorithms::TwoD
 
         int calcIndex = cellIndexX + _numCellsX * (cellIndexY);
 
-        return _grid[calcIndex];
+        return _gridFutures.at(timeIndex)[calcIndex];
     } // getCell
 
     // TODO: implement caching. depends on what hardware this runs on bc if we dont care abt space we could just hold a massive lookup table tbh (doesnt seem wise for a library that could be on many different systems -Drew)
@@ -132,7 +156,7 @@ namespace Algorithms::TwoD
         for (int i = minX; i < maxX; i++)   {
             for (int j = minY; j < maxY; j++)   {
                 int neighborIndex = x + _numCellsX * (y);
-                neighbors.push_back(_grid[neighborIndex]);
+                neighbors.push_back(_grid_0[neighborIndex]);
             }
         }
 
@@ -154,6 +178,11 @@ namespace Algorithms::TwoD
 
             _updates.push_back(UpdateRequest{calcIndex, 1});
         }
+
+        for(int i = 0; i <=  defaultFinalTime / dt; i++)
+        {
+            _gridFutures.push_back(_grid_0);
+        }
     } // addKnownObstacle
 
     void HybridGridManager2D::addKnownObstacle(const PointXY& point)   {
@@ -172,6 +201,11 @@ namespace Algorithms::TwoD
 
             _updates.push_back(UpdateRequest{calcIndex, 1});
         }
+
+        for(int i = 0; i <=  defaultFinalTime / dt; i++)
+        {
+            _gridFutures.push_back(_grid_0);
+        }
     } // addKnownObstacle
 
     void HybridGridManager2D::addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle)
@@ -181,16 +215,93 @@ namespace Algorithms::TwoD
         const std::vector<PointXY>& obstaclePolygon = obstacle->getCorners();
 
         // TODO: optimize
-        for(auto& cell : _grid)
+        for(auto& cell : _grid_0)
         {
             const auto CellPolygon  = cell.getCorners();
             if(Math::Geometry::polygonsIntersect(CellPolygon,obstaclePolygon))
             {
                 cell.setState(State::OBSTACLE);
+                cell.incrementOdds(1);
             }
         }
         _obstacleList.push_back(std::move(obstacle));
 
+        // this is where we propagate futures
+        
+        if(StaticObstacle* ob = dynamic_cast<StaticObstacle*>(obstacle.get()))
+        {
+            for(int i = 0; i <=  defaultFinalTime / dt; i++)
+            {
+                _gridFutures.push_back(_grid_0);
+            }
+        }
+        else if(DynamicObstacle* ob = dynamic_cast<DynamicObstacle*>(obstacle.get()))
+        {
+            auto states = ob->propagateInTime(defaultFinalTime, dt, 10);
+            int i = 0;
+            for(const auto& state : states)
+            {
+                std::vector<PointXY> polygon;
+                for(auto corner : ob->getCorners())
+                {
+                    PointXY cornerAdjusted = PointXY(corner.x + state.x, corner.y + state.y);
+                    polygon.push_back(Math::rotate2DPoint(cornerAdjusted, state.z));
+                }
+
+                for(auto& cell : _gridFutures.at(i))
+                {
+                    const auto CellPolygon  = cell.getCorners();
+                    if(Math::Geometry::polygonsIntersect(CellPolygon, polygon))
+                    {
+                        cell.setState(State::OBSTACLE);
+                        cell.incrementOdds(1);
+                    }
+                }
+
+                i++;
+
+            }
+        }
+        else if(DynamicUncertainObstacle* ob = dynamic_cast<DynamicUncertainObstacle*>(obstacle.get()))
+        {
+            int numSamples = 100;
+            auto SamplesStates = ob->GeneratePossibleFutures(defaultFinalTime, dt, 10, numSamples);
+
+            for(const auto& Sample : SamplesStates)
+            {
+                int i = 0;
+                for(const auto& state : Sample)
+                {
+                    std::vector<PointXY> polygon;
+                    for(auto corner : ob->getCorners())
+                    {
+                        PointXY cornerAdjusted = PointXY(corner.x + state.x, corner.y + state.y);
+                        polygon.push_back(Math::rotate2DPoint(cornerAdjusted, state.z));
+                    }
+
+                    for(auto& cell : _gridFutures.at(i))
+                    {
+                        const auto CellPolygon  = cell.getCorners();
+                        if(Math::Geometry::polygonsIntersect(CellPolygon, polygon))
+                        {
+                            cell.setState(State::UNCERTAIN);
+                            cell.incrementOdds(1/numSamples);
+                        }
+                    }
+
+                    i++;
+                }
+                
+            }
+            
+        }
+        else
+        {
+            // TODO: implement the rest of the obstacle types
+            // do nothing rn
+        }
+
+        
     } // addKnownObstacle
 
     void HybridGridManager2D::pushUpdatesToGrid()   {
@@ -208,16 +319,16 @@ namespace Algorithms::TwoD
                 std::scoped_lock updatesLock(_cellUpdateMutex);
 
                 for (auto& request : _updates)   {
-                    _grid[request.index].incrementOdds(request.oddsUpdate);
-                    int oddsVal = _grid[request.index].getOdds();
+                    _grid_0[request.index].incrementOdds(request.oddsUpdate);
+                    int oddsVal = _grid_0[request.index].getOdds();
                     if (oddsVal >= positveThreshold) {
-                        _grid[request.index].setState(OBSTACLE);
+                        _grid_0[request.index].setState(OBSTACLE);
                     }
                     else if(oddsVal <= clearThreshold)  {
-                        _grid[request.index].setState(CLEAR);
+                        _grid_0[request.index].setState(CLEAR);
                     }
                     else    {
-                        _grid[request.index].setState(UNCERTAIN);
+                        _grid_0[request.index].setState(UNCERTAIN);
                     }
                 }
                 _updates.clear();
@@ -235,7 +346,7 @@ namespace Algorithms::TwoD
         float lowestDistance = INFINITY;
         int closestCellIndex = -1;
         int currentIndex = 0;
-        for(const auto& cell : _grid)
+        for(const auto& cell : _grid_0)
         {
             // Run the checks
             if(cell.getState() == State::OBSTACLE)
@@ -249,7 +360,7 @@ namespace Algorithms::TwoD
             currentIndex++;
         }
 
-        return _grid.at(closestCellIndex).getCenter();
+        return _grid_0.at(closestCellIndex).getCenter();
 
     } // getNearestObstacleCenter
 
@@ -277,5 +388,3 @@ namespace Algorithms::TwoD
     } // getPointFromIndex
 
 }
-
-

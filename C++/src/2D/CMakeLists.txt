@@ -4,8 +4,10 @@ add_subdirectory(Validators)
 add_library(
     TwoD
         2DGridManager.cpp
+        2DHybridGridManager.cpp
         Planners/RRTStar/RRTStar2D.cpp
         Validators/RayTracingValidator.cpp
+        Validators/RayTracingValidatorUncertain.cpp
         
 )
 
