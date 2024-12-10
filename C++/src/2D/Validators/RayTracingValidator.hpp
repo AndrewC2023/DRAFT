@@ -28,7 +28,7 @@ namespace Algorithms::TwoD
     {
         public:
             RayTracingValidator(const Configuration::Config&,
-                                std::shared_ptr<GridManager2D>,
+                                std::shared_ptr<HybridGridManager2D>,
                                 std::vector<VehicleFeature>&);
                                 
             ~RayTracingValidator();
@@ -37,7 +37,7 @@ namespace Algorithms::TwoD
             bool validatePathSegment(const PointXY&, const PointXY&, float time, float& probability) override;
             void setVehicle(std::vector<VehicleFeature>&) override;
             const float getMinimumSafeDistance() override;
-            bool validatePose(const StateXYT&, float time ) override;
+            bool validatePose(const StateXYT&, float time ) override; // depreciated
 
         private:
 
@@ -51,7 +51,7 @@ namespace Algorithms::TwoD
             bool _gridGraphed;
 
             // grid
-            std::shared_ptr<GridManager2D> _grid;
+            std::shared_ptr<HybridGridManager2D> _grid;
 
             float _minimumSafeDistance; 
 

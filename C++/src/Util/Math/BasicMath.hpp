@@ -32,6 +32,8 @@ namespace Math
         static std::uniform_real_distribution<float> Var(0, 1);
         return Var(randomGenerator);
     }
+    
+    // TODO: add max function for arrays and lists
 }
 
 #endif // BASICMATH_H

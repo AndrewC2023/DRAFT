@@ -1,13 +1,13 @@
-add_executable(
-    RaytracingValidatorTest
+# add_executable(
+#     RaytracingValidatorTest
 
-    TestRayTracing.cpp
-)
+#     TestRayTracing.cpp
+# )
 
-target_link_libraries(
-    RaytracingValidatorTest
+# target_link_libraries(
+#     RaytracingValidatorTest
 
-    TwoD
-    BackendVisualization
-    Config
-)
+#     TwoD
+#     BackendVisualization
+#     Config
+# )

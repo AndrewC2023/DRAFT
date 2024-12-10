@@ -1,4 +1,4 @@
 add_subdirectory(3DGridManagerTest)
-add_subdirectory(2DStaticObstacleGridTest)
+add_subdirectory(2DObstacleGridTests)
 add_subdirectory(ValidatorTests)
 add_subdirectory(2DRRTStarTest)

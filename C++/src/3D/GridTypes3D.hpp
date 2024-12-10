@@ -82,7 +82,7 @@ namespace Algorithms::ThreeD {
                 _state = p_state;
             }
 
-            void incrementOdds(int increment) 
+            void incrementOdds(float increment) 
             {
                 _odds += increment;
             }

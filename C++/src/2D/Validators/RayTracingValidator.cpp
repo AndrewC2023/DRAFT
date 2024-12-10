@@ -11,7 +11,7 @@
 namespace Algorithms::TwoD
 {
     RayTracingValidator::RayTracingValidator(const Configuration::Config& Config,
-                                             std::shared_ptr<GridManager2D> Grid,
+                                             std::shared_ptr<HybridGridManager2D> Grid,
                                              std::vector<VehicleFeature>& vehicle):
                                              _grid(std::move(Grid)),
                                              _debug(Config.validators.debug)
@@ -19,7 +19,7 @@ namespace Algorithms::TwoD
         setVehicle(vehicle);
         if(_debug)
         { 
-            debugVisaulizer = new Visualization::Visualizer2D(_grid);   
+            debugVisaulizer = new Visualization::Visualizer2D();   
         }
         else
         {
@@ -53,7 +53,7 @@ namespace Algorithms::TwoD
         }
     } // validatePath
 
-    bool RayTracingValidator::validatePathSegment(const PointXY& head, const PointXY& tail, float time, float& probability)
+    [[gnu::hot]] bool RayTracingValidator::validatePathSegment(const PointXY& head, const PointXY& tail, float time, float& probability)
     {
         // Calculate deltas and angle
         const auto xDelta = tail.x - head.x;
@@ -77,6 +77,7 @@ namespace Algorithms::TwoD
         else
             pathTheta = std::atan(yDelta / xDelta);
 
+        float currentOdds = 0.0f;
         for(auto& feature : _vehicle)
         {
             // Calculate the outline of the path
@@ -100,7 +101,7 @@ namespace Algorithms::TwoD
             if(_debug)
             { 
                 if (!_gridGraphed) {
-                    debugVisaulizer->plotGrid(time);
+                    debugVisaulizer->plotGrid(_grid, time);
                     _gridGraphed = true;
                 }
                 debugVisaulizer->plotPolygon(outline);
@@ -110,23 +111,26 @@ namespace Algorithms::TwoD
             // Can't do much if there is no grid
             if(gridCells.empty()){
                 throw std::runtime_error("validator asked to validate on an empty grid");
+                probability = 1;
                 return false;
             }
-            float currentOdds = 0.0f;
+            
             for(const auto& cell : gridCells)
             {
                 // Safety check for safety
                 const auto& cellOutline = cell.getCorners();
                 if(cellOutline.size() != 4)
+                {
+                    probability = 1;
                     return false; // this must be done until convex hull is implemented
-
+                }
                 if(cellOutline[0].x > xMax || cellOutline[3].x < xMin || cellOutline[0].y > yMax || cellOutline[3].y < yMin)
                     continue;
                 // Check that the cell state is correct and the cell outline is in the bounds of the path before doing computation
                 // Cell outline is in the same order for every cell, with index 0 at the top left and 3 at the bottom right
                 
                 const auto cellState = cell.getState();
-                if(cellState == State::OBSTACLE)
+                if(cellState == State::OBSTACLE || cellState == State::UNCERTAIN)
                 {
                     // Check the 4 corners
                     // TODO: check if running the polygon intersect is faster than running this four times
@@ -134,19 +138,28 @@ namespace Algorithms::TwoD
                        Math::Geometry::isPointInsidePolygon(cellOutline[1], outline) ||
                        Math::Geometry::isPointInsidePolygon(cellOutline[2], outline) ||
                        Math::Geometry::isPointInsidePolygon(cellOutline[3], outline)   )
-                           return false;
-                } else if(cellState == State::UNCERTAIN)
-                {
-                    if(cell.getOdds() > currentOdds)
                     {
-                        currentOdds = cell.getOdds();
+                        if(cellState == State::UNCERTAIN)
+                        {
+                            if(cell.getOdds() > currentOdds)
+                            {
+                                currentOdds = cell.getOdds();
+                            }
+                        }
+                        else
+                        {
+                            probability = 1;
+                            return false;
+                        }
                     }
+                           
                 }
+                
             }
-            probability = currentOdds;
 
         }
-
+        
+        probability = currentOdds;
         return true;
     } // validatePathSegment
 

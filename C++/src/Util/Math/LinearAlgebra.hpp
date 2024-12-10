@@ -15,18 +15,18 @@
 namespace Math
 {
     // DCM matrix 2D
-    Eigen::Matrix2f DCM2D(float theta)
+    static inline Eigen::Matrix2f DCM2D(float theta)
     {
         Eigen::Matrix2f DCM(2,2);
+        DCM(0,0) = std::cos(theta);
+        DCM(0,1) = std::sin(theta);
+        DCM(1,0) = (-1)*std::sin(theta);
         DCM(1,1) = std::cos(theta);
-        DCM(1,2) = std::sin(theta);
-        DCM(2,1) = (-1)*std::sin(theta);
-        DCM(2,2) = std::cos(theta);
         
         return DCM;
     }
 
-    Algorithms::TwoD::PointXY rotate2DPoint(PointXY point, float theta)
+    static inline Algorithms::TwoD::PointXY rotate2DPoint(PointXY point, float theta)
     {
         Eigen::Matrix2f DCM = DCM2D(theta);
         Eigen::Vector2f pointVec(point.x, point.y);
@@ -35,7 +35,7 @@ namespace Math
     }
 
     // DCM matrix 3D
-    Eigen::Matrix3f DCM3D(float theta_x, float theta_y, float theat_z)
+    static inline Eigen::Matrix3f DCM3D(float theta_x, float theta_y, float theat_z)
     {
         Eigen::Matrix3f DCM(3,3);
         DCM(1,1) = std::cos(theta_y)*std::cos(theat_z);

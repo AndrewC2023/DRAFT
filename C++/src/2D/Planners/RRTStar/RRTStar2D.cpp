@@ -39,7 +39,7 @@ namespace Algorithms::TwoD
 
         // Empty the tree if this is being called again
         Tree.clear();
-        Tree.push_back(RRTStarNode({start, 0.0f, 0, 0}));
+        Tree.push_back(RRTStarNode({start, 0.0f, 0, 0, 0.0f, 0.0f}));
         
         numNodes = 1;
         int goalIndex = -1;
@@ -55,6 +55,7 @@ namespace Algorithms::TwoD
 
             // sample a new node
             bool successfulSample = false; // this condition stipulates that we must also be able to "steer" the node to a valid location
+            float gridOdds = 0;
             while (successfulSample == false)
             {
                 sample = sampleNewNode();
@@ -71,7 +72,7 @@ namespace Algorithms::TwoD
                     }
                 }
 
-                steer(sample, Tree.at(closestTreeIndex).position, successfulSample);
+                steer(sample, Tree.at(closestTreeIndex).position, successfulSample, gridOdds);
                 // steer function handles the while loop condition
             }
 
@@ -79,9 +80,9 @@ namespace Algorithms::TwoD
             // std::cout << "Sampled Point: " << sample << std::endl;
 
             // sucessful sample
-            float cost = costFunction(sample, Tree.at(closestTreeIndex).position) + Tree.at(closestTreeIndex).cost;
+            float cost = costFunction(sample, Tree.at(closestTreeIndex).position, gridOdds) + Tree.at(closestTreeIndex).cost;
             // add the node to the tree
-            Tree.push_back(RRTStarNode({sample, cost, numNodes, closestTreeIndex}));
+            Tree.push_back(RRTStarNode({sample, cost, numNodes, closestTreeIndex, gridOdds, 0.0f}));
 
             if(!foundEnd && sample == goal)
             {
@@ -188,6 +189,7 @@ namespace Algorithms::TwoD
             else
             {
                 successful = false; // we failed to validate the path
+                odds = 1.0f; // sanity
                 return;
             }
         }
@@ -285,18 +287,18 @@ namespace Algorithms::TwoD
         // we know this ALWAYS happens after the new node is added
         for (int i = 0; i < numNodes - 1; ++i)
         {
-            if((Tree[numNodes - 1].position - Tree[i].position).norm() > _maxEdgeLength)
+            if((Tree[numNodes - 1].position - Tree[i].position).norm() > _maxEdgeLength * 1.01)
             {
                 // we can't rewire
                 continue;
             }
 
             // check if the new node is a better parent
-            float newCost = costFunction(Tree[numNodes - 1].position, Tree[i].position) + Tree[numNodes - 1].cost;
+            float newCost = costFunction(Tree[numNodes - 1].position, Tree[i].position, Tree[i].occupancyOdds) + Tree[numNodes - 1].cost;
             if (newCost < Tree[i].cost)
             {
                 // validate the path
-                if (!_Validator->validatePathSegment(Tree[i].position, Tree[numNodes - 1].position, 0.0f))
+                if (!_Validator->validatePathSegment(Tree[i].position, Tree[numNodes - 1].position, 0.0f, Tree[i].occupancyOdds))
                 {
                     // Invalid, we can't rewire
                     continue;
@@ -308,7 +310,7 @@ namespace Algorithms::TwoD
         }
     } // Rewire
 
-    float RRTStar2D::costFunction(const PointXY& sampledPoint, const PointXY& nearestNode)
+    float RRTStar2D::costFunction(const PointXY& sampledPoint, const PointXY& nearestNode, const float odds)
     {
         float distance = std::sqrt(std::pow(sampledPoint.x - nearestNode.x, 2) + std::pow(sampledPoint.y - nearestNode.y, 2));
         // any other punishements go here

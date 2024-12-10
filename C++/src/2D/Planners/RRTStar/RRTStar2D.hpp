@@ -101,7 +101,7 @@ namespace Algorithms::TwoD
             
             void rewire();
 
-            float costFunction(const PointXY& sampledPoint, const PointXY& nearestNode);
+            float costFunction(const PointXY& sampledPoint, const PointXY& nearestNode, const float odds);
 
             int FindNearestNode(PointXY);
 

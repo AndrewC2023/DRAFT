@@ -11,6 +11,7 @@
    on the robust built in methods of boost due to the potential overhead
 */
 #include "2DHybridGridManager.hpp"
+#include <omp.h>
 
 namespace Algorithms::TwoD 
 {
@@ -42,6 +43,10 @@ namespace Algorithms::TwoD
 
     std::vector<Cell> HybridGridManager2D::getCells([[maybe_unused]] float time)
     {
+        if(time > defaultFinalTime)
+        {
+            throw std::runtime_error("Time is outside of the defined time domain, not handling for this yet");
+        }
         // solve for which grid we want to return
         int gridIndex = static_cast<int>(std::round(time / dt));
 
@@ -179,10 +184,10 @@ namespace Algorithms::TwoD
             _updates.push_back(UpdateRequest{calcIndex, 1});
         }
 
-        for(int i = 0; i <=  defaultFinalTime / dt; i++)
-        {
-            _gridFutures.push_back(_grid_0);
-        }
+        // for(int i = 0; i <=  defaultFinalTime / dt; i++)
+        // {
+        //     _gridFutures.push_back(_grid_0);
+        // }
     } // addKnownObstacle
 
     void HybridGridManager2D::addKnownObstacle(const PointXY& point)   {
@@ -202,14 +207,16 @@ namespace Algorithms::TwoD
             _updates.push_back(UpdateRequest{calcIndex, 1});
         }
 
-        for(int i = 0; i <=  defaultFinalTime / dt; i++)
-        {
-            _gridFutures.push_back(_grid_0);
-        }
+        // for(int i = 0; i <=  defaultFinalTime / dt; i++)
+        // {
+        //     _gridFutures.push_back(_grid_0);
+        // }
     } // addKnownObstacle
 
-    void HybridGridManager2D::addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle)
+    [[gnu::hot]] void HybridGridManager2D::addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle)
     {
+
+        std::cout << "Adding obstacle" << std::endl;
         // for now this is only handling certain static obstacles
         // TODO: add cases for each child of I2Dobstacle (uncertainones will require monte carlo sim or something PCE??)
         const std::vector<PointXY>& obstaclePolygon = obstacle->getCorners();
@@ -221,40 +228,62 @@ namespace Algorithms::TwoD
             if(Math::Geometry::polygonsIntersect(CellPolygon,obstaclePolygon))
             {
                 cell.setState(State::OBSTACLE);
-                cell.incrementOdds(1);
+                cell.incrementOdds(1.0f);
             }
         }
-        _obstacleList.push_back(std::move(obstacle));
+
+        // notice that _grid_0 contains both all the obstacles at time zero and all static obstacles
 
         // this is where we propagate futures
-        
+
         if(StaticObstacle* ob = dynamic_cast<StaticObstacle*>(obstacle.get()))
         {
+
             for(int i = 0; i <=  defaultFinalTime / dt; i++)
             {
-                _gridFutures.push_back(_grid_0);
+                #pragma omp parallel for
+                for(auto& cell : _gridFutures.at(i)) 
+                {
+                    const auto CellPolygon  = cell.getCorners();
+                    if(Math::Geometry::polygonsIntersect(CellPolygon,obstaclePolygon))
+                    {
+                        cell.setState(State::OBSTACLE);
+                        cell.incrementOdds(1.0f);
+
+                    }
+                }
+                
             }
         }
         else if(DynamicObstacle* ob = dynamic_cast<DynamicObstacle*>(obstacle.get()))
         {
-            auto states = ob->propagateInTime(defaultFinalTime, dt, 10);
+
+            auto states = ob->propagateInTime(defaultFinalTime, dt, _subResolution);
             int i = 0;
             for(const auto& state : states)
             {
+                std::cout << "State at time: " << i*dt << ", " << state << std::endl;
                 std::vector<PointXY> polygon;
                 for(auto corner : ob->getCorners())
                 {
-                    PointXY cornerAdjusted = PointXY(corner.x + state.x, corner.y + state.y);
-                    polygon.push_back(Math::rotate2DPoint(cornerAdjusted, state.z));
+
+                    PointXY cornerRotated =  Math::rotate2DPoint(corner, -state.z);
+                    
+                    PointXY cornerAdjusted = PointXY(cornerRotated.x + state.x, cornerRotated.y + state.y);
+                    polygon.push_back(cornerAdjusted);
+                    
                 }
 
+                #pragma omp parallel for
                 for(auto& cell : _gridFutures.at(i))
                 {
+                    
                     const auto CellPolygon  = cell.getCorners();
                     if(Math::Geometry::polygonsIntersect(CellPolygon, polygon))
                     {
+                        //std::cout << "Obstacle at time: " << i*dt << std::endl;
                         cell.setState(State::OBSTACLE);
-                        cell.incrementOdds(1);
+                        cell.incrementOdds(1.0f);
                     }
                 }
 
@@ -264,33 +293,38 @@ namespace Algorithms::TwoD
         }
         else if(DynamicUncertainObstacle* ob = dynamic_cast<DynamicUncertainObstacle*>(obstacle.get()))
         {
-            int numSamples = 100;
-            auto SamplesStates = ob->GeneratePossibleFutures(defaultFinalTime, dt, 10, numSamples);
-
+            
+            auto SamplesStates = ob->GeneratePossibleFutures(defaultFinalTime, dt, _subResolution, _numSamples);
+            int sampCount = 0;
             for(const auto& Sample : SamplesStates)
             {
                 int i = 0;
                 for(const auto& state : Sample)
                 {
+                    
                     std::vector<PointXY> polygon;
                     for(auto corner : ob->getCorners())
                     {
-                        PointXY cornerAdjusted = PointXY(corner.x + state.x, corner.y + state.y);
-                        polygon.push_back(Math::rotate2DPoint(cornerAdjusted, state.z));
+                        PointXY cornerRotated =  Math::rotate2DPoint(corner, -state.z);
+                        PointXY cornerAdjusted = PointXY(cornerRotated.x + state.x, cornerRotated.y + state.y);
+                        polygon.push_back(cornerAdjusted);
                     }
 
+                    #pragma omp parallel for
                     for(auto& cell : _gridFutures.at(i))
                     {
                         const auto CellPolygon  = cell.getCorners();
                         if(Math::Geometry::polygonsIntersect(CellPolygon, polygon))
                         {
                             cell.setState(State::UNCERTAIN);
-                            cell.incrementOdds(1/numSamples);
+                            cell.incrementOdds(1.0f/_numSamples);
                         }
                     }
 
                     i++;
                 }
+                std::cout << "on sample: " << sampCount << std::endl;
+                sampCount++;
                 
             }
             
@@ -301,7 +335,7 @@ namespace Algorithms::TwoD
             // do nothing rn
         }
 
-        
+        _obstacleList.push_back(std::move(obstacle));
     } // addKnownObstacle
 
     void HybridGridManager2D::pushUpdatesToGrid()   {

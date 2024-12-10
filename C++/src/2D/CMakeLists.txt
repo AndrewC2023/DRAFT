@@ -6,8 +6,8 @@ add_library(
         2DGridManager.cpp
         2DHybridGridManager.cpp
         Planners/RRTStar/RRTStar2D.cpp
+        Planners/RRTStar/TimeRRTStar2D.cpp
         Validators/RayTracingValidator.cpp
-        Validators/RayTracingValidatorUncertain.cpp
         
 )
 

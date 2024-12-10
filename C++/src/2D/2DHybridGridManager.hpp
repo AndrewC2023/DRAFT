@@ -4,8 +4,8 @@
  */
 
 
-#ifndef TWODGRIDMANAGER_H
-#define TWODGRIDMANAGER_H
+#ifndef HYBRIDTWODGRIDMANAGER_H
+#define HYBRIDTWODGRIDMANAGER_H
 
 // std
 #include <iostream>
@@ -109,8 +109,10 @@ namespace Algorithms::TwoD {
         std::vector<Cell> _grid_0;
         std::vector<std::vector<Cell>> _gridFutures;
         float t_0 = 0;
-        float dt = 0.1;
-        const float defaultFinalTime = 30.0f;
+        float dt = 0.5;
+        const float defaultFinalTime = 60.0f;
+        int _numSamples = 1000;
+        int _subResolution = 20;
 
         // The grid will also cointain a list of known obstacles, This allows for the opportunity to potential speed up path validation
         std::vector<std::unique_ptr<I2DObstacle>> _obstacleList;
@@ -146,4 +148,4 @@ namespace Algorithms::TwoD {
 } 
 
 
-#endif // TWODGRIDMANAGER_H
+#endif // HYBRIDTWODGRIDMANAGER_H

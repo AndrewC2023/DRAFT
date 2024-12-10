@@ -32,7 +32,7 @@ namespace Algorithms::TwoD
             virtual bool validatePath(const std::deque<PointXY>&, float time, float& probability) = 0;
             virtual bool validatePathSegment(const PointXY&, const PointXY&, float time, float& probability) = 0;
             virtual const float getMinimumSafeDistance() = 0;
-            virtual bool validatePose(const StateXYT&, float time) = 0;
+            virtual bool validatePose(const StateXYT&, float time) = 0; // TODO: depreciated
             virtual void setVehicle(std::vector<VehicleFeature>&) = 0;
 
     };

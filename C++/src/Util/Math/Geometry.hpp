@@ -29,6 +29,24 @@ using namespace Algorithms::ThreeD;
 namespace Math::Geometry
 {
 
+    /** Returns true if the provided point is inside the provided polygon outline,
+     *  using a ray-casting algorithm. This flips the value of inPolygon back and
+     *  forth every time a wall is crossed, which means the number will be odd (true)
+     *  if the point lies inside the polygon
+     * 
+     *  @note this function is incredibly useful and well written, no need to rewrite
+     */
+    [[gnu::hot, maybe_unused, nodiscard]] static inline bool isPointInsidePolygon(const PointXY& point, const std::vector<PointXY>& polygon)
+    {
+        bool inPolygon = false;
+        for(std::size_t i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++)
+        {
+            if(((polygon[i].y > point.y) != (polygon[j].y > point.y)) && (point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x))
+                inPolygon = !inPolygon;
+        }
+        return inPolygon;
+    }
+
     /**  Function that returns true if the polygons formed by the points in a and b intersect one another
      *   i.e. a is a set of 4 points that form a square, and b is a set of 3 points that form a triangle
      *
@@ -43,6 +61,18 @@ namespace Math::Geometry
     {
         if(a.empty() || b.empty())
             return false;
+
+        // early exit if any point is inside the other polygon, leaving the more difficult computation only for the case where the polygons overlap but without a corner doing so
+        for(const auto& point : a)
+        {
+            if(isPointInsidePolygon(point, b))
+                return true;
+        }
+        for(const auto& point : b)
+        {
+            if(isPointInsidePolygon(point, a))
+                return true;
+        }
 
         typedef boost::geometry::model::d2::point_xy<float> point_2d;
         typedef boost::geometry::model::polygon<point_2d> polygon_2d;
@@ -78,6 +108,15 @@ namespace Math::Geometry
         // Boost geometry seems to not like shapes contained within other shapes. The above code will account for intersections where the edges cross, but if one shape is contained within another, it
         // will not be updated. This checks if one shape is contained entirely within another
         return !results.empty() || boost::geometry::within(poly_a, poly_b) || boost::geometry::within(poly_b, poly_a);
+    }
+
+    [[gnu::hot, maybe_unused, nodiscard]] static bool polygonsIntersect2(const std::vector<PointXY>& a, const std::vector<PointXY>& b)
+    {
+        for(const auto& point : a)
+        {
+            if(isPointInsidePolygon(point, b))
+                return true;
+        }
     }
     
     /** Function for getting the intersect point of two lines
@@ -289,24 +328,6 @@ namespace Math::Geometry
 
        // Distance to line is the height of the parallelogram, so area / base = height = distance to point
        return static_cast<float>(area / lineDelta.norm());
-    }
-
-    /** Returns true if the provided point is inside the provided polygon outline,
-     *  using a ray-casting algorithm. This flips the value of inPolygon back and
-     *  forth every time a wall is crossed, which means the number will be odd (true)
-     *  if the point lies inside the polygon
-     * 
-     *  @note this function is incredibly useful and well written, no need to rewrite
-     */
-    [[gnu::hot, maybe_unused, nodiscard]] static inline bool isPointInsidePolygon(const PointXY& point, const std::vector<PointXY>& polygon)
-    {
-        bool inPolygon = false;
-        for(std::size_t i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++)
-        {
-            if(((polygon[i].y > point.y) != (polygon[j].y > point.y)) && (point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x))
-                inPolygon = !inPolygon;
-        }
-        return inPolygon;
     }
     
 }

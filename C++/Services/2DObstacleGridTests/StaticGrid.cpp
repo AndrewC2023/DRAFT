@@ -1,6 +1,6 @@
 /*
  * Author: Andrew Campbell
- * Date: 12-05-2024
+ * Date: 12-04-2024
  */
 
 #include <2D/2DGridManager.hpp>
@@ -21,11 +21,11 @@ int main()
     grid->addKnownObstacle(std::make_unique<Algorithms::TwoD::StaticObstacle>(Algorithms::TwoD::PointXY(5.0,5.0), 3, 1.0, M_PI/4));
     grid->addKnownObstacle(std::make_unique<Algorithms::TwoD::StaticObstacle>(std::vector<Algorithms::TwoD::PointXY>({Algorithms::TwoD::PointXY(6.0,3.0),Algorithms::TwoD::PointXY(5.5,4.4),Algorithms::TwoD::PointXY(2.2,8.5)})));
 
-    auto* visualizer = new Visualization::Visualizer2D(grid);
+    auto* visualizer = new Visualization::Visualizer2D();
 
     float time = 0;
     
-    visualizer->plotGrid(time);
+    visualizer->plotGrid(grid);
     visualizer->show("Grid population test");
 
     std::cout << "Press Enter to end the test" << std::endl;

@@ -10,7 +10,7 @@
 #include "../../IPathPlanner2D.hpp"
 
 // Dependent Classes
-#include "../../2DGridManager.hpp"
+#include "../../2DHybridGridManager.hpp"
 #include "../../IPathValidator2D.hpp"
 
 // Config
@@ -29,7 +29,7 @@
 namespace Algorithms::TwoD
 {
     /**
-     * @class TimeRRTStar2D
+     * @class RRTStar2D
      * @brief Implements the RRT* (Rapidly-exploring Random Tree Star) algorithm for 2D path planning.
      * 
      * This class provides the functionality to plan a path in a 2D space using the RRT* algorithm.
@@ -51,7 +51,7 @@ namespace Algorithms::TwoD
     {
         public:
             TimeRRTStar2D(const Configuration::Config&, 
-                      std::shared_ptr<GridManager2D>,
+                      std::shared_ptr<HybridGridManager2D>,
                       std::shared_ptr<IPathValidator2D>);
 
             ~TimeRRTStar2D() = default;
@@ -74,6 +74,8 @@ namespace Algorithms::TwoD
             float yMin;
             float yMax;
 
+            float _velocity = 0.5; // m/s
+
             // Random Generators
             std::mt19937 _randGenX;
             std::mt19937 _randGenY;
@@ -85,7 +87,7 @@ namespace Algorithms::TwoD
             std::uniform_real_distribution<float> _goalBiasDistribution;
 
             // smart pointers to the grid and path validator
-            std::shared_ptr<GridManager2D> _Grid;
+            std::shared_ptr<HybridGridManager2D> _Grid;
             std::shared_ptr<IPathValidator2D> _Validator;
 
             // Config
@@ -97,11 +99,11 @@ namespace Algorithms::TwoD
 
             PointXY sampleNewNode();
 
-            void steer(PointXY& sampledPoint, PointXY nearestNode, bool& successful);
+            void steer(PointXY& sampledPoint, RRTStarNode nearestNode, bool& successful, float& odds);
             
             void rewire();
 
-            float costFunction(const PointXY& sampledPoint, const PointXY& nearestNode);
+            float costFunction(const PointXY& sampledPoint, const PointXY& nearestNode, const float odds);
 
             int FindNearestNode(PointXY);
 

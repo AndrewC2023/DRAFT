@@ -26,6 +26,8 @@ namespace Algorithms::TwoD
         float cost;
         int treeIndex;
         int parentIndex;
+        float occupancyOdds;
+        float time;
     };
 
     struct AStarNetworkNode

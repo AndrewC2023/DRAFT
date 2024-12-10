@@ -85,14 +85,16 @@ namespace Algorithms::TwoD
         class DynamicObstacle : public I2DObstacle // TODO: Finish this class and fix it, so so so much to fix here
         {
             public:
-            DynamicObstacle(StateXYT BoundaryConditionState, 
+            DynamicObstacle(std::vector<PointXY> Corners,
+                            StateXYT BoundaryConditionState, 
                             float boundaryConditionInitialTime,
                             float forwardVelocity,
-                            float turnRate)
-                            : Pose_0(BoundaryConditionState),
+                            float TurnRate)
+                            : corners(Corners),
+                              Pose_0(BoundaryConditionState),
                               t_0(boundaryConditionInitialTime),
                               velocity(forwardVelocity),
-                              turnRate(turnRate)
+                              turnRate(TurnRate)
             {}
             const std::vector<PointXY>& getCorners() override { return corners; }
 
@@ -104,7 +106,7 @@ namespace Algorithms::TwoD
                     trajectory.push_back(Pose_0);
 
                     int subcount = 1;
-
+                    
                     while (t < finalTime)
                     {
                         
@@ -160,18 +162,22 @@ namespace Algorithms::TwoD
                 DynamicUncertainObstacle(std::vector<PointXY> Corners, 
                                          StateXYT boundaryConditionState, 
                                          float boundaryConditionInitialTime,
-                                         float boundaryConditionVelocity, 
+                                         float boundaryConditionVelocityMean, 
+                                         float boundaryConditionVelocityVariance, 
                                          float boundaryConditionTurnRateMean,
                                          float boundaryConditionTurnRateVariance)
                                          : corners(Corners), 
                                            initialCMstate(boundaryConditionState), 
                                            initialTime(boundaryConditionInitialTime), 
-                                           velocity(boundaryConditionVelocity), 
+                                           velocityMean(boundaryConditionVelocityMean),
+                                           velocityVariance(boundaryConditionVelocityVariance), 
                                            turnRateMean(boundaryConditionTurnRateMean),
                                            turnRateVariance(boundaryConditionTurnRateVariance),
-                                           randomGenerator({std::random_device{}()})
+                                           randomGenerator1({std::random_device{}()}),
+                                           randomGenerator2({std::random_device{}()})
                 {
-                    normDist = std::normal_distribution(boundaryConditionTurnRateMean , boundaryConditionTurnRateVariance);
+                    normDistTurnRate = std::normal_distribution(boundaryConditionTurnRateMean , boundaryConditionTurnRateVariance);
+                    normDistVelocity = std::normal_distribution(boundaryConditionVelocityMean , boundaryConditionVelocityVariance);
                 }
 
                 std::vector<std::vector<StateXYT>> GeneratePossibleFutures(float finalTime, float dt, int subResolution, int numSamples)
@@ -179,6 +185,7 @@ namespace Algorithms::TwoD
                     std::vector<std::vector<StateXYT>> possibleFutures;
                     for(int i = 0; i < numSamples; i++)
                     {
+                        
                         possibleFutures.push_back(propagateInTime(finalTime, dt, subResolution));
                     }
                     return possibleFutures;
@@ -193,7 +200,8 @@ namespace Algorithms::TwoD
                     trajectory.push_back(initialCMstate);
 
                     int subcount = 1;
-                    float turnRate = normDist(randomGenerator);
+                    float turnRate = normDistTurnRate(randomGenerator1);
+                    float velocity = normDistVelocity(randomGenerator2);
 
                     while (t < finalTime)
                     {
@@ -207,7 +215,8 @@ namespace Algorithms::TwoD
                         {
                             trajectory.push_back(position);
                             t += dt;
-                            turnRate = normDist(randomGenerator);
+                            turnRate = normDistTurnRate(randomGenerator1);
+                            velocity = normDistVelocity(randomGenerator2);
                             subcount = 1;
                         }else{
                             subcount++;
@@ -223,13 +232,16 @@ namespace Algorithms::TwoD
                 std::vector<PointXY> corners; // these points are given and one should consider the centroid the CM unless specified
                 float initialTime;
                 StateXYT initialCMstate;    
-                float velocity; // constant forward velocity
+                float velocityMean; // constant forward velocity
+                float velocityVariance; // constant forward velocity
                 float turnRateMean; // turn rate as input
                 float turnRateVariance; // turn rate as input
 
                 // random generators:
-                std::mt19937 randomGenerator;
-                std::normal_distribution<float> normDist;
+                std::mt19937 randomGenerator1;
+                std::mt19937 randomGenerator2;
+                std::normal_distribution<float> normDistTurnRate;
+                std::normal_distribution<float> normDistVelocity;
             // need boundary conditions  
         };
 
@@ -301,7 +313,7 @@ namespace Algorithms::TwoD
                 state = p_state;
             }
 
-            void incrementOdds(int increment) 
+            void incrementOdds(float increment) 
             {
                 odds += increment;
                 if (odds > 1.0f)

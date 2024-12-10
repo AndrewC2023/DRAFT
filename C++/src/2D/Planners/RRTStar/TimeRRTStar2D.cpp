@@ -8,7 +8,7 @@
 namespace Algorithms::TwoD
 {
     TimeRRTStar2D::TimeRRTStar2D(const Configuration::Config& Config,
-                         std::shared_ptr<GridManager2D> grid,
+                         std::shared_ptr<HybridGridManager2D> grid,
                          std::shared_ptr<IPathValidator2D> validator):
                          _Grid(std::move(grid)),
                          _Validator(std::move(validator)),
@@ -39,7 +39,7 @@ namespace Algorithms::TwoD
 
         // Empty the tree if this is being called again
         Tree.clear();
-        Tree.push_back(RRTStarNode({start, 0.0f, 0, 0}));
+        Tree.push_back(RRTStarNode({start, 0.0f, 0, 0, 0.0f, 0.0f}));
         
         numNodes = 1;
         int goalIndex = -1;
@@ -55,23 +55,24 @@ namespace Algorithms::TwoD
 
             // sample a new node
             bool successfulSample = false; // this condition stipulates that we must also be able to "steer" the node to a valid location
+            float gridOdds = 0;
             while (successfulSample == false)
             {
                 sample = sampleNewNode();
                 // find nearest node TODO make function
-                float lowestManhattanDistance = INFINITY;
+                float lowestCostParent = INFINITY;
                 closestTreeIndex = 0;
                 for(int i = 0; i < numNodes; i++)
                 {
-                    float CurrentManhattanDist = std::pow(Tree[i].position.x - sample.x, 2) + std::pow(Tree[i].position.y - sample.y,2);
-                    if(CurrentManhattanDist < lowestManhattanDistance)
+                    float CurrentCost = (Tree[i].position - sample).norm() + Tree[i].occupancyOdds * _invalidPenalty;
+                    if(CurrentCost < lowestCostParent)
                     {
                         closestTreeIndex = i;
-                        lowestManhattanDistance = CurrentManhattanDist;
+                        lowestCostParent = CurrentCost;
                     }
                 }
 
-                steer(sample, Tree.at(closestTreeIndex).position, successfulSample);
+                steer(sample, Tree.at(closestTreeIndex), successfulSample, gridOdds);
                 // steer function handles the while loop condition
             }
 
@@ -79,9 +80,10 @@ namespace Algorithms::TwoD
             // std::cout << "Sampled Point: " << sample << std::endl;
 
             // sucessful sample
-            float cost = costFunction(sample, Tree.at(closestTreeIndex).position) + Tree.at(closestTreeIndex).cost;
+            float cost = costFunction(sample, Tree.at(closestTreeIndex).position, gridOdds) + Tree.at(closestTreeIndex).cost;
             // add the node to the tree
-            Tree.push_back(RRTStarNode({sample, cost, numNodes, closestTreeIndex}));
+            float time = Tree.at(closestTreeIndex).time + (Tree.at(closestTreeIndex).position - sample).norm() / _velocity; 
+            Tree.push_back(RRTStarNode({sample, cost, numNodes, closestTreeIndex, gridOdds, time}));
 
             if(!foundEnd && sample == goal)
             {
@@ -148,24 +150,27 @@ namespace Algorithms::TwoD
             sample.x = _xDistribution(_randGenX);
             sample.y = _yDistribution(_randGenY);
             // check if its in a safe region
-            sucessfulSample = (_Grid->getCell(sample,time).getState() == State::CLEAR);
+            State state = _Grid->getCell(sample, 0.0).getState();
+            sucessfulSample = (state == State::CLEAR || state == State::UNCERTAIN);
         }
         return sample;
 
     } // sampleNewNode
 
-    void TimeRRTStar2D::steer(PointXY& sampledPoint, PointXY nearestNode, bool& successful)
+
+    
+    void TimeRRTStar2D::steer(PointXY& sampledPoint, RRTStarNode nearestNode, bool& successful, float& odds)
     {
 
         successful = false;
         
         // Calculate the unit vector
-        PointXY vector = sampledPoint - nearestNode;
+        PointXY vector = sampledPoint - nearestNode.position;
         PointXY unit_vector = vector / vector.norm();
         PointXY stepVector = PointXY(unit_vector.x * _steerStepSize, unit_vector.y * _steerStepSize);
 
         // std::cout << "xStep " << stepVector.x * _steerStepSize << std::endl;
-        // std::cout << "yStep " << stepVector.y * _steerStepSize << std::endl;     
+        // std::cout << "yStep " << stepVector.y * _steerStepSize << std::endl;
         // std::cout << "steerStepSize " << _steerStepSize << std::endl;
 
         // std::cout << "in steer function" << std::endl;
@@ -177,7 +182,24 @@ namespace Algorithms::TwoD
         // fast ways to exit to avoid more calls to the validator
         if (vector.norm() < _steerStepSize)
         {
-            if(_Validator->validatePathSegment(nearestNode, sampledPoint, 0.0f))
+            
+            if(_Validator->validatePathSegment(nearestNode.position, sampledPoint, nearestNode.time, odds))
+            {
+                successful = true;
+                return;
+            }
+            else
+            {
+                successful = false; // we failed to validate the path
+                odds = 1.0f; // sanity
+                return;
+            }
+        }
+        
+        
+        if((sampledPoint - nearestNode.position).norm() < _maxEdgeLength)
+        {
+            if(_Validator->validatePathSegment(nearestNode.position, sampledPoint, nearestNode.time, odds))
             {
                 successful = true;
                 return;
@@ -190,23 +212,15 @@ namespace Algorithms::TwoD
         }
         
         
-        if((sampledPoint - nearestNode).norm() < _maxEdgeLength)
-        {
-            if(_Validator->validatePathSegment(nearestNode, sampledPoint, 0.0f))
-            {
-                successful = true;
-                return;
-            }
-            
-        }
-        
-        
         // Loop setup
-        PointXY lastPoint = nearestNode;
+        PointXY lastPoint = nearestNode.position;
         PointXY tempPoint = lastPoint + stepVector;
 
         float travelled = _steerStepSize;
         bool first = true;
+        float probability = 0.0f;
+        odds = 0;
+        
         while (!successful)
         {
             travelled += _steerStepSize;
@@ -214,7 +228,7 @@ namespace Algorithms::TwoD
             if (first)
             {
                 first = false;
-                if(!_Validator->validatePathSegment(nearestNode, tempPoint, 0.0f))
+                if(!_Validator->validatePathSegment(nearestNode.position, tempPoint, nearestNode.time, odds))
                 {
                     successful = false;
                     return;
@@ -222,7 +236,7 @@ namespace Algorithms::TwoD
                 // else we hav ethe ability to steer until an obstacle is hit
             }
 
-            if (!_Validator->validatePathSegment(lastPoint, tempPoint, 0.0f))
+            if (!_Validator->validatePathSegment(lastPoint, tempPoint, nearestNode.time + (tempPoint - nearestNode.position).norm() / _velocity, probability))
             {
                 // Hit obstacle, exit
                 sampledPoint = lastPoint;
@@ -234,6 +248,14 @@ namespace Algorithms::TwoD
                 // Max length Reached
                 sampledPoint = tempPoint;
                 successful = true;
+
+                if(probability > odds)
+                {
+                    // we have hit a higher probability cell but we arent completely invalid
+                    // we can still move but we need to be careful
+                    odds = probability;
+                }
+
                 return;
             }
             else if (std::sqrt(std::pow(tempPoint.x - sampledPoint.x, 2) + std::pow(tempPoint.y - sampledPoint.y, 2)) < _steerStepSize * 1.1f)
@@ -249,6 +271,14 @@ namespace Algorithms::TwoD
                 tempPoint = tempPoint + stepVector;
                 
             }
+            
+            if(probability > odds)
+            {
+                // we have hit a higher probability cell but we arent completely invalid
+                // we can still move but we need to be careful
+                odds = probability;
+               
+            }
 
         }
 
@@ -259,18 +289,18 @@ namespace Algorithms::TwoD
         // we know this ALWAYS happens after the new node is added
         for (int i = 0; i < numNodes - 1; ++i)
         {
-            if((Tree[numNodes - 1].position - Tree[i].position).norm() > _maxEdgeLength)
+            if((Tree[numNodes - 1].position - Tree[i].position).norm() > _maxEdgeLength * 1.01)
             {
                 // we can't rewire
                 continue;
             }
 
             // check if the new node is a better parent
-            float newCost = costFunction(Tree[numNodes - 1].position, Tree[i].position) + Tree[numNodes - 1].cost;
+            float newCost = costFunction(Tree[numNodes - 1].position, Tree[i].position, Tree[i].occupancyOdds) + Tree[numNodes - 1].cost;
             if (newCost < Tree[i].cost)
             {
                 // validate the path
-                if (!_Validator->validatePathSegment(Tree[i].position, Tree[numNodes - 1].position, 0.0f))
+                if (!_Validator->validatePathSegment(Tree[i].position, Tree[numNodes - 1].position, 0.0f, Tree[i].occupancyOdds))
                 {
                     // Invalid, we can't rewire
                     continue;
@@ -278,15 +308,17 @@ namespace Algorithms::TwoD
                 // rewire the node
                 Tree[i].cost = newCost;
                 Tree[i].parentIndex = numNodes - 1;
+                Tree[i].time = Tree[numNodes - 1].time + (Tree[numNodes - 1].position - Tree[i].position).norm() / _velocity;
             }
         }
     } // Rewire
 
-    float TimeRRTStar2D::costFunction(const PointXY& sampledPoint, const PointXY& nearestNode)
+    float TimeRRTStar2D::costFunction(const PointXY& sampledPoint, const PointXY& nearestNode, const float odds)
     {
         float distance = std::sqrt(std::pow(sampledPoint.x - nearestNode.x, 2) + std::pow(sampledPoint.y - nearestNode.y, 2));
         // any other punishements go here
         float cost = distance;
+        cost += _invalidPenalty * odds;
         return cost;
     } // costFunction
 

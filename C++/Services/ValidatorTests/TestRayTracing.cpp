@@ -1,6 +1,6 @@
 /*
  * Author: Andrew Campbell
- * Date: 12-06-2024
+ * Date: 12-02-2024
  */
 
 #include "2D/2DGridManager.hpp"
@@ -29,8 +29,8 @@ int main()
 
     
     auto* validator = new RayTracingValidator(config, grid, vehicle);
-
-    if(validator->validatePath(path, 0.0))
+    float prob = 0.0;
+    if(validator->validatePath(path, 0.0, prob))
     {
         std::cout << "Path is Valid\n";
     } else{

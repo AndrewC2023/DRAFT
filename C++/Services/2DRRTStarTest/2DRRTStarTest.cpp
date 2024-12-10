@@ -1,6 +1,6 @@
 /*
  * Author: Andrew Campbell
- * Date: 12-06-2024
+ * Date: 12-04-2024
  */
 
 #include "2D/2DGridManager.hpp"
@@ -31,15 +31,18 @@ int main()
     std::shared_ptr<RRTStar2D> planner = std::make_shared<RRTStar2D>(config, grid, validator);
 
     grid->addKnownObstacle(std::make_unique<Algorithms::TwoD::StaticObstacle>(Algorithms::TwoD::PointXY(5.0,5.0), 1, 0.67, -M_PI/4));
+    grid->addKnownObstacle(std::make_unique<Algorithms::TwoD::StaticObstacle>(Algorithms::TwoD::PointXY(1.0,9.0), 3, 1, M_PI/4));
+    grid->addKnownObstacle(std::make_unique<Algorithms::TwoD::StaticObstacle>(Algorithms::TwoD::PointXY(9.0,1.0), 3, 1, M_PI/4));
+    grid->addKnownObstacle(std::make_unique<Algorithms::TwoD::StaticObstacle>(Algorithms::TwoD::PointXY(7.5,5.0), 5, 0.25, 0.0f));
 
-    std::deque<PointXY> path = planner->PlanPath(PointXY(2.0,2.0), PointXY(8.0,8.0));
+    std::deque<PointXY> path = planner->PlanPath(PointXY(6.5,2.0), PointXY(8.0,8.0));
     std::vector<RRTStarNode> tree = planner->getTree();
     
-    auto* visualizer = new Visualization::Visualizer2D(grid);
+    auto* visualizer = new Visualization::Visualizer2D();
 
-    visualizer->plotGrid(0.0);
+    visualizer->plotGrid(grid);
+    visualizer->plotTree(tree);
     visualizer->plotPath(path);
-    // visualizer->plotTree(tree);
     visualizer->show("RRT* Path Planning");
    
     return 0;

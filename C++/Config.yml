@@ -107,9 +107,9 @@ Grid:
 
 Planners:
   RRTStar:
-    maxEdgeLength: 0.5
-    maxIterations: 3000
-    endBias: 0.5
+    maxEdgeLength: 1
+    maxIterations: 7000
+    endBias: 0.1
     steerStep: 0.1
     invalidPenalty: 1000.0
   EP_RRTStar:

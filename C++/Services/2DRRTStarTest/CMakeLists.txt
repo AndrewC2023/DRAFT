@@ -1,13 +1,13 @@
-add_executable(
-    2DRRTStarTest
+# add_executable(
+#     2DRRTStarTest
 
-    2DRRTStarTest.cpp
-)
+#     2DRRTStarTest.cpp
+# )
 
-target_link_libraries(
-    2DRRTStarTest
+# target_link_libraries(
+#     2DRRTStarTest
 
-    TwoD
-    Config
-    BackendVisualization
-)
+#     TwoD
+#     Config
+#     BackendVisualization
+# )
