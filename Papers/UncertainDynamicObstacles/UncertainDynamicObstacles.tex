@@ -1,0 +1,43 @@
+\documentclass{aiaa-tc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{algpseudocode}
+
+\title{Optimal Path Planning in the Presence of Static Obstacles and Uncertain Dynamic Obstacles}
+
+\author{Andrew C. Campbell\textsuperscript{1}\\The University of Alabama, Tuscaloosa, AL, 35487}
+
+\begin{document}
+\footnotetext[1]{Graduate Research Assistant, Aerospace Engineering Mechanics, accampbell4@crimson.ua.edu.}
+\maketitle
+
+\begin{abstract}
+In this paper a method for augmenting the RRT* algorithm introduced by Karaman \& Frazzoli \cite{doi:10.1177/0278364911406761} such that 
+it can plan in an uncertain dynamic environment is presented. The innovation is primarily in the development of a grid management system capable of handling
+multiple obstacle types including uncertian obstacles, such that the probability of a cell being occupiead at a certain time can be calculated and passed to any planning system.
+Notably this grid management system is capable of interfacing with any planner that calculates its own state in relation to time as it plans. This allows for a planning algorithm to
+avoid future collisions, and avoid regions that a moving obstacle could occupy in the future, all while avoind static obstacles as any conventional planner.
+\end{abstract}
+
+\section{Introduction}
+The path and motion planning problem is a fundamental problem in robotics and autonomous systems.
+There has yet to be an extensive amount of work done on the problem of path planning in the presence of dynamic obstacles,
+let alone Uncertain as well. The development then of a system that can manage all these cases at once is necessary to provide more flexibility
+for the implementation of planners on autonimous systems to provide a more robust and reliable system. Presented here is an RRT* planner that calculates time passed
+as it plans in conjunction with a hybrid grid system capabla of being fed bot certain and uncertain static and dynamic obstacles. The grid system is
+capable of propagating all obstacle types through time to inform a planner.
+
+\section{Problem Setup \& Algorithms}
+
+
+\section{Conclusion}
+
+
+
+
+\bibliographystyle{plain}
+\bibliography{References}
+
+\end{document}
+
