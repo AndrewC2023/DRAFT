@@ -2,14 +2,15 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
-\usepackage{algpseudocode}
+\usepackage{algorithm2e}
+\usepackage{float}
 
 \title{Optimal Path Planning in the Presence of Static Obstacles and Uncertain Dynamic Obstacles}
 
 \author{Andrew C. Campbell\thanks{Graduate Research Assistant, Aerospace Engineering \& Mechanics, accampbell4@crimson.ua.edu.}\\The University of Alabama, Tuscaloosa, AL, 35487}
 
 \begin{document}
-
+\RestyleAlgo{ruled}
 \maketitle
 
 \begin{abstract}
@@ -68,7 +69,84 @@ that \(x_1 = x_{init}\), \(x_n = x_{goal}\), and \(T(\mathcal{P}, V) \subset \ma
 \section{RRT* Algorithm and Grid Management System}
 For an RRT* planning algorithm let \(\mathcal{T}(\mathcal{V},E)\) define the tree where \(\mathcal{V}\) are 
 the vertices and \(E\) are the edges. let \(N \in \mathbb{N}\) denote the number of samples
-that that the algorithm will take to plan. the algorithm is as follows
+that that the algorithm will take to plan. a cost discrete function to some horizon \(\ell\) is conventionally defined generally as:
+\[
+J = c_\ell(x_\ell) + \sum_{t=0}^{\ell-1} c_t(x_t, u_t),
+\]
+where \(c_\ell(x_\ell)\) and \(c_t(x_t, u_t)\) are local cost functions for the discrete space and \(x\) is a state and \(u\) is an input. The first term then is the cost at the
+horizon and the second term is the cost to said horizon. When applied we can define our cost function \(c(x_t, u_t)\) in any way we like
+to tune or guide a planner. to follow this structer a planner will have to implement the cost function such that it is summed with all parent nodes
+to the current node (the horizon) in this case.
+
+\begin{algorithm}[H]
+    \caption{RRT*}\label{alg:rrtstar}
+    \KwIn{$x_{init}$, $x_{goal}$, $N$}
+    \KwOut{$\mathcal{P}$ from $x_{init}$ to $x_{goal}$}
+    $\mathcal{T} \gets \{x_{init}\}$\;
+    \For{$i \gets 1$ \textbf{to} $N$}{
+        $x_{rand} \gets \text{SampleRandomState}()$\;
+        $x_{nearest} \gets \text{NearestNeighbor}(\mathcal{T}, x_{rand})$\;
+        $x_{new} \gets \text{Steer}(x_{nearest}, x_{rand})$\;
+        \If{$\text{Validator.CollisionFree}(x_{nearest}, x_{new})$}{
+            $cost_{new} \gets $ \;
+            $\mathcal{T}.\text{add\_vertex}(x_{new})$\;
+            $\mathcal{T}.\text{add\_edge}(x_{nearest}, x_{new})$\;
+            $X_{near} \gets \text{Near}(\mathcal{T}, x_{new}, r)$\;
+            $x_{min} \gets x_{nearest}$\;
+            $c_{min} \gets \text{Cost}(x_{nearest}) + \text{Cost}(x_{nearest}, x_{new})$\;
+            \ForEach{$x_{near} \in X_{near}$}{
+                \If{$\text{Validator.CollisionFree}(x_{near}, x_{new})$ \textbf{and} $\text{Cost}(x_{near}) + \text{Cost}(x_{near}, x_{new}) < c_{min}$}{
+                    $x_{min} \gets x_{near}$\;
+                    $c_{min} \gets \text{Cost}(x_{near}) + \text{Cost}(x_{near}, x_{new})$\;
+                }
+            }
+            $\mathcal{T}.\text{add\_edge}(x_{min}, x_{new})$\;
+            \ForEach{$x_{near} \in X_{near}$}{
+                \If{$\text{Validator.CollisionFree}(x_{new}, x_{near})$ \textbf{and} $\text{Cost}(x_{new}) + \text{Cost}(x_{new}, x_{near}) < \text{Cost}(x_{near})$}{
+                    $x_{parent} \gets \text{Parent}(x_{near})$\;
+                    $\mathcal{T}.\text{remove\_edge}(x_{parent}, x_{near})$\;
+                    $\mathcal{T}.\text{add\_edge}(x_{new}, x_{near})$\;
+                }
+            }
+        }
+    }
+    \Return $\text{ExtractPath}(\mathcal{T}, x_{goal})$\;
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \caption{Validator.CollisionFree()}\label{alg:validator}
+    \KwIn{$x_{head}$, $x_{tail}$, $\mathcal{G}$, $\mathcal{V}$}
+    \KwOut{bool $clear$}
+    $\mathcal{T} \gets \{x_{init}\}$\;
+    \For{$i \gets 1$ \textbf{to} $N$}{
+        $x_{rand} \gets \text{SampleRandomState}()$\;
+        $x_{nearest} \gets \text{NearestNeighbor}(\mathcal{T}, x_{rand})$\;
+        $x_{new} \gets \text{Steer}(x_{nearest}, x_{rand})$\;
+        \If{$\text{Validator.CollisionFree}(x_{nearest}, x_{new})$}{
+            $\mathcal{T}.\text{add\_vertex}(x_{new})$\;
+            $\mathcal{T}.\text{add\_edge}(x_{nearest}, x_{new})$\;
+            $X_{near} \gets \text{Near}(\mathcal{T}, x_{new}, r)$\;
+            $x_{min} \gets x_{nearest}$\;
+            $c_{min} \gets \text{Cost}(x_{nearest}) + \text{Cost}(x_{nearest}, x_{new})$\;
+            \ForEach{$x_{near} \in X_{near}$}{
+                \If{$\text{CollisionFree}(x_{near}, x_{new})$ \textbf{and} $\text{Cost}(x_{near}) + \text{Cost}(x_{near}, x_{new}) < c_{min}$}{
+                    $x_{min} \gets x_{near}$\;
+                    $c_{min} \gets \text{Cost}(x_{near}) + \text{Cost}(x_{near}, x_{new})$\;
+                }
+            }
+            $\mathcal{T}.\text{add\_edge}(x_{min}, x_{new})$\;
+            \ForEach{$x_{near} \in X_{near}$}{
+                \If{$\text{CollisionFree}(x_{new}, x_{near})$ \textbf{and} $\text{Cost}(x_{new}) + \text{Cost}(x_{new}, x_{near}) < \text{Cost}(x_{near})$}{
+                    $x_{parent} \gets \text{Parent}(x_{near})$\;
+                    $\mathcal{T}.\text{remove\_edge}(x_{parent}, x_{near})$\;
+                    $\mathcal{T}.\text{add\_edge}(x_{new}, x_{near})$\;
+                }
+            }
+        }
+    }
+    \Return $\text{ExtractPath}(\mathcal{T}, x_{goal})$\;
+\end{algorithm}
+poop
 
 \section{Results}
 
@@ -76,7 +154,7 @@ that that the algorithm will take to plan. the algorithm is as follows
     \centering % Centers the image
     \includegraphics[width=5in]{ExRRTStar.png} % Adjust width as needed
     \caption{3D results using ELQR provided by van den} % Caption for figure
-    \label{fig:your_label} % Label for referencing in text
+    \label{fig:one} % Label for referencing in text
 \end{figure}
 
 \section{Conclusion}
