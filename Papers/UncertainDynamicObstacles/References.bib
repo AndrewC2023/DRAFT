@@ -26,3 +26,17 @@ eprint = {
 ,
     abstract = { During the last decade, sampling-based path planning algorithms, such as probabilistic roadmaps (PRM) and rapidly exploring random trees (RRT), have been shown to work well in practice and possess theoretical guarantees such as probabilistic completeness. However, little effort has been devoted to the formal analysis of the quality of the solution returned by such algorithms, e.g. as a function of the number of samples. The purpose of this paper is to fill this gap, by rigorously analyzing the asymptotic behavior of the cost of the solution returned by stochastic sampling-based algorithms as the number of samples increases. A number of negative results are provided, characterizing existing algorithms, e.g. showing that, under mild technical conditions, the cost of the solution returned by broadly used sampling-based algorithms converges almost surely to a non-optimal value. The main contribution of the paper is the introduction of new algorithms, namely, PRM* and RRT*, which are provably asymptotically optimal, i.e. such that the cost of the returned solution converges almost surely to the optimum. Moreover, it is shown that the computational complexity of the new algorithms is within a constant factor of that of their probabilistically complete (but not asymptotically optimal) counterparts. The analysis in this paper hinges on novel connections between stochastic sampling-based path planning algorithms and the theory of random geometric graphs. }
 }
+
+@article{DING2023101937,
+title = {An improved RRT* algorithm for robot path planning based on path expansion heuristic sampling},
+journal = {Journal of Computational Science},
+volume = {67},
+pages = {101937},
+year = {2023},
+issn = {1877-7503},
+doi = {https://doi.org/10.1016/j.jocs.2022.101937},
+url = {https://www.sciencedirect.com/science/article/pii/S1877750322002964},
+author = {Jun Ding and Yinxuan Zhou and Xia Huang and Kun Song and Shiqing Lu and Lusheng Wang},
+keywords = {Path planning, Narrow corridor, RRT*, Heuristic sampling},
+abstract = {Rapidly-exploring Random Tree Star (RRT*) algorithm and its variants based on random sampling can provide a collision-free and asymptotic optimal solution for many path planning problems. However, many RRT* based variants have low sampling efficiency and slow convergence rate in the environment which consists of long corridors, due to a large number of iterations are required in sampling critical nodes. To overcome this problem, the paper proposes the Expanding Path RRT* (EP-RRT*) based on heuristic sampling in path expansion area. By combining the greedy heuristic of Rapidly exploring Random Tree (RRT)-Connect, EP-RRT* quickly explores the environment in order to find a feasible path, and then expands it to obtain the heuristic sampling area. It iteratively searches in the heuristic sampling area which also changes with the continuous optimization of the path, and finally obtains an optimal or suboptimal path connecting starting point and target point. Comparisons of EP-RRT* with RRT* and Informed RRT* in four simulation environments verify that EP-RRT* improves the node utilization, accelerates the convergence rate, and obtains a better path for the same number of iterations.}
+}
