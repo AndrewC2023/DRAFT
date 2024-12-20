@@ -71,15 +71,15 @@ that \(x_1 = x_{init}\), \(x_n = x_{goal}\), and \(T(\mathcal{P}, V) \subset \ma
 \section{RRT* Algorithm and Grid Management System}
 For an RRT* planning algorithm let \(\mathcal{T} = \mathcal{T}(\mathcal{V},E)\) define the tree where \(\mathcal{V}\) are 
 the vertices and \(E\) are the edges. let \(N \in \mathbb{N}\) denote the number of samples
-that that the algorithm will take to plan. Let \(r\) define the maximum edge length for a tree. a discrete cost function 
+that the algorithm will take to plan. Let \(r\) define the maximum edge length for a tree. a discrete cost function 
 to some horizon \(\ell\) is conventionally defined generally as:
-\[
-J = c_\ell(x_\ell) + \sum_{t=0}^{\ell-1} c_t(x_t, u_t)
+\[ 
+J = c_\ell(x_\ell) + \sum_{t=0}^{\ell-1} c_t(x_t, u_t) 
 \]
 where \(c_\ell(x_\ell)\) and \(c_t(x_t, u_t)\) are local cost functions for the discrete space and \(x\) is a state and \(u\) is an input. 
 The first term then is the cost at the
 horizon and the second term is the cost to said horizon. When applied we can define our cost function \(c(x_t, u_t)\) in any way we like
-to tune or guide a planner to minimize this function over \(\mathcal{X}\). to follow this structure a planner will have to implement the 
+to tune or guide a planner to minimize this function over \(\mathcal{X}\). To follow this structure a planner will have to implement the 
 cost function such that it is summed with all parent nodes
 to the current node (the horizon) in this case.
     
@@ -204,8 +204,8 @@ determines time to travel as well.
     \label{fig:twosubfigs1}
 \end{figure}
 
-To examine the effectiveness of the proposed algorithms the test environment was setup as a \(10m \times 10m \times 1min\) configuration space with a static certain obstacle in the center
-and an uncertain dynamic obstacle with a starting orientation pointing north traveling at a forward velocity of \(0.2\text{ } m/s\), with a mean velocity of \(0.2\text m/s\), velocity variance \(0.1\text m/s\), 
+To examine the effectiveness of the proposed algorithms the test environment was set up as a \(10m \times 10m \times 1min\) configuration space with a static certain obstacle in the center
+and an uncertain dynamic obstacle with a starting orientation pointing north traveling at a forward velocity of \(0.2\text{ } m/s\), with a mean velocity of \(0.2\text{ }m/s\), velocity variance \(0.1\text{ }m/s\), 
 mean turn rate of \(1 \degree/s\) and turn rate variance of \(8.59437 \degree/s\) and using 1000 samples of projected futures.
 
 
@@ -256,7 +256,7 @@ visualization of the behavior of the planner.
 
 \section{Conclusion}
 It is shown that using this grid system, a safe path, in a dynamic environment can be determined even when the future is uncertain. Among the need for more testing to quantify
-robustness, runtime, efficiency, and comparison with other appraches, the current work can use further development for the implementation of more complex dynamics for both obstacles and vehicles,
+robustness, runtime, efficiency, and comparison with other approaches, the current work can use further development for the implementation of more complex dynamics for both obstacles and vehicles,
 requiring the creation of a dynamics class to manage the behavior of these items on its own. Optimizations of the sampling system are necessary as well and should likely include a polynomial chaos expansion
 of the solved dynamic equations to reduce the number of required samples to converge on the predicted future probability field.
 
@@ -264,4 +264,3 @@ of the solved dynamic equations to reduce the number of required samples to conv
 \bibliography{References}
 
 \end{document}
-
