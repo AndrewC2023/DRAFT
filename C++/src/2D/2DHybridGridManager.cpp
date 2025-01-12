@@ -9,6 +9,8 @@
    more than just on initialization or on adding an obstacle, for validation and propagation of 
    dynamic obstacles it may be necessary to write a much faster custom method rather than relying
    on the robust built in methods of boost due to the potential overhead
+
+   Need GPU acceleration for obstacle additions it seems
 */
 #include "2DHybridGridManager.hpp"
 #include <omp.h>
@@ -148,6 +150,8 @@ namespace Algorithms::TwoD
     {
         std::vector<Cell> neighbors;
 
+        // this relys of static cast flooring the value with doesn't happen in negative numbers BUT ifan index is negative that would also be bad
+        // this hurts my soul becuase the math is kinda wrong but it works in this case so this should remain untouched
         int cellIndexX = static_cast<int>(std::round((x - _xMin) / _cellSize));
         int cellIndexY = static_cast<int>(std::round((y - _yMin) / _cellSize));
         // TODO: there is a deterministic way to implement this given we know how the list is structured 
@@ -262,7 +266,7 @@ namespace Algorithms::TwoD
             int i = 0;
             for(const auto& state : states)
             {
-                std::cout << "State at time: " << i*dt << ", " << state << std::endl;
+                std::cout << "State at time: " << i*dt << ", " << state << std::endl; // TODO: remove this
                 std::vector<PointXY> polygon;
                 for(auto corner : ob->getCorners())
                 {
@@ -418,7 +422,7 @@ namespace Algorithms::TwoD
 
     const PointXY HybridGridManager2D::getPointFromIndex(const IndexXY index)
     {
-        return PointXY(index.x * _cellSize - 0.5 * _cellSize, index.y * _cellSize - 0.5 * _cellSize);
+        return PointXY(index.x * _cellSize + 0.5 * _cellSize, index.y * _cellSize + 0.5 * _cellSize);
     } // getPointFromIndex
 
 }
