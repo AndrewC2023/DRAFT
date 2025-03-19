@@ -19,6 +19,7 @@ include_directories(${EIGEN3_INCLUDE_DIRS})
 
 # Matplot++
 find_package(Matplot++ REQUIRED)
+include_directories(${MATPLOT_INCLUDE_DIR})
 
 ## Configures cmake to output binaries in build/bin
 ## make sure to run cmake configuration command cmake -S . -B build in the C++ directory
