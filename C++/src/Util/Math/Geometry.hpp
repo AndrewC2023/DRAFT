@@ -29,6 +29,7 @@ using namespace Algorithms::ThreeD;
 namespace Math::Geometry
 {
 
+    // TODO: check this
     /** Returns true if the provided point is inside the provided polygon outline,
      *  using a ray-casting algorithm. This flips the value of inPolygon back and
      *  forth every time a wall is crossed, which means the number will be odd (true)
