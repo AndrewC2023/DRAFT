@@ -90,14 +90,17 @@ namespace Visualization
         for(const auto& cell : grid->getCells(0.0))
         {
             auto index = cell.getIndex();
-            if(cell.getState() == State::OBSTACLE)
+            switch(cell.getState())
             {
+            case State::OBSTACLE:
                 occupancyGrid.at(index.y).at(index.x) = 1;
-            } else if(cell.getState() == State::UNCERTAIN)
-            {
+                break;
+            case State::UNCERTAIN:
                 occupancyGrid.at(index.y).at(index.x) = cell.getOdds();
-            } else {
+                break;
+            case State::CLEAR:
                 occupancyGrid.at(index.y).at(index.x) = 0;
+                break;
             }
         }
 
