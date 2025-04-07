@@ -163,9 +163,6 @@ namespace Algorithms::TwoD
     } // addKnownObstacle
 
     void GridManager2D::addKnownObstacle(const PointXY& point)   {
-        int _numCellsX = static_cast<int>(_xSize / _cellSize);
-        int _numCellsY = static_cast<int>(_ySize / _cellSize);
-
         int cellIndexX = static_cast<int>(std::round((point.x - _xMin) / _cellSize));
         int cellIndexY = static_cast<int>(std::round((point.y - _yMin) / _cellSize));
 
