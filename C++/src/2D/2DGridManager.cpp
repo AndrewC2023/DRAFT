@@ -32,6 +32,7 @@ namespace Algorithms::TwoD
 
         createEmptyGrid();
         _cellUpdateThread = std::thread([this](){ pushUpdatesToGrid(); });
+        _invalidCell = Cell(PointXY(0.0f,0.0f), IndexXY(0,0), _cellSize, State::OBSTACLE,1.0f)
     } // constructor
 
     GridManager2D::~GridManager2D(){
@@ -69,7 +70,7 @@ namespace Algorithms::TwoD
     } // createEmptyGrid
 
     // returns the cell that contains point at x, y, z
-    Cell GridManager2D::getCell(float x, float y) {
+    Cell& GridManager2D::getCell(float x, float y) {
 
         int cellIndexX = static_cast<int>(std::round((x - _xMin) / _cellSize));
         int cellIndexY = static_cast<int>(std::round((y - _yMin) / _cellSize));
@@ -83,7 +84,7 @@ namespace Algorithms::TwoD
              * return meaning;ess occupied cell
              * come up with a create an out of bounds state, construct a Cell of that state and return it, make the class calling this handle it
              */
-            return Cell(PointXY(0.0f,0.0f), IndexXY(0,0), _cellSize, State::OBSTACLE,1.0f);
+            return _invalidCell;
         }
 
         int calcIndex = cellIndexX + _numCellsX * (cellIndexY + _numCellsY);
@@ -92,7 +93,7 @@ namespace Algorithms::TwoD
     } // getCell
 
     // returns the cell that contains PointXYZ point
-    Cell GridManager2D::getCell(PointXY point) 
+    Cell& GridManager2D::getCell(PointXY point) 
     {
         int cellIndexX = static_cast<int>(std::round((point.x - _xMin) / _cellSize));
         int cellIndexY = static_cast<int>(std::round((point.y - _yMin) / _cellSize));
@@ -106,13 +107,18 @@ namespace Algorithms::TwoD
              * return meaning;ess occupied cell
              * come up with a create an out of bounds state, construct a Cell of that state and return it, make the class calling this handle it
              */
-            return Cell(PointXY(0.0f,0.0f), IndexXY(0,0), _cellSize, State::OBSTACLE,1.0f);
+            return _invalidCell;
         }
 
         int calcIndex = cellIndexX + _numCellsX * (cellIndexY);
 
         return _grid[calcIndex];
     } // getCell
+
+    Cell& GridManager2D::getCell(const IndexXY& index)
+    {
+        return _grid[index.x + _numCellsX * (index.y)];
+    }
 
     // TODO: implement caching. depends on what hardware this runs on bc if we dont care abt space we could just hold a massive lookup table tbh (doesnt seem wise for a library that could be on many different systems -Drew)
     std::vector<Cell> GridManager2D::getNeighbors(float x, float y, int depth)   
@@ -172,6 +178,10 @@ namespace Algorithms::TwoD
 
             _updates.push_back(UpdateRequest{calcIndex, 1});
         }
+    } // addKnownObstacle
+
+    void GridManager2D::addKnownObstacle(const IndexXY& index)   {
+        getCell(index).setState(State::OBSTACLE);
     } // addKnownObstacle
 
     void GridManager2D::addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle)

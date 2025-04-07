@@ -32,7 +32,8 @@ namespace Algorithms::TwoD {
      *     Add obstalce retangle and body type 
      * and add obstacle methods for that type
      */
-    class GridManager2D   {
+    class GridManager2D
+    {
         public:
         /** GridManager 2D
          *  @param p_minX the minimum X value in true space
@@ -50,9 +51,11 @@ namespace Algorithms::TwoD {
         std::vector<Cell> getCells(float);
 
         // returns cell at x, y, z
-        Cell getCell(float x, float y);
+        Cell& getCell(float x, float y);
         // returns cell at center point
-        Cell getCell(PointXY point);
+        Cell& getCell(PointXY point);
+
+        Cell& getCell(const IndexXY& index);
 
         const float getCellSize();
 
@@ -82,6 +85,8 @@ namespace Algorithms::TwoD {
          *  will find the cell that contains this point and set it as occupied
          */
         void addKnownObstacle(std::unique_ptr<I2DObstacle> obstacle); // TODO: change to boost polygon and intersect!
+
+        void addKnownObstacle(const IndexXY& index);
 
         /** get the nearest obstacle center
          *  @param checkPoint the point that we want to see what the nearest obstacle is to
@@ -135,6 +140,8 @@ namespace Algorithms::TwoD {
         float clearThreshold = 0.05;
 
         void createEmptyGrid();
+
+        Cell _invalidCell;
 
     };
 } 
