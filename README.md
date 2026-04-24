@@ -1,4 +1,4 @@
-# Planning Algorithm Development
+# DRAFT: Dynamics, Routing, Autonomy, and Feasibility Testbed
 
 A collection of MATLAB, Python, & C++ Planning/navigation algorithms and their tracked development
 
