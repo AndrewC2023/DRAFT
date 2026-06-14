@@ -1,3 +1,5 @@
-add_subdirectory(3D)
-add_subdirectory(2D)
+add_subdirectory(Autonomy)
+add_subdirectory(Dynamics)
+add_subdirectory(Perception)
+add_subdirectory(Simulation)
 add_subdirectory(Util)
