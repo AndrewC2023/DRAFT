@@ -22,4 +22,9 @@ namespace DRAFT::Simulation
     {
         // Simulation run implementation
     }
+
+    void DraftSim::step()
+    {
+        for(int i = 0; i < draftSimObjects.size())
+    }
 }

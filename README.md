@@ -10,6 +10,8 @@ It is the desire for DRAFT to have a Qt based frontend eventually allowing users
 ## Development Environment Setup
 It is recommended for development to use the dockerfile provided to build a container and run tests validation and build documentation in there. The dev container should ease the process of building individual modules of DRAFT and test them separatesly with the unit tests or build validation scripts to put together a sim without the use of the frontend. For now front end is not supported and there are not plans to support it in the backend dev container.
 
+For VSCode users, a .devcontainer folder is provided, you are 
+
 To setup the Dev Container you must have docker on your machine which likely will need wsl installed as well. Make sure the docker daemon is running before building or running the image/container. To do this you can run docker desktop on windows. On linux machines one may have to setup the docker daemon to run on system start or start running it from the terminal. 
 
 For first time setup you will need to build the image (note you should run these commands from the root directory of the repository):
@@ -45,4 +47,4 @@ STOUT: or Stochastic Trials for Optimal Uncertainty-aware Trajectories is a proj
 ## POUR add-on
 
 ## Contribution
-At the moment for contribution, ask Andrew Campbell for access if you do not already have it, then checkout a branch from master named approapraitely for the feature you want to add. develop on that branch, write tests and document please. Once done if possible please merge the parent branch/master branch back into yours to resolve conflicts if they exist, retest and submit a pull request.
+Ask Andrew Campbell for access if you do not already have it (no need for forking yet), then checkout a branch from master for the feature you want to add. develop on that branchl; write tests and document please. Once done, if possible, please merge the parent branch/master branch back into yours to resolve conflicts there if they exist. Then rebuild, retest and submit a pull request.
