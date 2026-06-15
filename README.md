@@ -28,6 +28,15 @@ docker run --rm -it --name draft-container --mount type=bind,source="$(pwd)",tar
 
 just type ```exit``` in the container to close it, for subsequent use the ducker run commands above just need to be run from the root directory so long as you have need deleted the image otherwise it must also be rebuilt.
 <!-- note that if I eventually host the image building it wont be needed -->
+
+Once the container is setup and youhave a terminal in it with the repository mounted you can run the `setup.sh` script which should make and configure the build folders, it can also be used to clear and reconfigure the build folder. Likely you will need to give the script permissions to run first, from the root directory:
+
+```bash
+cd admin
+sudo chmod +x setup.sh
+sudo ./setup.sh
+```
+
 ## STOUT add-on
 STOUT: or Stochastic Trials for Optimal Uncertainty-aware Trajectories is a project on using uncertain dynamics systems for path planning and guidance. Draft in its autonomy framework will eventually be able to support this and may in the end fully incorporate STOUT.
 

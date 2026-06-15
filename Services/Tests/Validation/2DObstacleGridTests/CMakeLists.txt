@@ -10,14 +10,14 @@
 #     BackendVisualization
 # )
 
-add_executable(
-    Test_2DHybridGrid
+# add_executable(
+#     Test_2DHybridGrid
 
-    HybridGrid.cpp
-)
-target_link_libraries(
-    Test_2DHybridGrid
+#     HybridGrid.cpp
+# )
+# target_link_libraries(
+#     Test_2DHybridGrid
 
-    TwoD
-    BackendVisualization
-)
+#     TwoD
+#     BackendVisualization
+# )
