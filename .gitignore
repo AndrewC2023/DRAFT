@@ -33,3 +33,5 @@ reqLib
 *.synctex.gz
 *.bbl
 *.blg
+
+gncpp/

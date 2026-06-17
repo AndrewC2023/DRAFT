@@ -18,13 +18,15 @@ namespace DRAFT::Simulation
         // Destructor implementation
     }
 
-    void DraftSim::run()
+    void DraftSim::Run()
     {
         // Simulation run implementation
     }
 
-    void DraftSim::step()
+    void DraftSim::Step()
     {
-        for(int i = 0; i < draftSimObjects.size())
+        for(int i = 0; i < draftSimObjects.size(); i++){
+            draftSimObjects[i].Step(stepSize_);
+        }
     }
 }

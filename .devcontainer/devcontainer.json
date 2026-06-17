@@ -9,13 +9,21 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "cschlosser.doxdocgen",
+        "ms-python.black-formatter",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
         "ms-vscode.cpptools",
         "ms-vscode.cmake-tools",
+        "redhat.vscode-yaml",
         "twxs.cmake"
       ],
       "settings": {
         "C_Cpp.default.cppStandard": "c++20",
+        "C_Cpp.default.compilerPath": "/usr/bin/g++",
+        "C_Cpp.default.intelliSenseMode": "linux-gcc-x64",
         "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+        "C_Cpp.default.compileCommands": "${workspaceFolder}/build/Debug/compile_commands.json",
         "cmake.configureOnOpen": false,
         "cmake.buildDirectory": "${workspaceFolder}/build/${buildType}",
         "files.eol": "\n"

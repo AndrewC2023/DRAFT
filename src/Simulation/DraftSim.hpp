@@ -7,7 +7,7 @@
 #define DRAFTSIM_H
 
 // Custom Types
-#include <DraftSimObject.hpp>
+#include "DraftSimObject.hpp"
 
 // STD
 #include <vector>
@@ -21,21 +21,21 @@ namespace DRAFT::Simulation
             DraftSim();
             ~DraftSim();
 
-            void step();
-            void run();
+            void Step();
+            void Run();
         private:
             // List of simulation objects getting called in each step
-            std::vector<DraftSimObject> draftSimObjects;
+            std::vector<Objects::DraftSimObject> draftSimObjects;
 
             // Internal Values
-            double simTime = 10;
-            double initialTime = 0;
-            double stepSize = 0.001;
+            double simTime_ = 10;
+            double initialTime_ = 0;
+            double stepSize_ = 0.001;
 
             // flags
-            bool isRunning;
-            bool paused;
-            bool loggingEnabled;
+            bool isRunning_;
+            bool paused_;
+            bool loggingEnabled_;
 
         
 

@@ -10,7 +10,7 @@
 #include <cstdint>
 
 // maybe string, TODO: implement what is returned or caught when running step so the parent sim knows what extra actions to do.
-namespace DRAFT::Simulation
+namespace DRAFT::Simulation::Objects
 {
     class DraftSimObject
     {
@@ -18,9 +18,9 @@ namespace DRAFT::Simulation
             explicit DraftSimObject(std::uint64_t id) : id_(id) {};
             virtual ~DraftSimObject() = default;
             
-            virtual void step(double deltaTime) = 0; // Pure virtual function to be implemented by derived classes
+            virtual void Step(double deltaTime) = 0; // Pure virtual function to be implemented by derived classes
 
-            std::uint64_t getID() const noexcept { return id_;};
+            std::uint64_t getID_() const noexcept { return id_;};
 
         private:
             const std::uint64_t id_;

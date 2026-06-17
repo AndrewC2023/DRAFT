@@ -48,3 +48,5 @@ STOUT: or Stochastic Trials for Optimal Uncertainty-aware Trajectories is a proj
 
 ## Contribution
 Ask Andrew Campbell for access if you do not already have it (no need for forking yet), then checkout a branch from master for the feature you want to add. develop on that branchl; write tests and document please. Once done, if possible, please merge the parent branch/master branch back into yours to resolve conflicts there if they exist. Then rebuild, retest and submit a pull request.
+
+Generally please follow the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) for style, primarily so that namespace usage, local versus global versus class variables are more clear, and so that style overall is consistent. The exception is that I prefer mixedCase for variable names and PascalCase for functions.
