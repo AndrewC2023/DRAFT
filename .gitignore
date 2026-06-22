@@ -35,3 +35,8 @@ reqLib
 *.blg
 
 gncpp/
+
+*.json
+logs/
+__pycache__/
+results/

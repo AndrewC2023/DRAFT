@@ -74,10 +74,6 @@ namespace Draft::Util::Math
      */
     template<typename Tvalue>
     Tvalue Saturate(Tvalue value, Tvalue minValue, Tvalue maxValue) {
-        if (minValue > maxValue){
-            throw std::invalid_argument("Minimum saturation value must not exceed maximum saturation value.");
-        }
-
         return std::clamp(value, minValue, maxValue);
     };
 
@@ -144,7 +140,7 @@ namespace Draft::Util::Math
      * @param maxValues Element-wise maximum allowed values.
      * @return Saturated vector with the same dimension as the input vector.
      * @throws std::invalid_argument If dimensions differ, an input contains a
-     * non-finite value, or any minimum exceeds its corresponding maximum.
+     * non-finite value.
      */
     inline Eigen::VectorXd Saturate(const Eigen::VectorXd& vector, const Eigen::VectorXd& minValues, const Eigen::VectorXd& maxValues) {
         ValidateVectorDimension(minValues, vector.size(), "Minimum saturation vector");
@@ -152,11 +148,6 @@ namespace Draft::Util::Math
         ValidateFinite(vector, "Saturation input vector");
         ValidateFinite(minValues, "Minimum saturation vector");
         ValidateFinite(maxValues, "Maximum saturation vector");
-
-        if ((minValues.array() > maxValues.array()).any()){
-            throw std::invalid_argument("Minimum saturation values must not exceed maximum saturation values.");
-        }
-
         return vector.cwiseMax(minValues).cwiseMin(maxValues);
     };
 
@@ -205,11 +196,13 @@ namespace Draft::Util::Math
         const Eigen::VectorXd k3 = derivative(time + 0.5 * dt, state + 0.5 * dt * k2);
         const Eigen::VectorXd k4 = derivative(time + dt, state + dt * k3);
 
-        if (k1.size() != state.size() || k2.size() != state.size() || k3.size() != state.size() || k4.size() != state.size()){
-            throw std::runtime_error(
-                "Derivative dimension does not match state dimension."
-            );
-        }
+        // Worried this is just back checking to add when it comes to compute
+        // maybe implement a build option here for building with or without certain checks 
+        // if (k1.size() != state.size() || k2.size() != state.size() || k3.size() != state.size() || k4.size() != state.size()){
+        //     throw std::runtime_error(
+        //         "Derivative dimension does not match state dimension."
+        //     );
+        // }
 
         return state + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
     }

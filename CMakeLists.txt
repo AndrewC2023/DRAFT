@@ -19,6 +19,8 @@ find_package(yaml-cpp REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(GTest REQUIRED)
 
+enable_testing()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

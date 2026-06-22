@@ -9,3 +9,5 @@ target_link_libraries(Dynamics
     INTERFACE
         Eigen3::Eigen
 )
+
+add_subdirectory(NonLinearModels)
