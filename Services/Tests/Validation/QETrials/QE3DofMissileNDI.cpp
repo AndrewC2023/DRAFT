@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <utility>
 
+// honestly this is not great but can serve as a foundation for a generalize NDI class for DRAFT
+
 namespace Draft::Autonomy::Control
 {
     namespace
@@ -23,13 +25,9 @@ namespace Draft::Autonomy::Control
         constexpr int DiveAngleIndex = 9;
     }
 
-    QE3DofMissileNDI::QE3DofMissileNDI(
-        Draft::Dynamics::QE3DofMissileParameters parameters,
-        Gains gains)
+    QE3DofMissileNDI::QE3DofMissileNDI(Draft::Dynamics::QE3DofMissileParameters parameters, Gains gains)
         : parameters_(std::move(parameters)),
-          gains_(gains)
-    {
-    }
+          gains_(gains) {}
 
     Eigen::VectorXd QE3DofMissileNDI::ComputeCommand(
         const Eigen::VectorXd& state,
@@ -40,77 +38,52 @@ namespace Draft::Autonomy::Control
         const double airspeed = state(AirspeedIndex);
         const double altitude = -state(DownPositionIndex);
 
-        const AtmosphereDerivatives atmosphere =
-            CalculateAtmosphereDerivatives(airspeed, altitude);
+        const AtmosphereDerivatives atmosphere = CalculateAtmosphereDerivatives(airspeed, altitude);
+        const Eigen::Vector3d outputRate = CalculateOutputRate(state, atmosphere);
+        const Eigen::Vector3d drift = CalculateDrift(state, atmosphere, outputRate);
+        const Eigen::Matrix3d decoupling = CalculateDecouplingMatrix(state);
 
-        const Eigen::Vector3d outputRate =
-            CalculateOutputRate(state, atmosphere);
-        const Eigen::Vector3d drift =
-            CalculateDrift(state, atmosphere, outputRate);
-        const Eigen::Matrix3d decoupling =
-            CalculateDecouplingMatrix(state);
-
+        // Track airspeed, heading, and flight-path angle with second-order
+        // error dynamics. Heading is wrapped so the controller takes the
+        // short way around the circle.
         Eigen::Vector3d error;
         error <<
             commandedOutput(0) - state(AirspeedIndex),
-            Draft::Util::Math::WrapAngleToPi(
-                commandedOutput(1) - state(HeadingIndex)),
+            Draft::Util::Math::WrapAngleToPi(commandedOutput(1) - state(HeadingIndex)),
             commandedOutput(2) - state(FlightPathAngleIndex);
 
-        const Eigen::Vector3d errorRate =
-            commandedOutputRate - outputRate;
+        const Eigen::Vector3d errorRate = commandedOutputRate - outputRate;
 
         Eigen::Vector3d proportionalGain;
         proportionalGain <<
-            gains_.airspeedNaturalFrequency
-                * gains_.airspeedNaturalFrequency,
-            gains_.headingNaturalFrequency
-                * gains_.headingNaturalFrequency,
-            gains_.flightPathNaturalFrequency
-                * gains_.flightPathNaturalFrequency;
+            gains_.airspeedNaturalFrequency * gains_.airspeedNaturalFrequency,
+            gains_.headingNaturalFrequency * gains_.headingNaturalFrequency,
+            gains_.flightPathNaturalFrequency * gains_.flightPathNaturalFrequency;
 
         Eigen::Vector3d derivativeGain;
         derivativeGain <<
-            2.0 * gains_.airspeedDampingRatio
-                * gains_.airspeedNaturalFrequency,
-            2.0 * gains_.headingDampingRatio
-                * gains_.headingNaturalFrequency,
-            2.0 * gains_.flightPathDampingRatio
-                * gains_.flightPathNaturalFrequency;
+            2.0 * gains_.airspeedDampingRatio * gains_.airspeedNaturalFrequency,
+            2.0 * gains_.headingDampingRatio * gains_.headingNaturalFrequency,
+            2.0 * gains_.flightPathDampingRatio * gains_.flightPathNaturalFrequency;
 
         const Eigen::Vector3d virtualControl =
-            commandedOutputAcceleration
-            + derivativeGain.cwiseProduct(errorRate)
-            + proportionalGain.cwiseProduct(error);
+            commandedOutputAcceleration + derivativeGain.cwiseProduct(errorRate) + proportionalGain.cwiseProduct(error);
 
-        // The decoupling matrix is triangular, so this matches the
-        // presentation's sequential solve without forming an explicit inverse.
+        // The decoupling matrix is triangular, so this is the presentation's
+        // sequential solve without forming an explicit inverse.
         Eigen::Vector3d command;
         command(0) = (virtualControl(0) - drift(0)) / decoupling(0, 0);
-        command(1) = (
-            virtualControl(1)
-            - drift(1)
-            - decoupling(1, 0) * command(0)
-            ) / decoupling(1, 1);
-        command(2) = (
-            virtualControl(2)
-            - drift(2)
-            - decoupling(2, 0) * command(0)
-            ) / decoupling(2, 2);
+        command(1) = (virtualControl(1) - drift(1) - decoupling(1, 0) * command(0)) / decoupling(1, 1);
+        command(2) = (virtualControl(2) - drift(2) - decoupling(2, 0) * command(0)) / decoupling(2, 2);
 
-        command(0) = Draft::Util::Math::Saturate(
-            command(0), 0.0, parameters_.maxThrust);
-        command(1) = Draft::Util::Math::Saturate(
-            command(1), -parameters_.maxTurnAngle, parameters_.maxTurnAngle);
-        command(2) = Draft::Util::Math::Saturate(
-            command(2), -parameters_.maxDiveAngle, parameters_.maxDiveAngle);
+        command(0) = Draft::Util::Math::Saturate(command(0), 0.0, parameters_.maxThrust);
+        command(1) = Draft::Util::Math::Saturate(command(1), -parameters_.maxTurnAngle, parameters_.maxTurnAngle);
+        command(2) = Draft::Util::Math::Saturate(command(2), -parameters_.maxDiveAngle, parameters_.maxDiveAngle);
 
         return command;
     }
 
-    Eigen::Vector3d QE3DofMissileNDI::CalculateOutputRate(
-        const Eigen::VectorXd& state,
-        const AtmosphereDerivatives& atmosphere) const
+    Eigen::Vector3d QE3DofMissileNDI::CalculateOutputRate(const Eigen::VectorXd& state, const AtmosphereDerivatives& atmosphere) const
     {
         const double airspeed = state(AirspeedIndex);
         const double flightPathAngle = state(FlightPathAngleIndex);
@@ -120,15 +93,9 @@ namespace Draft::Autonomy::Control
         const double diveAngle = state(DiveAngleIndex);
 
         Eigen::Vector3d outputRate;
-        outputRate(0) =
-            (thrust - atmosphere.drag) / mass
-            - atmosphere.gravity * std::sin(flightPathAngle);
-        outputRate(1) =
-            thrust * std::sin(turnAngle)
-            / (mass * airspeed * std::cos(flightPathAngle));
-        outputRate(2) =
-            -thrust * std::sin(diveAngle) / (mass * airspeed)
-            - atmosphere.gravity * std::cos(flightPathAngle) / airspeed;
+        outputRate(0) = (thrust - atmosphere.drag) / mass - atmosphere.gravity * std::sin(flightPathAngle);
+        outputRate(1) = thrust * std::sin(turnAngle) / (mass * airspeed * std::cos(flightPathAngle));
+        outputRate(2) = -thrust * std::sin(diveAngle) / (mass * airspeed) - atmosphere.gravity * std::cos(flightPathAngle) / airspeed;
 
         return outputRate;
     }
@@ -147,18 +114,11 @@ namespace Draft::Autonomy::Control
 
         const double airspeedRate = outputRate(0);
         const double flightPathRate = outputRate(2);
-        const double massRate = mass > parameters_.dryMass
-            ? -thrust / (parameters_.specificImpulse
-                * parameters_.standardGravity)
-            : 0.0;
+        const double massRate = mass > parameters_.dryMass ? -thrust / (parameters_.specificImpulse * parameters_.standardGravity) : 0.0;
 
-        const double altitudeRate =
-            airspeed * std::sin(flightPathAngle);
-        const double dragRate =
-            atmosphere.dragAirspeedDerivative * airspeedRate
-            + atmosphere.dragAltitudeDerivative * altitudeRate;
-        const double gravityRate =
-            atmosphere.gravityAltitudeDerivative * altitudeRate;
+        const double altitudeRate = airspeed * std::sin(flightPathAngle);
+        const double dragRate = atmosphere.dragAirspeedDerivative * airspeedRate + atmosphere.dragAltitudeDerivative * altitudeRate;
+        const double gravityRate = atmosphere.gravityAltitudeDerivative * altitudeRate;
 
         const double cosFlightPath = std::cos(flightPathAngle);
         const double sinFlightPath = std::sin(flightPathAngle);
@@ -204,8 +164,7 @@ namespace Draft::Autonomy::Control
         return drift;
     }
 
-    Eigen::Matrix3d QE3DofMissileNDI::CalculateDecouplingMatrix(
-        const Eigen::VectorXd& state) const
+    Eigen::Matrix3d QE3DofMissileNDI::CalculateDecouplingMatrix(const Eigen::VectorXd& state) const
     {
         const double airspeed = state(AirspeedIndex);
         const double flightPathAngle = state(FlightPathAngleIndex);
@@ -242,38 +201,22 @@ namespace Draft::Autonomy::Control
         return decoupling;
     }
 
-    QE3DofMissileNDI::AtmosphereDerivatives
-    QE3DofMissileNDI::CalculateAtmosphereDerivatives(
-        double airspeed,
-        double altitude) const
+    QE3DofMissileNDI::AtmosphereDerivatives QE3DofMissileNDI::CalculateAtmosphereDerivatives(double airspeed, double altitude) const
     {
         const double temperature = CalculateTemperature(altitude);
-        const double temperatureDerivative =
-            CalculateTemperatureDerivative(altitude);
-        const double speedOfSound = std::sqrt(
-            parameters_.specificHeatRatio
-            * parameters_.idealGasConstant
-            * temperature);
-        const double speedOfSoundAltitudeDerivative =
-            0.5 * speedOfSound * temperatureDerivative / temperature;
+        const double temperatureDerivative = CalculateTemperatureDerivative(altitude);
+        const double speedOfSound = std::sqrt(parameters_.specificHeatRatio * parameters_.idealGasConstant * temperature);
+        const double speedOfSoundAltitudeDerivative = 0.5 * speedOfSound * temperatureDerivative / temperature;
 
         const double machNumber = airspeed / speedOfSound;
         const double machAirspeedDerivative = 1.0 / speedOfSound;
-        const double machAltitudeDerivative =
-            -airspeed
-            * speedOfSoundAltitudeDerivative
-            / (speedOfSound * speedOfSound);
+        const double machAltitudeDerivative = -airspeed * speedOfSoundAltitudeDerivative / (speedOfSound * speedOfSound);
 
-        const double density =
-            parameters_.seaLevelDensity
-            * std::exp(-altitude / parameters_.referenceHeight);
-        const double densityAltitudeDerivative =
-            -density / parameters_.referenceHeight;
+        const double density = parameters_.seaLevelDensity * std::exp(-altitude / parameters_.referenceHeight);
+        const double densityAltitudeDerivative = -density / parameters_.referenceHeight;
 
-        const double dragCoefficient =
-            CalculateDragCoefficient(machNumber);
-        const double dragCoefficientDerivative =
-            CalculateDragCoefficientDerivative(machNumber);
+        const double dragCoefficient = CalculateDragCoefficient(machNumber);
+        const double dragCoefficientDerivative = CalculateDragCoefficientDerivative(machNumber);
 
         const double drag =
             0.5

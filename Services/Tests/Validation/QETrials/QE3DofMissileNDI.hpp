@@ -69,9 +69,7 @@ namespace Draft::Autonomy::Control
              * nonlinear missile model.
              * @param gains Desired second-order output tracking gains.
              */
-            QE3DofMissileNDI(
-                Draft::Dynamics::QE3DofMissileParameters parameters,
-                Gains gains);
+            QE3DofMissileNDI(Draft::Dynamics::QE3DofMissileParameters parameters, Gains gains);
 
             /**
              * @brief Computes the commanded thrust and thrust-vector angles.
@@ -104,24 +102,16 @@ namespace Draft::Autonomy::Control
             Gains gains_;
 
             /** @brief Evaluates output rates using achieved actuator states. */
-            Eigen::Vector3d CalculateOutputRate(
-                const Eigen::VectorXd& state,
-                const AtmosphereDerivatives& atmosphere) const;
+            Eigen::Vector3d CalculateOutputRate(const Eigen::VectorXd& state, const AtmosphereDerivatives& atmosphere) const;
 
             /** @brief Evaluates the analytical drift term a(x). */
-            Eigen::Vector3d CalculateDrift(
-                const Eigen::VectorXd& state,
-                const AtmosphereDerivatives& atmosphere,
-                const Eigen::Vector3d& outputRate) const;
+            Eigen::Vector3d CalculateDrift(const Eigen::VectorXd& state, const AtmosphereDerivatives& atmosphere, const Eigen::Vector3d& outputRate) const;
 
             /** @brief Evaluates the triangular decoupling matrix B(x). */
-            Eigen::Matrix3d CalculateDecouplingMatrix(
-                const Eigen::VectorXd& state) const;
+            Eigen::Matrix3d CalculateDecouplingMatrix(const Eigen::VectorXd& state) const;
 
             /** @brief Evaluates drag, gravity, and their needed derivatives. */
-            AtmosphereDerivatives CalculateAtmosphereDerivatives(
-                double airspeed,
-                double altitude) const;
+            AtmosphereDerivatives CalculateAtmosphereDerivatives(double airspeed, double altitude) const;
 
             double CalculateTemperature(double altitude) const;
             double CalculateTemperatureDerivative(double altitude) const;

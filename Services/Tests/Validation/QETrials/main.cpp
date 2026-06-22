@@ -1,6 +1,6 @@
 /*
  * Author: Andrew Campbell
- * Date: 06-22-2026
+ * Date: 06-21-2026
  */
 
 // Control
@@ -172,8 +172,7 @@ namespace
         const double mach = airspeed / speedOfSound;
         const double density = parameters.seaLevelDensity
             * std::exp(-altitude / parameters.referenceHeight);
-        const double dragCoefficient =
-            CalculateDragCoefficient(parameters, mach);
+        const double dragCoefficient = CalculateDragCoefficient(parameters, mach);
 
         return 0.5
             * parameters.referenceArea
@@ -197,10 +196,7 @@ namespace
     {
         Eigen::Vector3d output;
         output <<
-            MachToAirspeed(
-                parameters,
-                useFinalOutput ? scenario.finalMach : scenario.initialMach,
-                scenario.altitude),
+            MachToAirspeed(parameters, useFinalOutput ? scenario.finalMach : scenario.initialMach, scenario.altitude),
             useFinalOutput
                 ? scenario.finalHeading
                 : scenario.initialHeading,
@@ -229,10 +225,7 @@ namespace
         const double gammaHoldThrust =
             std::abs(mass * gravity * std::cos(flightPathAngle))
             / std::max(std::sin(parameters.maxDiveAngle), 1e-3);
-        const double thrust = Draft::Util::Math::Saturate(
-            std::max(axialTrimThrust, gammaHoldThrust),
-            1.0,
-            parameters.maxThrust);
+        const double thrust = Draft::Util::Math::Saturate(std::max(axialTrimThrust, gammaHoldThrust), 1.0, parameters.maxThrust);
         const double sineDive = Draft::Util::Math::Saturate(
             mass * gravity * std::cos(flightPathAngle) / thrust,
             -std::sin(parameters.maxDiveAngle),
@@ -243,10 +236,7 @@ namespace
         input <<
             thrust,
             0.0,
-            Draft::Util::Math::Saturate(
-                diveAngle,
-                -parameters.maxDiveAngle,
-                parameters.maxDiveAngle);
+            Draft::Util::Math::Saturate(diveAngle, -parameters.maxDiveAngle, parameters.maxDiveAngle);
         return input;
     }
 
@@ -258,8 +248,7 @@ namespace
     {
         // Keep the simulation initial actuator states close to a local
         // force-balance point so each scenario starts calmly.
-        const Eigen::VectorXd initialInput =
-            CalculateTrimLikeInput(parameters, initialOutput, mass, altitude);
+        const Eigen::VectorXd initialInput = CalculateTrimLikeInput(parameters, initialOutput, mass, altitude);
 
         Eigen::VectorXd state(10);
         state <<
@@ -327,10 +316,8 @@ namespace
             stateMinus(ii) -= perturbation;
 
             A.col(ii) = (
-                ReducedDerivative(
-                    parameters, statePlus, trimInput, trimMass, trimAltitude)
-                - ReducedDerivative(
-                    parameters, stateMinus, trimInput, trimMass, trimAltitude)
+                ReducedDerivative(parameters, statePlus, trimInput, trimMass, trimAltitude)
+                - ReducedDerivative(parameters, stateMinus, trimInput, trimMass, trimAltitude)
                 ) / (2.0 * perturbation);
         }
 
@@ -343,10 +330,8 @@ namespace
             inputMinus(ii) -= perturbation;
 
             B.col(ii) = (
-                ReducedDerivative(
-                    parameters, trimState, inputPlus, trimMass, trimAltitude)
-                - ReducedDerivative(
-                    parameters, trimState, inputMinus, trimMass, trimAltitude)
+                ReducedDerivative(parameters, trimState, inputPlus, trimMass, trimAltitude)
+                - ReducedDerivative(parameters, trimState, inputMinus, trimMass, trimAltitude)
                 ) / (2.0 * perturbation);
         }
     }
@@ -407,29 +392,19 @@ namespace
         Eigen::MatrixXd& A,
         Eigen::MatrixXd& B)
     {
-        LinearizeReducedModel(
-            parameters,
-            linearizationState,
-            linearizationInput,
-            mass,
-            altitude,
-            A,
-            B);
+        LinearizeReducedModel(parameters, linearizationState, linearizationInput, mass, altitude, A, B);
 
-        // Bryson-style weights use acceptable state and input deviations.
+        // These weights encode the tracking errors and command changes we are
+        // willing to tolerate around the local linear model.
         Eigen::MatrixXd Q = Eigen::MatrixXd::Zero(3, 3);
         Q(0, 0) = 1.0 / std::pow(80.0, 2);
-        Q(1, 1) = 1.0 / std::pow(
-            Draft::Util::Math::Degrees2Radians(15.0), 2);
-        Q(2, 2) = 1.0 / std::pow(
-            Draft::Util::Math::Degrees2Radians(6.0), 2);
+        Q(1, 1) = 1.0 / std::pow(Draft::Util::Math::Degrees2Radians(15.0), 2);
+        Q(2, 2) = 1.0 / std::pow(Draft::Util::Math::Degrees2Radians(6.0), 2);
 
         Eigen::MatrixXd R = Eigen::MatrixXd::Zero(3, 3);
         R(0, 0) = 1.0 / std::pow(200000.0, 2);
-        R(1, 1) = 1.0 / std::pow(
-            Draft::Util::Math::Degrees2Radians(35.0), 2);
-        R(2, 2) = 1.0 / std::pow(
-            Draft::Util::Math::Degrees2Radians(45.0), 2);
+        R(1, 1) = 1.0 / std::pow(Draft::Util::Math::Degrees2Radians(35.0), 2);
+        R(2, 2) = 1.0 / std::pow(Draft::Util::Math::Degrees2Radians(45.0), 2);
 
         return Draft::Autonomy::Control::LQR(A, B, Q, R);
     }
@@ -472,12 +447,7 @@ namespace
 
         for (int step = 0; step <= numSteps; step++){
             const double time = step * dt;
-            const ReferenceCommand reference =
-                CalculateLinearReference(
-                    time,
-                    scenario.transitionTime,
-                    initialReference,
-                    finalReference);
+            const ReferenceCommand reference = CalculateLinearReference(time, scenario.transitionTime, initialReference, finalReference);
             Eigen::VectorXd reducedState = state.head(3);
 
             // Keep heading error on the shortest angular path.
@@ -485,14 +455,10 @@ namespace
                 + Draft::Util::Math::WrapAngleToPi(
                     reducedState(1) - reference.output(1));
 
-            Eigen::VectorXd command = controller.ComputeControl(
-                reducedState, reference.output, referenceInput);
-            command(0) = Draft::Util::Math::Saturate(
-                command(0), 0.0, parameters.maxThrust);
-            command(1) = Draft::Util::Math::Saturate(
-                command(1), -parameters.maxTurnAngle, parameters.maxTurnAngle);
-            command(2) = Draft::Util::Math::Saturate(
-                command(2), -parameters.maxDiveAngle, parameters.maxDiveAngle);
+            Eigen::VectorXd command = controller.ComputeControl(reducedState, reference.output, referenceInput);
+            command(0) = Draft::Util::Math::Saturate(command(0), 0.0, parameters.maxThrust);
+            command(1) = Draft::Util::Math::Saturate(command(1), -parameters.maxTurnAngle, parameters.maxTurnAngle);
+            command(2) = Draft::Util::Math::Saturate(command(2), -parameters.maxDiveAngle, parameters.maxDiveAngle);
 
             log["samples"].push_back({
                 {"time", time},
@@ -542,18 +508,9 @@ namespace
 
         for (int step = 0; step <= numSteps; step++){
             const double time = step * dt;
-            const ReferenceCommand reference =
-                CalculateLinearReference(
-                    time,
-                    scenario.transitionTime,
-                    initialReference,
-                    finalReference);
+            const ReferenceCommand reference = CalculateLinearReference(time, scenario.transitionTime, initialReference, finalReference);
 
-            Eigen::VectorXd command = controller.ComputeCommand(
-                state,
-                reference.output,
-                reference.outputRate,
-                reference.outputAcceleration);
+            Eigen::VectorXd command = controller.ComputeCommand(state, reference.output, reference.outputRate, reference.outputAcceleration);
 
             log["samples"].push_back({
                 {"time", time},
@@ -608,15 +565,9 @@ namespace
 
         for (int step = 0; step <= numSteps; step++){
             const double time = step * dt;
-            const ReferenceCommand reference =
-                CalculateLinearReference(
-                    time,
-                    scenario.transitionTime,
-                    initialReference,
-                    finalReference);
+            const ReferenceCommand reference = CalculateLinearReference(time, scenario.transitionTime, initialReference, finalReference);
 
-            Eigen::VectorXd command =
-                controller.ComputeCommand(state, reference.output);
+            Eigen::VectorXd command = controller.ComputeCommand(state, reference.output);
 
             log["samples"].push_back({
                 {"time", time},
@@ -644,8 +595,7 @@ namespace
                   << finalState(0) - finalReference(0) << " m/s\n";
         std::cout << label << " final heading error: "
                   << Draft::Util::Math::Radians2Degrees(
-                        Draft::Util::Math::WrapAngleToPi(
-                            finalState(1) - finalReference(1)))
+                        Draft::Util::Math::WrapAngleToPi(finalState(1) - finalReference(1)))
                   << " deg\n";
         std::cout << label << " final flight-path angle error: "
                   << Draft::Util::Math::Radians2Degrees(
@@ -750,9 +700,7 @@ int main()
         .headingDampingRatio = 1.0,
         .flightPathDampingRatio = 1.0
     };
-    Draft::Autonomy::Control::QE3DofMissileNDI ndiController(
-        parameters,
-        ndiGains);
+    Draft::Autonomy::Control::QE3DofMissileNDI ndiController(parameters, ndiGains);
 
     // The gain schedule is intentionally small and uses nearest-neighbor
     // lookup so it stays easy to explain in the report.
@@ -779,11 +727,10 @@ int main()
             .diveCommand = Draft::Util::Math::Degrees2Radians(45.0)
         };
 
+    // Build this once. Runtime lookup selects the closest grid point; it does
+    // not interpolate or retrim during the simulation.
     Draft::Autonomy::Control::QE3DofMissileGainScheduledLQR
-        scheduledLqrController(
-            parameters,
-            scheduledLqrGrid,
-            scheduledLqrWeights);
+        scheduledLqrController(parameters, scheduledLqrGrid, scheduledLqrWeights);
 
     std::cout << "Gain-scheduled LQR points: "
               << scheduledLqrController.GetScheduleSize() << "\n";
@@ -798,12 +745,7 @@ int main()
             MakeOutput(parameters, scenario, false);
         const Eigen::Vector3d finalReference =
             MakeOutput(parameters, scenario, true);
-        const Eigen::VectorXd initialState =
-            MakeInitialState(
-                parameters,
-                initialReference,
-                scenario.mass,
-                scenario.altitude);
+        const Eigen::VectorXd initialState = MakeInitialState(parameters, initialReference, scenario.mass, scenario.altitude);
 
         std::cout << "\nRunning " << scenario.name << "\n";
         std::cout << scenario.description << "\n";
@@ -815,34 +757,20 @@ int main()
 
         if (scenario.runLqr){
             const Eigen::VectorXd lqrReferenceInput =
-                CalculateTrimLikeInput(
-                    parameters,
-                    finalReference,
-                    scenario.mass,
-                    scenario.altitude);
+                CalculateTrimLikeInput(parameters, finalReference, scenario.mass, scenario.altitude);
             Eigen::MatrixXd A;
             Eigen::MatrixXd B;
             Draft::Autonomy::Control::LQR lqrController =
-                BuildLqrController(
-                    parameters,
-                    finalReference,
-                    lqrReferenceInput,
-                    scenario.mass,
-                    scenario.altitude,
-                    A,
-                    B);
+                BuildLqrController(parameters, finalReference, lqrReferenceInput, scenario.mass, scenario.altitude, A, B);
 
             Eigen::MatrixXd controllability(3, 9);
             controllability << B, A * B, A * A * B;
             const Eigen::MatrixXd closedLoop =
                 A - B * lqrController.GetGain();
-            const Eigen::EigenSolver<Eigen::MatrixXd> eigenSolver(
-                closedLoop,
-                false);
+            const Eigen::EigenSolver<Eigen::MatrixXd> eigenSolver(closedLoop, false);
 
             std::cout << "LQR controllability rank: "
-                      << Eigen::FullPivLU<Eigen::MatrixXd>(
-                            controllability).rank()
+                      << Eigen::FullPivLU<Eigen::MatrixXd>(controllability).rank()
                       << "\n";
             std::cout << "LQR reduced closed-loop poles:\n"
                       << eigenSolver.eigenvalues() << "\n";
@@ -861,10 +789,7 @@ int main()
                     windNed,
                     TimeStep,
                     logDirectory / (scenario.name + "_lqr.json"));
-            PrintFinalError(
-                scenario.name + " LQR",
-                finalLqrState,
-                finalReference);
+            PrintFinalError(scenario.name + " LQR", finalLqrState, finalReference);
         }
 
         const Eigen::VectorXd finalScheduledLqrState =
@@ -879,10 +804,7 @@ int main()
                 TimeStep,
                 logDirectory
                     / (scenario.name + "_gain_scheduled_lqr.json"));
-        PrintFinalError(
-            scenario.name + " Gain-Scheduled LQR",
-            finalScheduledLqrState,
-            finalReference);
+        PrintFinalError(scenario.name + " Gain-Scheduled LQR", finalScheduledLqrState, finalReference);
 
         const Eigen::VectorXd finalNdiState =
             RunNdiTrial(
@@ -895,10 +817,7 @@ int main()
                 windNed,
                 TimeStep,
                 logDirectory / (scenario.name + "_ndi.json"));
-        PrintFinalError(
-            scenario.name + " NDI",
-            finalNdiState,
-            finalReference);
+        PrintFinalError(scenario.name + " NDI", finalNdiState, finalReference);
     }
 
     return 0;

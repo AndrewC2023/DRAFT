@@ -50,7 +50,7 @@ namespace Draft::Autonomy::Control
                 std::vector<double> flightPathAngle; ///< Gamma grid in radians.
             };
 
-            /** @brief Bryson-style allowable deviations used for Q and R. */
+            /** @brief Allowable state errors and input changes used for Q and R. */
             struct Weights
             {
                 double airspeedError;        ///< Allowed airspeed error in m/s.
@@ -68,10 +68,7 @@ namespace Draft::Autonomy::Control
              * @param grid Scheduling grid.
              * @param weights LQR state and input weights.
              */
-            QE3DofMissileGainScheduledLQR(
-                Draft::Dynamics::QE3DofMissileParameters parameters,
-                Grid grid,
-                Weights weights);
+            QE3DofMissileGainScheduledLQR(Draft::Dynamics::QE3DofMissileParameters parameters, Grid grid, Weights weights);
 
             /**
              * @brief Computes a saturated scheduled LQR command.
@@ -80,9 +77,7 @@ namespace Draft::Autonomy::Control
              * @param referenceOutput Desired `[airspeed, heading, gamma]`.
              * @return Commanded `[T_c, delta_t,c, delta_d,c]`.
              */
-            Eigen::VectorXd ComputeCommand(
-                const Eigen::VectorXd& state,
-                const Eigen::Vector3d& referenceOutput) const;
+            Eigen::VectorXd ComputeCommand(const Eigen::VectorXd& state, const Eigen::Vector3d& referenceOutput) const;
 
             /** @brief Returns the number of schedule points that were built. */
             std::size_t GetScheduleSize() const noexcept;
@@ -106,28 +101,13 @@ namespace Draft::Autonomy::Control
 
             void BuildSchedule();
 
-            SchedulePoint MakeSchedulePoint(
-                double mach,
-                double altitude,
-                double mass,
-                double flightPathAngle) const;
+            SchedulePoint MakeSchedulePoint(double mach, double altitude, double mass, double flightPathAngle) const;
 
-            const SchedulePoint& FindNearestPoint(
-                double mach,
-                double altitude,
-                double mass,
-                double flightPathAngle) const;
+            const SchedulePoint& FindNearestPoint(double mach, double altitude, double mass, double flightPathAngle) const;
 
-            Eigen::Vector3d CalculateTrimLikeInput(
-                const Eigen::Vector3d& output,
-                double mass,
-                double altitude) const;
+            Eigen::Vector3d CalculateTrimLikeInput(const Eigen::Vector3d& output, double mass, double altitude) const;
 
-            Eigen::Vector3d ReducedDerivative(
-                const Eigen::Vector3d& state,
-                const Eigen::Vector3d& input,
-                double mass,
-                double altitude) const;
+            Eigen::Vector3d ReducedDerivative(const Eigen::Vector3d& state, const Eigen::Vector3d& input, double mass, double altitude) const;
 
             void LinearizeReducedModel(
                 const Eigen::Vector3d& trimState,

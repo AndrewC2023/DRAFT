@@ -24,10 +24,7 @@ namespace Draft::Autonomy::Control
         constexpr int DownPositionIndex = 6;
     }
 
-    QE3DofMissileGainScheduledLQR::QE3DofMissileGainScheduledLQR(
-        Draft::Dynamics::QE3DofMissileParameters parameters,
-        Grid grid,
-        Weights weights)
+    QE3DofMissileGainScheduledLQR::QE3DofMissileGainScheduledLQR(Draft::Dynamics::QE3DofMissileParameters parameters, Grid grid, Weights weights)
         : parameters_(std::move(parameters)),
           grid_(std::move(grid)),
           weights_(weights)
@@ -35,22 +32,16 @@ namespace Draft::Autonomy::Control
         BuildSchedule();
     }
 
-    Eigen::VectorXd QE3DofMissileGainScheduledLQR::ComputeCommand(
-        const Eigen::VectorXd& state,
-        const Eigen::Vector3d& referenceOutput) const
+    Eigen::VectorXd QE3DofMissileGainScheduledLQR::ComputeCommand(const Eigen::VectorXd& state, const Eigen::Vector3d& referenceOutput) const
     {
         const double altitude = -state(DownPositionIndex);
-        const double mach =
-            referenceOutput(AirspeedIndex) / CalculateSpeedOfSound(altitude);
+        const double mach = referenceOutput(AirspeedIndex) / CalculateSpeedOfSound(altitude);
         const double mass = state(MassIndex);
 
-        const SchedulePoint& point =
-            FindNearestPoint(
-                mach,
-                altitude,
-                mass,
-                referenceOutput(FlightPathAngleIndex));
+        const SchedulePoint& point = FindNearestPoint(mach, altitude, mass, referenceOutput(FlightPathAngleIndex));
 
+        // Keep the heading error local to the chosen reference before using
+        // the scheduled local LQR law.
         Eigen::Vector3d reducedState = state.head(3);
         reducedState(HeadingIndex) =
             referenceOutput(HeadingIndex)
@@ -60,18 +51,14 @@ namespace Draft::Autonomy::Control
         const Eigen::Vector3d error = reducedState - referenceOutput;
         Eigen::Vector3d command = point.trimInput - point.gain * error;
 
-        command(0) = Draft::Util::Math::Saturate(
-            command(0), 0.0, parameters_.maxThrust);
-        command(1) = Draft::Util::Math::Saturate(
-            command(1), -parameters_.maxTurnAngle, parameters_.maxTurnAngle);
-        command(2) = Draft::Util::Math::Saturate(
-            command(2), -parameters_.maxDiveAngle, parameters_.maxDiveAngle);
+        command(0) = Draft::Util::Math::Saturate(command(0), 0.0, parameters_.maxThrust);
+        command(1) = Draft::Util::Math::Saturate(command(1), -parameters_.maxTurnAngle, parameters_.maxTurnAngle);
+        command(2) = Draft::Util::Math::Saturate(command(2), -parameters_.maxDiveAngle, parameters_.maxDiveAngle);
 
         return command;
     }
 
-    std::size_t QE3DofMissileGainScheduledLQR::GetScheduleSize()
-        const noexcept
+    std::size_t QE3DofMissileGainScheduledLQR::GetScheduleSize() const noexcept
     {
         return schedule_.size();
     }
@@ -88,26 +75,15 @@ namespace Draft::Autonomy::Control
         for (const double mach : grid_.mach){
             for (const double altitude : grid_.altitude){
                 for (const double mass : grid_.mass){
-                    for (const double flightPathAngle
-                        : grid_.flightPathAngle){
-                        schedule_.push_back(
-                            MakeSchedulePoint(
-                                mach,
-                                altitude,
-                                mass,
-                                flightPathAngle));
+                    for (const double flightPathAngle : grid_.flightPathAngle){
+                        schedule_.push_back(MakeSchedulePoint(mach, altitude, mass, flightPathAngle));
                     }
                 }
             }
         }
     }
 
-    QE3DofMissileGainScheduledLQR::SchedulePoint
-    QE3DofMissileGainScheduledLQR::MakeSchedulePoint(
-        double mach,
-        double altitude,
-        double mass,
-        double flightPathAngle) const
+    QE3DofMissileGainScheduledLQR::SchedulePoint QE3DofMissileGainScheduledLQR::MakeSchedulePoint(double mach, double altitude, double mass, double flightPathAngle) const
     {
         Eigen::Vector3d trimState;
         trimState <<
@@ -115,9 +91,10 @@ namespace Draft::Autonomy::Control
             0.0,
             flightPathAngle;
 
-        const Eigen::Vector3d trimInput =
-            CalculateTrimLikeInput(trimState, mass, altitude);
+        const Eigen::Vector3d trimInput = CalculateTrimLikeInput(trimState, mass, altitude);
 
+        // Linearize the reduced output model at this grid point and solve one
+        // local continuous-time LQR problem.
         Eigen::Matrix3d A;
         Eigen::Matrix3d B;
         LinearizeReducedModel(trimState, trimInput, mass, altitude, A, B);
@@ -145,34 +122,23 @@ namespace Draft::Autonomy::Control
         };
     }
 
-    const QE3DofMissileGainScheduledLQR::SchedulePoint&
-    QE3DofMissileGainScheduledLQR::FindNearestPoint(
-        double mach,
-        double altitude,
-        double mass,
-        double flightPathAngle) const
+    const QE3DofMissileGainScheduledLQR::SchedulePoint& QE3DofMissileGainScheduledLQR::FindNearestPoint(double mach, double altitude, double mass, double flightPathAngle) const
     {
-        const double machScale =
-            std::max(grid_.mach.back() - grid_.mach.front(), 1.0);
-        const double altitudeScale =
-            std::max(grid_.altitude.back() - grid_.altitude.front(), 1.0);
-        const double massScale =
-            std::max(grid_.mass.back() - grid_.mass.front(), 1.0);
-        const double gammaScale =
-            std::max(
-                grid_.flightPathAngle.back() - grid_.flightPathAngle.front(),
-                Draft::Util::Math::Degrees2Radians(1.0));
+        const double machScale = std::max(grid_.mach.back() - grid_.mach.front(), 1.0);
+        const double altitudeScale = std::max(grid_.altitude.back() - grid_.altitude.front(), 1.0);
+        const double massScale = std::max(grid_.mass.back() - grid_.mass.front(), 1.0);
+        const double gammaScale = std::max(
+            grid_.flightPathAngle.back() - grid_.flightPathAngle.front(),
+            Draft::Util::Math::Degrees2Radians(1.0));
 
         const SchedulePoint* nearestPoint = &schedule_.front();
         double bestDistance = std::numeric_limits<double>::infinity();
 
         for (const SchedulePoint& point : schedule_){
             const double machError = (mach - point.mach) / machScale;
-            const double altitudeError =
-                (altitude - point.altitude) / altitudeScale;
+            const double altitudeError = (altitude - point.altitude) / altitudeScale;
             const double massError = (mass - point.mass) / massScale;
-            const double gammaError =
-                (flightPathAngle - point.flightPathAngle) / gammaScale;
+            const double gammaError = (flightPathAngle - point.flightPathAngle) / gammaScale;
 
             const double distance =
                 machError * machError
@@ -189,10 +155,7 @@ namespace Draft::Autonomy::Control
         return *nearestPoint;
     }
 
-    Eigen::Vector3d QE3DofMissileGainScheduledLQR::CalculateTrimLikeInput(
-        const Eigen::Vector3d& output,
-        double mass,
-        double altitude) const
+    Eigen::Vector3d QE3DofMissileGainScheduledLQR::CalculateTrimLikeInput(const Eigen::Vector3d& output, double mass, double altitude) const
     {
         const double airspeed = output(AirspeedIndex);
         const double flightPathAngle = output(FlightPathAngleIndex);
@@ -200,17 +163,14 @@ namespace Draft::Autonomy::Control
         const double drag = CalculateDrag(airspeed, altitude);
 
         // This is exact only when thrust-vectoring can satisfy both axial and
-        // flight-path balance. Otherwise it gives the nearest saturated
-        // feedforward command for this simple no-lift model.
+        // flight-path balance. Otherwise it gives the nearest saturated trim
+        // command for this simple no-lift model.
         const double axialTrimThrust =
             drag + mass * gravity * std::sin(flightPathAngle);
         const double gammaHoldThrust =
             std::abs(mass * gravity * std::cos(flightPathAngle))
             / std::max(std::sin(parameters_.maxDiveAngle), 1e-3);
-        const double thrust = Draft::Util::Math::Saturate(
-            std::max(axialTrimThrust, gammaHoldThrust),
-            1.0,
-            parameters_.maxThrust);
+        const double thrust = Draft::Util::Math::Saturate(std::max(axialTrimThrust, gammaHoldThrust), 1.0, parameters_.maxThrust);
         const double sineDive = Draft::Util::Math::Saturate(
             mass * gravity * std::cos(flightPathAngle) / thrust,
             -std::sin(parameters_.maxDiveAngle),
@@ -220,18 +180,11 @@ namespace Draft::Autonomy::Control
         input <<
             thrust,
             0.0,
-            Draft::Util::Math::Saturate(
-                -std::asin(sineDive),
-                -parameters_.maxDiveAngle,
-                parameters_.maxDiveAngle);
+            Draft::Util::Math::Saturate(-std::asin(sineDive), -parameters_.maxDiveAngle, parameters_.maxDiveAngle);
         return input;
     }
 
-    Eigen::Vector3d QE3DofMissileGainScheduledLQR::ReducedDerivative(
-        const Eigen::Vector3d& state,
-        const Eigen::Vector3d& input,
-        double mass,
-        double altitude) const
+    Eigen::Vector3d QE3DofMissileGainScheduledLQR::ReducedDerivative(const Eigen::Vector3d& state, const Eigen::Vector3d& input, double mass, double altitude) const
     {
         const double airspeed = state(AirspeedIndex);
         const double flightPathAngle = state(FlightPathAngleIndex);
@@ -275,8 +228,7 @@ namespace Draft::Autonomy::Control
 
             A.col(ii) = (
                 ReducedDerivative(statePlus, trimInput, mass, altitude)
-                - ReducedDerivative(stateMinus, trimInput, mass, altitude)
-                ) / (2.0 * perturbation);
+                - ReducedDerivative(stateMinus, trimInput, mass, altitude)) / (2.0 * perturbation);
         }
 
         for (int ii = 0; ii < 3; ii++){
@@ -289,8 +241,7 @@ namespace Draft::Autonomy::Control
 
             B.col(ii) = (
                 ReducedDerivative(trimState, inputPlus, mass, altitude)
-                - ReducedDerivative(trimState, inputMinus, mass, altitude)
-                ) / (2.0 * perturbation);
+                - ReducedDerivative(trimState, inputMinus, mass, altitude)) / (2.0 * perturbation);
         }
     }
 
