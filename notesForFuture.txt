@@ -1,0 +1,86 @@
+Vibed LQR dont use but look into comments:
+
+#include <iostream>
+#include <Eigen/Dense>
+
+// Function to solve the Continuous-time Algebraic Riccati Equation (CARE)
+// Method used: Schur Decomposition
+// 
+// Note: For advanced production, professional tools like Drake or MATLAB use 
+// generalized eigenspaces or QZ algorithms. This template represents a standard robust 
+// approach for small to medium scale systems.
+Eigen::MatrixXd solveCARE(const Eigen::MatrixXd& A, const Eigen::MatrixXd& B, 
+                        const Eigen::MatrixXd& Q, const Eigen::MatrixXd& R) {
+    int n = A.rows();
+    int m = B.cols();
+
+    // 1. Construct the Hamiltonian matrix H
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(2 * n, 2 * n);
+    H.block(0, 0, n, n) = A;
+    H.block(0, n, n, n) = -B * R.inverse() * B.transpose();
+    H.block(n, 0, n, n) = -Q;
+    H.block(n, n, n, n) = -A.transpose();
+
+    // 2. Compute eigenvalues and eigenvectors of H
+    Eigen::EigenSolver<Eigen::MatrixXd> es(H);
+
+    // 3. Select the stable eigenvectors (with negative real parts)
+    Eigen::MatrixXcd U = Eigen::MatrixXcd::Zero(2 * n, n);
+    int j = 0;
+    for (int i = 0; i < 2 * n; ++i) {
+        // Checking if the eigenvalue has a negative real part
+        if (es.eigenvalues()[i].real() < 0) {
+            U.col(j) = es.eigenvalues().eigenvectors().col(i);
+            j++;
+        }
+    }
+
+    // 4. Split U into top and bottom blocks
+    Eigen::MatrixXcd U1 = U.block(0, 0, n, n);
+    Eigen::MatrixXcd U2 = U.block(n, 0, n, n);
+
+    // 5. Solve for P: P = U2 * U1^-1
+    // Using complex to real cast since P is theoretically symmetric and real
+    Eigen::MatrixXd P = (U2 * U1.inverse()).real();
+
+    return P;
+}
+
+int main() {
+    // Define system dimensions
+    int n = 2; // Number of states
+    int m = 1; // Number of control inputs
+
+    // State matrix A
+    Eigen::MatrixXd A(n, n);
+    A << 0, 1,
+        -2, -3;
+
+    // Control matrix B
+    Eigen::MatrixXd B(n, m);
+    B << 0,
+         1;
+
+    // State cost matrix Q
+    Eigen::MatrixXd Q(n, n);
+    Q << 1, 0,
+         0, 1;
+
+    // Control cost matrix R
+    Eigen::MatrixXd R(m, m);
+    R << 1;
+
+    // Solve the Riccati Equation
+    Eigen::MatrixXd P = solveCARE(A, B, Q, R);
+
+    // Calculate LQR Gain: K = R^-1 * B^T * P
+    Eigen::MatrixXd K = R.inverse() * B.transpose() * P;
+
+    std::cout << "Optimal Riccati Matrix P:\n" << P << "\n\n";
+    std::cout << "Optimal LQR Gain K:\n" << K << "\n";
+
+    return 0;
+}
+
+
+------------------------------------------------------------------------------------------------------------------------------------

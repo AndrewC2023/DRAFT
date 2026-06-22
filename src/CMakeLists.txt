@@ -1,0 +1,6 @@
+# add_subdirectory(Autonomy)
+add_subdirectory(Autonomy/Control)
+add_subdirectory(Dynamics)
+# add_subdirectory(Perception)
+add_subdirectory(Simulation)
+# add_subdirectory(Util)

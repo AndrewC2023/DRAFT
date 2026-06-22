@@ -1,6 +1,0 @@
-add_subdirectory(AStar)
-# add_subdirectory(AStarTree)
-# add_subdirectory(RHELQR)
-# add_subdirectory(RRG)
-# add_subdirectory(RRTSharp)
-#add_subdirectory(RRTStar)

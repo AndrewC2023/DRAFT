@@ -1,0 +1,32 @@
+FROM ubuntu:24.04
+
+# make it headless
+ENV DEBIAN_FRONTEND=noninteractive 
+
+# install dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    g++ \
+    gdb \
+    cmake \
+    git \
+    libeigen3-dev \
+    ca-certificates \
+    libboost-dev \
+    libgtest-dev \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-matplotlib \
+    nlohmann-json3-dev \
+    libyaml-cpp-dev \
+    doxygen \
+    graphviz \
+    python3-sphinx \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# mount the project directory
+WORKDIR /workspace
+
+CMD ["/bin/bash"]

@@ -15,8 +15,8 @@ _deps
 .vscode
 
 # ignore built code
-C++/build/
-C++/build/.cmake/
+build/
+build/.cmake/
 
 # ignore cached python
 __pycache__
@@ -33,3 +33,10 @@ reqLib
 *.synctex.gz
 *.bbl
 *.blg
+
+gncpp/
+
+*.json
+logs/
+__pycache__/
+results/

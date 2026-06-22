@@ -1,0 +1,6 @@
+add_subdirectory(Control)
+add_subdirectory(Guidance)
+add_subdirectory(Hazard_Detection)
+add_subdirectory(Middleware)
+add_subdirectory(Navigation)
+add_subdirectory(Planning)
