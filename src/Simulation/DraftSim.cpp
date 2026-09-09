@@ -26,7 +26,14 @@ namespace DRAFT::Simulation
     void DraftSim::Step()
     {
         for(int i = 0; i < draftSimObjects.size(); i++){
-            draftSimObjects[i].Step(stepSize_);
+            draftSimObjects[i].Step(timeStepSize_);
+        }
+    }
+
+    void DraftSim::Step(float timeStep)
+    {
+        for(int i = 0; i < draftSimObjects.size(); i++){
+            draftSimObjects[i].Step(timeStep);
         }
     }
 }
